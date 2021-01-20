@@ -16,6 +16,7 @@ namespace FOnlineDatRipper
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Text;
     using System.Windows.Forms;
 
     /// <summary>
@@ -74,17 +75,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred.
+        /// Tells if cache miss has occurred..
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length.
+        /// Defines the begin index of the item block and it's always 1000 in length..
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items.
+        /// Defines the the dat list view items..
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -108,18 +109,19 @@ namespace FOnlineDatRipper
         {
             treeViewDat.BeginUpdate();
             // then call preorder
-            List<Node<string>> nodelist = dat.Tree.Preorder();
+            List<Node<string>> datPreOrderList = dat.Tree.Preorder();
 
             treeViewDat.Nodes.Clear();
 
             TreeNodeCollection selected = treeViewDat.Nodes;
             TreeNode selectedNode = null;
 
-            foreach (Node<string> node in nodelist)
+            foreach (Node<string> datNode in datPreOrderList)
             {
-                if (node.Parent != null)
+                // position yourself always to be the parent of the datNode
+                if (datNode.Parent != null)
                 {
-                    int level = node.Level();
+                    int level = datNode.Level();
                     while (selectedNode.Level >= level)
                     {
                         selectedNode = selectedNode.Parent;
@@ -127,19 +129,22 @@ namespace FOnlineDatRipper
                     selected = selectedNode.Nodes;
                 }
 
-                if (node == dat.Tree.Root)
+                // these elifs are for choosing corresponding image
+                if (datNode == dat.Tree.Root)
                 {
-                    selectedNode = new TreeNode(node.Data, ClosedRootIndex, ClosedRootIndex);
+                    selectedNode = new TreeNode(datNode.Data, ClosedRootIndex, ClosedRootIndex);
                 }
-                else if (node.Children.Count != 0)
+                else if (datNode.Children.Count != 0)
                 {
-                    selectedNode = new TreeNode(node.Data, ClosedDirIndex, ClosedDirIndex);
+                    selectedNode = new TreeNode(datNode.Data, ClosedDirIndex, ClosedDirIndex);
                 }
                 else
                 {
-                    selectedNode = new TreeNode(node.Data, FileIndex, FileIndex);
+                    selectedNode = new TreeNode(datNode.Data, FileIndex, FileIndex);
                 }
-                selectedNode.Tag = node;
+
+                // associate with the node dat tree
+                selectedNode.Tag = datNode;
                 selected.Add(selectedNode);
             }
 
@@ -152,32 +157,66 @@ namespace FOnlineDatRipper
         /// Builds the list view.
         /// Tree child nodes are displayed as items in the view.
         /// </summary>
-        /// <param name="node">.</param>
-        private void BuildListView(TreeNode node)
+        /// <param name="datNode"> dat node to start building from .</param>
+        private void BuildListView(Node<string> datNode)
         {
             datCacheMiss = true;
             datListViewItems.Clear();
-            int imageIndex;
-            if (node.Level == 0)
+
+            // create path list in rever se order
+            Node<string> inode = datNode;
+            List<string> pathList = new List<string>();
+            while (inode != null)
             {
-                imageIndex = OpenedRootIndex;
+                pathList.Add(inode.Data);
+                inode = inode.Parent;
             }
-            else if (node.Nodes.Count != 0)
+            pathList.Reverse();
+
+            // build string from the list -> txtBoxPathInfo
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            foreach (string part in pathList)
             {
-                imageIndex = OpenedDirIndex;
+                sb.Append(part);
+                if (index != pathList.Count)
+                {
+                    sb.Append("/");
+                }
+                index++;
             }
-            else
+            txtBoxPathInfo.Text = sb.ToString();
+
+            int dirCount = 0;
+            int fileCount = 0;
+            foreach (Node<string> child in datNode.Children)
             {
-                imageIndex = FileIndex;
-            }
-            foreach (TreeNode child in node.Nodes)
-            {
-                ListViewItem item = new ListViewItem(child.Text, imageIndex);
+                // image index is chosen on these circumstances
+                int imageIndex;
+                if (child == dat.Tree.Root)
+                {
+                    imageIndex = ClosedRootIndex;
+                }
+                else if (child.Children.Count != 0)
+                {
+                    imageIndex = ClosedDirIndex;
+                    dirCount++;
+                }
+                else
+                {
+                    imageIndex = FileIndex;
+                    fileCount++;
+                }
+
+                // create new list view item and add it to the big list
+                ListViewItem item = new ListViewItem(child.Data, imageIndex);
+                // tag tree node from the dat instance
                 item.Tag = child;
                 datListViewItems.Add(item);
             }
-            node.Expand();
+            txtBoxFileCount.Text = String.Format("{0} directories and {1} files", dirCount, fileCount);
 
+            // enable virtual (for better performance)
             listViewDat.VirtualMode = true;
             listViewDat.VirtualListSize = datListViewItems.Count;
         }
@@ -233,8 +272,9 @@ namespace FOnlineDatRipper
                         () =>
                         {
                             DatDoAll();
+                            txtBoxInArch.Text = datfile;
                             BuildTreeView();
-                            BuildListView(treeViewDat.Nodes[0]);
+                            BuildListView(dat.Tree.Root);
                         }
                     )
                     );
@@ -250,8 +290,8 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            this.taskProgressBar.Value = 100;
             MessageBox.Show("Dat File sucessfully loaded in " + seconds + " seconds!", "Reading Dat File");
+            this.taskProgressBar.Value = 0;
         }
 
         /// <summary>
@@ -309,7 +349,15 @@ namespace FOnlineDatRipper
         {
             IAsyncResult asyncResult = treeViewDat.BeginInvoke(new Action(() =>
             {
-                BuildListView(e.Node);
+                if (e.Node.IsExpanded)
+                {
+                    e.Node.Collapse();
+                }
+                else
+                {
+                    e.Node.Expand();
+                }
+                BuildListView((Node<string>)e.Node.Tag);
             }));
             treeViewDat.EndInvoke(asyncResult);
         }
@@ -323,13 +371,11 @@ namespace FOnlineDatRipper
         {
             IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
             {
-                ListView.SelectedListViewItemCollection selectedItems = listViewDat.SelectedItems;
-                foreach (object item in selectedItems)
+                ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                foreach (int selectedIndex in selectedIndices)
                 {
-                    ListViewItem selItem = (ListViewItem)item;
-                    TreeNode node = (TreeNode)selItem.Tag;
-
-                    BuildListView(node);
+                    ListViewItem selItem = datListViewItems[selectedIndex];
+                    BuildListView((Node<string>)selItem.Tag);
                 }
             }));
             listViewDat.EndInvoke(asyncResult);
@@ -349,8 +395,6 @@ namespace FOnlineDatRipper
                 datCacheMiss = false;
                 // simply retrieve it from the cache
                 e.Item = datCache[e.ItemIndex];
-
-                Console.WriteLine("Cache hit!");
             }
             // otherwise if cache miss occurs
             else
@@ -359,8 +403,6 @@ namespace FOnlineDatRipper
                 datCacheMiss = true;
                 // fetch new one, wait to see what happens   
                 e.Item = this.datListViewItems[e.ItemIndex];
-
-                Console.WriteLine("Cache miss!");
             }
         }
 
@@ -386,7 +428,6 @@ namespace FOnlineDatRipper
                     datCache[i] = datListViewItems[e.StartIndex + i];
                 }
 
-                Console.WriteLine("Cache refilled");
             }
         }
     }

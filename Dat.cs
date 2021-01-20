@@ -54,7 +54,7 @@ namespace FOnlineDatRipper
         private readonly Tree<string> tree = new Tree<string>(new Node<string>("root"));
 
         /// <summary>
-        /// Defines the scope for nodes...
+        /// Defines the scope for nodes....
         /// </summary>
         private readonly List<List<Node<string>>> scope = new List<List<Node<string>>>();
 

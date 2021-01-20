@@ -118,54 +118,54 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="lblInDir.AutoSize" type="System.Boolean, mscorlib">
+  <data name="lblInArchive.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="lblInDir.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="lblInArchive.Location" type="System.Drawing.Point, System.Drawing">
     <value>12, 23</value>
   </data>
-  <data name="lblInDir.Size" type="System.Drawing.Size, System.Drawing">
-    <value>79, 13</value>
+  <data name="lblInArchive.Size" type="System.Drawing.Size, System.Drawing">
+    <value>73, 13</value>
   </data>
-  <data name="lblInDir.TabIndex" type="System.Int32, mscorlib">
+  <data name="lblInArchive.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
-  <data name="lblInDir.Text" xml:space="preserve">
-    <value>Input Directory:</value>
+  <data name="lblInArchive.Text" xml:space="preserve">
+    <value>Input Archive:</value>
   </data>
-  <data name="&gt;&gt;lblInDir.Name" xml:space="preserve">
-    <value>lblInDir</value>
+  <data name="&gt;&gt;lblInArchive.Name" xml:space="preserve">
+    <value>lblInArchive</value>
   </data>
-  <data name="&gt;&gt;lblInDir.Type" xml:space="preserve">
+  <data name="&gt;&gt;lblInArchive.Type" xml:space="preserve">
     <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;lblInDir.Parent" xml:space="preserve">
+  <data name="&gt;&gt;lblInArchive.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;lblInDir.ZOrder" xml:space="preserve">
-    <value>9</value>
+  <data name="&gt;&gt;lblInArchive.ZOrder" xml:space="preserve">
+    <value>8</value>
   </data>
-  <data name="txtBoxInDir.Location" type="System.Drawing.Point, System.Drawing">
+  <data name="txtBoxInArch.Location" type="System.Drawing.Point, System.Drawing">
     <value>97, 20</value>
   </data>
-  <data name="txtBoxInDir.Size" type="System.Drawing.Size, System.Drawing">
+  <data name="txtBoxInArch.Size" type="System.Drawing.Size, System.Drawing">
     <value>221, 20</value>
   </data>
-  <data name="txtBoxInDir.TabIndex" type="System.Int32, mscorlib">
+  <data name="txtBoxInArch.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <data name="&gt;&gt;txtBoxInDir.Name" xml:space="preserve">
-    <value>txtBoxInDir</value>
+  <data name="&gt;&gt;txtBoxInArch.Name" xml:space="preserve">
+    <value>txtBoxInArch</value>
   </data>
-  <data name="&gt;&gt;txtBoxInDir.Type" xml:space="preserve">
+  <data name="&gt;&gt;txtBoxInArch.Type" xml:space="preserve">
     <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
-  <data name="&gt;&gt;txtBoxInDir.Parent" xml:space="preserve">
+  <data name="&gt;&gt;txtBoxInArch.Parent" xml:space="preserve">
     <value>$this</value>
   </data>
-  <data name="&gt;&gt;txtBoxInDir.ZOrder" xml:space="preserve">
-    <value>8</value>
+  <data name="&gt;&gt;txtBoxInArch.ZOrder" xml:space="preserve">
+    <value>7</value>
   </data>
   <data name="treeViewDat.ImageIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -178,7 +178,7 @@
         AAEAAAD/////AQAAAAAAAAAMAgAAAFdTeXN0ZW0uV2luZG93cy5Gb3JtcywgVmVyc2lvbj00LjAuMC4w
         LCBDdWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWI3N2E1YzU2MTkzNGUwODkFAQAAACZTeXN0
         ZW0uV2luZG93cy5Gb3Jtcy5JbWFnZUxpc3RTdHJlYW1lcgEAAAAERGF0YQcCAgAAAAkDAAAADwMAAADQ
-        QgAAAk1TRnQBSQFMAgEBBQEAAWgBAAFoAQABGgEAARoBAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAFo
+        QgAAAk1TRnQBSQFMAgEBBQEAAZABAAGQAQABGgEAARoBAAT/ARkBAAj/AUIBTQE2BwABNgMAASgDAAFo
         AwABNAMAAQEBAAEYBQABYAE/GAAB7QHfAdUB6wFnAUAB4wFWATIB2QFSATIB0AFQATIByQFNATIBxQFL
         ATIBwAFKATIBvgFJATIBvQFJATIBvAFIATIBvAFIATIBvAFJATIBvQFJATIBwAFKATIBwgFLATIBxwFN
         ATIBzAFPATIB1AFRATIB3AFUATIB5AFfATwB6QHWAcr2AAHrAccBtQH8AUwBHgH8AXgBMQH7AZkBbQHw
@@ -467,13 +467,13 @@
 </value>
   </data>
   <data name="treeViewDat.Location" type="System.Drawing.Point, System.Drawing">
-    <value>12, 96</value>
+    <value>6, 19</value>
   </data>
   <data name="treeViewDat.SelectedImageIndex" type="System.Int32, mscorlib">
     <value>0</value>
   </data>
   <data name="treeViewDat.Size" type="System.Drawing.Size, System.Drawing">
-    <value>403, 490</value>
+    <value>403, 432</value>
   </data>
   <data name="treeViewDat.TabIndex" type="System.Int32, mscorlib">
     <value>2</value>
@@ -485,10 +485,10 @@
     <value>System.Windows.Forms.TreeView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;treeViewDat.Parent" xml:space="preserve">
-    <value>$this</value>
+    <value>groupBoxDatArchive</value>
   </data>
   <data name="&gt;&gt;treeViewDat.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>2</value>
   </data>
   <data name="txtBoxOutDir.Location" type="System.Drawing.Point, System.Drawing">
     <value>97, 56</value>
@@ -543,10 +543,10 @@
     <value>6</value>
   </data>
   <data name="listViewDat.Location" type="System.Drawing.Point, System.Drawing">
-    <value>421, 96</value>
+    <value>415, 19</value>
   </data>
   <data name="listViewDat.Size" type="System.Drawing.Size, System.Drawing">
-    <value>673, 490</value>
+    <value>658, 432</value>
   </data>
   <data name="listViewDat.TabIndex" type="System.Int32, mscorlib">
     <value>6</value>
@@ -558,10 +558,10 @@
     <value>System.Windows.Forms.ListView, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;listViewDat.Parent" xml:space="preserve">
-    <value>$this</value>
+    <value>groupBoxDatArchive</value>
   </data>
   <data name="&gt;&gt;listViewDat.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>3</value>
   </data>
   <data name="btnInDir.Location" type="System.Drawing.Point, System.Drawing">
     <value>324, 18</value>
@@ -585,7 +585,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnInDir.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <data name="btnOutDir.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -612,7 +612,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnOutDir.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="btnExtract.Location" type="System.Drawing.Point, System.Drawing">
     <value>421, 56</value>
@@ -636,13 +636,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;btnExtract.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="taskProgressBar.Location" type="System.Drawing.Point, System.Drawing">
-    <value>421, 592</value>
+    <value>6, 19</value>
   </data>
   <data name="taskProgressBar.Size" type="System.Drawing.Size, System.Drawing">
-    <value>673, 23</value>
+    <value>1061, 23</value>
   </data>
   <data name="taskProgressBar.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -654,9 +654,123 @@
     <value>System.Windows.Forms.ProgressBar, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;taskProgressBar.Parent" xml:space="preserve">
-    <value>$this</value>
+    <value>groupBoxWorkProgress</value>
   </data>
   <data name="&gt;&gt;taskProgressBar.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Name" xml:space="preserve">
+    <value>txtBoxFileCount</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Parent" xml:space="preserve">
+    <value>groupBoxDatArchive</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Name" xml:space="preserve">
+    <value>txtBoxPathInfo</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Parent" xml:space="preserve">
+    <value>groupBoxDatArchive</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="groupBoxDatArchive.Location" type="System.Drawing.Point, System.Drawing">
+    <value>7, 82</value>
+  </data>
+  <data name="groupBoxDatArchive.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1079, 485</value>
+  </data>
+  <data name="groupBoxDatArchive.TabIndex" type="System.Int32, mscorlib">
+    <value>11</value>
+  </data>
+  <data name="groupBoxDatArchive.Text" xml:space="preserve">
+    <value>Dat Archive Structure</value>
+  </data>
+  <data name="&gt;&gt;groupBoxDatArchive.Name" xml:space="preserve">
+    <value>groupBoxDatArchive</value>
+  </data>
+  <data name="&gt;&gt;groupBoxDatArchive.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBoxDatArchive.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupBoxDatArchive.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="txtBoxFileCount.Location" type="System.Drawing.Point, System.Drawing">
+    <value>415, 452</value>
+  </data>
+  <data name="txtBoxFileCount.Size" type="System.Drawing.Size, System.Drawing">
+    <value>658, 20</value>
+  </data>
+  <data name="txtBoxFileCount.TabIndex" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Name" xml:space="preserve">
+    <value>txtBoxFileCount</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.Parent" xml:space="preserve">
+    <value>groupBoxDatArchive</value>
+  </data>
+  <data name="&gt;&gt;txtBoxFileCount.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="txtBoxPathInfo.Location" type="System.Drawing.Point, System.Drawing">
+    <value>6, 452</value>
+  </data>
+  <data name="txtBoxPathInfo.Size" type="System.Drawing.Size, System.Drawing">
+    <value>403, 20</value>
+  </data>
+  <data name="txtBoxPathInfo.TabIndex" type="System.Int32, mscorlib">
+    <value>7</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Name" xml:space="preserve">
+    <value>txtBoxPathInfo</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TextBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.Parent" xml:space="preserve">
+    <value>groupBoxDatArchive</value>
+  </data>
+  <data name="&gt;&gt;txtBoxPathInfo.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="groupBoxWorkProgress.Location" type="System.Drawing.Point, System.Drawing">
+    <value>21, 581</value>
+  </data>
+  <data name="groupBoxWorkProgress.Size" type="System.Drawing.Size, System.Drawing">
+    <value>1073, 60</value>
+  </data>
+  <data name="groupBoxWorkProgress.TabIndex" type="System.Int32, mscorlib">
+    <value>12</value>
+  </data>
+  <data name="groupBoxWorkProgress.Text" xml:space="preserve">
+    <value>Work Progress</value>
+  </data>
+  <data name="&gt;&gt;groupBoxWorkProgress.Name" xml:space="preserve">
+    <value>groupBoxWorkProgress</value>
+  </data>
+  <data name="&gt;&gt;groupBoxWorkProgress.Type" xml:space="preserve">
+    <value>System.Windows.Forms.GroupBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;groupBoxWorkProgress.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;groupBoxWorkProgress.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
@@ -666,7 +780,7 @@
     <value>6, 13</value>
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>1106, 635</value>
+    <value>1106, 711</value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

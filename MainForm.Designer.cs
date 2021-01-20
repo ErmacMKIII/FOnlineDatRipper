@@ -43,8 +43,8 @@ namespace FOnlineDatRipper
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.lblInDir = new System.Windows.Forms.Label();
-            this.txtBoxInDir = new System.Windows.Forms.TextBox();
+            this.lblInArchive = new System.Windows.Forms.Label();
+            this.txtBoxInArch = new System.Windows.Forms.TextBox();
             this.treeViewDat = new System.Windows.Forms.TreeView();
             this.imgLstDatStruct = new System.Windows.Forms.ImageList(this.components);
             this.txtBoxOutDir = new System.Windows.Forms.TextBox();
@@ -54,18 +54,24 @@ namespace FOnlineDatRipper
             this.btnOutDir = new System.Windows.Forms.Button();
             this.btnExtract = new System.Windows.Forms.Button();
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
+            this.groupBoxDatArchive = new System.Windows.Forms.GroupBox();
+            this.txtBoxFileCount = new System.Windows.Forms.TextBox();
+            this.txtBoxPathInfo = new System.Windows.Forms.TextBox();
+            this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
+            this.groupBoxDatArchive.SuspendLayout();
+            this.groupBoxWorkProgress.SuspendLayout();
             this.SuspendLayout();
             // 
-            // lblInDir
+            // lblInArchive
             // 
-            resources.ApplyResources(this.lblInDir, "lblInDir");
-            this.lblInDir.Name = "lblInDir";
+            resources.ApplyResources(this.lblInArchive, "lblInArchive");
+            this.lblInArchive.Name = "lblInArchive";
             // 
-            // txtBoxInDir
+            // txtBoxInArch
             // 
-            resources.ApplyResources(this.txtBoxInDir, "txtBoxInDir");
-            this.txtBoxInDir.Name = "txtBoxInDir";
-            this.txtBoxInDir.ReadOnly = true;
+            resources.ApplyResources(this.txtBoxInArch, "txtBoxInArch");
+            this.txtBoxInArch.Name = "txtBoxInArch";
+            this.txtBoxInArch.ReadOnly = true;
             // 
             // treeViewDat
             // 
@@ -133,34 +139,66 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.taskProgressBar, "taskProgressBar");
             this.taskProgressBar.Name = "taskProgressBar";
             // 
+            // groupBoxDatArchive
+            // 
+            this.groupBoxDatArchive.Controls.Add(this.txtBoxFileCount);
+            this.groupBoxDatArchive.Controls.Add(this.txtBoxPathInfo);
+            this.groupBoxDatArchive.Controls.Add(this.treeViewDat);
+            this.groupBoxDatArchive.Controls.Add(this.listViewDat);
+            resources.ApplyResources(this.groupBoxDatArchive, "groupBoxDatArchive");
+            this.groupBoxDatArchive.Name = "groupBoxDatArchive";
+            this.groupBoxDatArchive.TabStop = false;
+            // 
+            // txtBoxFileCount
+            // 
+            resources.ApplyResources(this.txtBoxFileCount, "txtBoxFileCount");
+            this.txtBoxFileCount.Name = "txtBoxFileCount";
+            this.txtBoxFileCount.ReadOnly = true;
+            // 
+            // txtBoxPathInfo
+            // 
+            resources.ApplyResources(this.txtBoxPathInfo, "txtBoxPathInfo");
+            this.txtBoxPathInfo.Name = "txtBoxPathInfo";
+            this.txtBoxPathInfo.ReadOnly = true;
+            // 
+            // groupBoxWorkProgress
+            // 
+            this.groupBoxWorkProgress.Controls.Add(this.taskProgressBar);
+            resources.ApplyResources(this.groupBoxWorkProgress, "groupBoxWorkProgress");
+            this.groupBoxWorkProgress.Name = "groupBoxWorkProgress";
+            this.groupBoxWorkProgress.TabStop = false;
+            // 
             // MainForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.taskProgressBar);
+            this.Controls.Add(this.groupBoxWorkProgress);
+            this.Controls.Add(this.groupBoxDatArchive);
             this.Controls.Add(this.btnExtract);
             this.Controls.Add(this.btnOutDir);
             this.Controls.Add(this.btnInDir);
-            this.Controls.Add(this.listViewDat);
             this.Controls.Add(this.txtBoxOutDir);
             this.Controls.Add(this.lblOutDir);
-            this.Controls.Add(this.treeViewDat);
-            this.Controls.Add(this.txtBoxInDir);
-            this.Controls.Add(this.lblInDir);
+            this.Controls.Add(this.txtBoxInArch);
+            this.Controls.Add(this.lblInArchive);
             this.Name = "MainForm";
+            this.groupBoxDatArchive.ResumeLayout(false);
+            this.groupBoxDatArchive.PerformLayout();
+            this.groupBoxWorkProgress.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         /// <summary>
         /// Defines the lblInDir.
         /// </summary>
-        private System.Windows.Forms.Label lblInDir;
+        private System.Windows.Forms.Label lblInArchive;
 
         /// <summary>
         /// Defines the txtBoxInDir.
         /// </summary>
-        private System.Windows.Forms.TextBox txtBoxInDir;
+        private System.Windows.Forms.TextBox txtBoxInArch;
 
         /// <summary>
         /// Defines the treeViewDat.
@@ -206,5 +244,9 @@ namespace FOnlineDatRipper
         /// Defines the taskProgressBar.
         /// </summary>
         private System.Windows.Forms.ProgressBar taskProgressBar;
+        private System.Windows.Forms.GroupBox groupBoxDatArchive;
+        private System.Windows.Forms.TextBox txtBoxPathInfo;
+        private System.Windows.Forms.TextBox txtBoxFileCount;
+        private System.Windows.Forms.GroupBox groupBoxWorkProgress;
     }
 }
