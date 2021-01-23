@@ -118,6 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="acm_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\acm_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="app" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\app.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -127,11 +130,23 @@
   <data name="dir_icon_opened" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\dir_icon_opened.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="extract_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\extract_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="eye_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\eye_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Fallout_Palette" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\Fallout Palette.act;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="file_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\file_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="root" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\res\root.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="frm_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\frm_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="load_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\load_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="root_icon_closed" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\root_icon_closed.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

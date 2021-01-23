@@ -26,8 +26,12 @@ namespace FOnlineDatRipper
         [STAThread]
         internal static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            // Init palette (load 256 colors)
+            Palette.Init();
+
+            // Create and display the form
+            // Application.EnableVisualStyles();            
+            Application.SetCompatibleTextRenderingDefault(true);
             Application.Run(new MainForm());
         }
     }

@@ -16,7 +16,7 @@ namespace FOnlineDatRipper
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Text;
+    using System.Drawing;
     using System.Windows.Forms;
 
     /// <summary>
@@ -24,6 +24,17 @@ namespace FOnlineDatRipper
     /// </summary>
     internal partial class MainForm : Form
     {
+        // Colors for dark theme
+        /// <summary>
+        /// Defines the DarkBackground.
+        /// </summary>
+        public static readonly Color DarkBackground = Color.FromArgb(0x40, 0x40, 0x40);
+
+        /// <summary>
+        /// Defines the DarkForeground.
+        /// </summary>
+        public static readonly Color DarkForeground = Color.Orange;
+
         /// <summary>
         /// Defines the ClosedRootIndex.
         /// </summary>
@@ -50,14 +61,29 @@ namespace FOnlineDatRipper
         internal const int FileIndex = 4;
 
         /// <summary>
-        /// Defines the dat.
+        /// Defines the ACMIndex.
+        /// </summary>
+        internal const int ACMIndex = 5;
+
+        /// <summary>
+        /// Defines the FRMIndex.
+        /// </summary>
+        internal const int FRMIndex = 6;
+
+        /// <summary>
+        /// Defines the Fallout dat..
         /// </summary>
         private readonly Dat dat = new Dat();
 
         /// <summary>
         /// Defines the datfile.
         /// </summary>
-        private string datfile = "";
+        private string datfile;
+
+        /// <summary>
+        /// Defines the output directory to extract the data.
+        /// </summary>
+        private string outDir;
 
         /// <summary>
         /// Defines the stopwatch.
@@ -65,9 +91,14 @@ namespace FOnlineDatRipper
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
-        /// Defines the worker.
+        /// Defines the loading worker..
         /// </summary>
-        private readonly BackgroundWorker worker = new BackgroundWorker();
+        private readonly BackgroundWorker reader = new BackgroundWorker();
+
+        /// <summary>
+        /// Defines the extractor worker..
+        /// </summary>
+        private readonly BackgroundWorker extractor = new BackgroundWorker();
 
         /// <summary>
         /// Defines the datCache.
@@ -75,17 +106,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred..
+        /// Tells if cache miss has occurred...
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length..
+        /// Defines the begin index of the item block and it's always 1000 in length...
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items..
+        /// Defines the the dat list view items...
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -100,6 +131,44 @@ namespace FOnlineDatRipper
         public MainForm()
         {
             InitializeComponent();
+            SubToDatEvents();
+            InitDarkTheme(this);
+        }
+
+        /// <summary>
+        /// The InitDarkTheme.
+        /// </summary>
+        /// <param name="root">The root<see cref="Control"/>.</param>
+        private void InitDarkTheme(Control root)
+        {
+            root.BackColor = DarkBackground;
+            root.ForeColor = DarkForeground;
+
+            foreach (Control ctrl in root.Controls)
+            {
+                InitDarkTheme(ctrl);
+            }
+        }
+
+        /// <summary>
+        /// The SubToDatEvents.
+        /// </summary>
+        private void SubToDatEvents()
+        {
+            dat.OnProgressUpdate += Dat_OnProgressUpdate;
+        }
+
+        /// <summary>
+        /// The Dat_OnProgressUpdate.
+        /// </summary>
+        /// <param name="value">The value<see cref="double"/>.</param>
+        private void Dat_OnProgressUpdate(double value)
+        {
+            // its in another thread so invoke back to UI thread
+            base.Invoke((Action)delegate
+            {
+                this.taskProgressBar.Value = (int)Math.Round(dat.Progress);
+            });
         }
 
         /// <summary>
@@ -138,6 +207,14 @@ namespace FOnlineDatRipper
                 {
                     selectedNode = new TreeNode(datNode.Data, ClosedDirIndex, ClosedDirIndex);
                 }
+                else if (datNode.Data.ToLower().EndsWith(".acm"))
+                {
+                    selectedNode = new TreeNode(datNode.Data, ACMIndex, ACMIndex);
+                }
+                else if (datNode.Data.ToLower().EndsWith(".frm"))
+                {
+                    selectedNode = new TreeNode(datNode.Data, FRMIndex, FRMIndex);
+                }
                 else
                 {
                     selectedNode = new TreeNode(datNode.Data, FileIndex, FileIndex);
@@ -163,29 +240,8 @@ namespace FOnlineDatRipper
             datCacheMiss = true;
             datListViewItems.Clear();
 
-            // create path list in rever se order
-            Node<string> inode = datNode;
-            List<string> pathList = new List<string>();
-            while (inode != null)
-            {
-                pathList.Add(inode.Data);
-                inode = inode.Parent;
-            }
-            pathList.Reverse();
-
-            // build string from the list -> txtBoxPathInfo
-            StringBuilder sb = new StringBuilder();
-            int index = 0;
-            foreach (string part in pathList)
-            {
-                sb.Append(part);
-                if (index != pathList.Count)
-                {
-                    sb.Append("/");
-                }
-                index++;
-            }
-            txtBoxPathInfo.Text = sb.ToString();
+            // set path info to the full file name generated from datnode
+            txtBoxPathInfo.Text = Dat.GetFileName(datNode);
 
             int dirCount = 0;
             int fileCount = 0;
@@ -201,6 +257,16 @@ namespace FOnlineDatRipper
                 {
                     imageIndex = ClosedDirIndex;
                     dirCount++;
+                }
+                else if (child.Data.ToLower().EndsWith(".acm"))
+                {
+                    imageIndex = ACMIndex;
+                    fileCount++;
+                }
+                else if (child.Data.ToLower().EndsWith(".frm"))
+                {
+                    imageIndex = FRMIndex;
+                    fileCount++;
                 }
                 else
                 {
@@ -247,11 +313,31 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
+        /// The DatDoExtractAll.
+        /// </summary>
+        private void DatDoExtractAll()
+        {
+            stopwatch.Start();
+
+            // call dat to extract all
+            dat.ExtractAll(outDir);
+
+            // stop measuring the time
+            stopwatch.Stop();
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
         /// The btnInDir_Click.
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
-        private void btnInDir_Click(object sender, EventArgs e)
+        private void btnInArch_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -261,47 +347,34 @@ namespace FOnlineDatRipper
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
                     datfile = openFileDialog.FileName;
+                    txtBoxInArch.Text = datfile;
 
-                    worker.DoWork += Worker_DoWork;
-                    worker.ProgressChanged += Worker_ProgressChanged;
-                    worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
-                    worker.WorkerReportsProgress = true;
-                    worker.RunWorkerAsync();
-
-                    IAsyncResult asyncResult = btnInDir.BeginInvoke(new Action(
-                        () =>
-                        {
-                            DatDoAll();
-                            txtBoxInArch.Text = datfile;
-                            BuildTreeView();
-                            BuildListView(dat.Tree.Root);
-                        }
-                    )
-                    );
-                    btnInDir.EndInvoke(asyncResult);
+                    reader.DoWork += Reader_DoWork;
+                    reader.RunWorkerCompleted += Reader_RunWorkerCompleted;
+                    reader.RunWorkerAsync();
                 }
             }
         }
 
         /// <summary>
-        /// The Worker_RunWorkerCompleted.
+        /// Executes after Reader complete it's work.
         /// </summary>
-        /// <param name="sender">The sender<see cref="object"/>.</param>
-        /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        /// <param name="sender">.</param>
+        /// <param name="e">.</param>
+        private void Reader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show("Dat File sucessfully loaded in " + seconds + " seconds!", "Reading Dat File");
+            if (dat.Error)
+            {
+                MessageBox.Show(dat.ErrorMessage + "(" + seconds + " seconds)", "Reading Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                MessageBox.Show("Dat File sucessfully loaded in " + seconds + " seconds!", "Reading Dat File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             this.taskProgressBar.Value = 0;
-        }
 
-        /// <summary>
-        /// The Worker_ProgressChanged.
-        /// </summary>
-        /// <param name="sender">The sender<see cref="object"/>.</param>
-        /// <param name="e">The e<see cref="ProgressChangedEventArgs"/>.</param>
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            this.taskProgressBar.Value = e.ProgressPercentage;
+            BuildTreeView(); // build left side, tree view
+            BuildListView(dat.Tree.Root); // build right side list view
         }
 
         /// <summary>
@@ -309,15 +382,9 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Reader_DoWork(object sender, DoWorkEventArgs e)
         {
-            var backgroundWorker = sender as BackgroundWorker;
-            while (dat.Progress < 100.0)
-            {
-                int value = (int)Math.Round(dat.Progress);
-                backgroundWorker.ReportProgress(value);
-            }
-            backgroundWorker.ReportProgress(100);
+            DatDoAll(); // read dat file, build dat tree            
         }
 
         /// <summary>
@@ -429,6 +496,99 @@ namespace FOnlineDatRipper
                 }
 
             }
+        }
+
+        /// <summary>
+        /// The previewToolStripMenuItem_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void previewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+
+            // create FRM array for the subform
+            FRM[] fRMs = new FRM[selectedIndices.Count];
+            int index = 0;
+            foreach (int selectedIndex in selectedIndices)
+            {
+                ListViewItem selItem = datListViewItems[selectedIndex];
+                Node<string> datNode = (Node<string>)selItem.Tag;
+                DataBlock dataBlock = dat.GetDataBlock(datNode);
+                byte[] bytes = dat.Data(dataBlock);
+                fRMs[index++] = new FRM(dataBlock.Filename, bytes);
+            }
+
+            // create and use the subform
+            using (FrmForm frmForm = new FrmForm(fRMs))
+            {
+                frmForm.ShowDialog();
+            }
+        }
+
+        /// <summary>
+        /// The btnOutDir_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void btnOutDir_Click(object sender, EventArgs e)
+        {
+            using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
+            {
+                if (openDirDialog.ShowDialog() == DialogResult.OK)
+                {
+                    outDir = openDirDialog.SelectedPath;
+                    this.txtBoxOutDir.Text = outDir;
+                }
+            }
+        }
+
+        /// <summary>
+        /// The btnExtract_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void btnExtract_Click(object sender, EventArgs e)
+        {
+            if (datfile == null)
+            {
+                MessageBox.Show("There's no dat file. Make sure it's loaded first!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (outDir == null)
+            {
+                MessageBox.Show("Output directory is not selected!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting Dat File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (dialogResult == DialogResult.Yes)
+                {
+                    extractor.DoWork += Extractor_DoWork;
+                    extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+                    extractor.RunWorkerAsync();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The Extractor_DoWork.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
+        private void Extractor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            DatDoExtractAll();
+        }
+
+        /// <summary>
+        /// The Extractor_RunWorkerCompleted.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
+        private void Extractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            MessageBox.Show("Dat File sucessfully extracted in " + seconds + " seconds!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            this.taskProgressBar.Value = 0;
         }
     }
 }

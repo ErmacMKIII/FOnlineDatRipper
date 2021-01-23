@@ -12,11 +12,11 @@
 
 namespace FOnlineDatRipper
 {
+    using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
-    using zlib;
 
     /// <summary>
     /// Defines the <see cref="Dat" />.
@@ -54,7 +54,7 @@ namespace FOnlineDatRipper
         private readonly Tree<string> tree = new Tree<string>(new Node<string>("root"));
 
         /// <summary>
-        /// Defines the scope for nodes....
+        /// Defines the scope for nodes.....
         /// </summary>
         private readonly List<List<Node<string>>> scope = new List<List<Node<string>>>();
 
@@ -77,6 +77,37 @@ namespace FOnlineDatRipper
         /// Gets or sets the Progress.
         /// </summary>
         public double Progress { get => progress; set => progress = value; }
+
+        /// <summary>
+        /// Is error occurred?.
+        /// </summary>
+        private bool error = false;
+
+        /// <summary>
+        /// Error message to display.
+        /// </summary>
+        private string errorMessage = "";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Error.
+        /// </summary>
+        public bool Error { get => error; set => error = value; }
+
+        /// <summary>
+        /// Gets or sets the ErrorMessage.
+        /// </summary>
+        public string ErrorMessage { get => errorMessage; set => errorMessage = value; }
+
+        /// <summary>
+        /// The ProgressUpdate.
+        /// </summary>
+        /// <param name="value">The value<see cref="double"/>.</param>
+        public delegate void ProgressUpdate(double value);
+
+        /// <summary>
+        /// Defines the OnProgressUpdate.
+        /// </summary>
+        public event ProgressUpdate OnProgressUpdate;
 
         /// <summary>
         /// Loads from the file into the memory.
@@ -118,7 +149,10 @@ namespace FOnlineDatRipper
             // otherwise quit
             else
             {
-                throw new Exception("Error - input filepath doesn't exist!");
+                error = true;
+                errorMessage = "Error - input filepath doesn't exist!";
+                progress = 100.0;
+                return;
             }
 
             // reading from the buffer (stored in the memory) ...
@@ -131,7 +165,10 @@ namespace FOnlineDatRipper
                 // checking if size is ok
                 if (realDatSize != datSize)
                 {
-                    throw new Exception("Error - real and dat differ in size!");
+                    error = true;
+                    errorMessage = "Error - real and dat differ in size!";
+                    progress = 100.0;
+                    return;
                 }
 
                 // reading tree size
@@ -143,6 +180,7 @@ namespace FOnlineDatRipper
                 uint fileCount = br.ReadUInt32();
 
                 progress += 5.0;
+                OnProgressUpdate(progress);
 
                 // iterating through the files (they can be compressed or uncompressed)
                 for (uint i = 0; i < fileCount; i++)
@@ -167,9 +205,16 @@ namespace FOnlineDatRipper
                     dataBlocks.Add(dataBlock);
 
                     progress += 95.0 / (double)fileCount;
+                    OnProgressUpdate(progress);
                 }
 
-                // closing the stream
+                if (br.BaseStream.Position > datSize)
+                {
+                    error = true;
+                    errorMessage = "Error - reading position going over the max dat archive size!";
+                }
+
+                // closing the stream (although unecessary)
                 br.Close();
             }
 
@@ -186,21 +231,16 @@ namespace FOnlineDatRipper
             // if data block is compressed
             if (dataBlock.Compressed)
             {
-                // src array (compressed), copied from buffer at data block offset
-                byte[] src = new byte[dataBlock.PackedSize];
-                Array.Copy(buffer, dataBlock.Offset, src, 0, src.Length);
+                // data array (uncompressed)
+                byte[] data = new byte[dataBlock.RealSize];
 
-                // dst array (uncompressed)
-                byte[] dst = new byte[dataBlock.RealSize];
-                // involve 3rd part lib for extracting (speed is preferred)
-                using (ZOutputStream zos = new ZOutputStream(new MemoryStream(src), zlibConst.Z_BEST_SPEED))
+                // involve ICSharpCode.SharpZipLib for extracting (RECOMMENDED)
+                using (InflaterInputStream decompressStream = new InflaterInputStream(new MemoryStream(buffer, (int)dataBlock.Offset, (int)dataBlock.PackedSize)))
                 {
-                    // write to the dst array and finish
-                    zos.Write(dst, 0, dst.Length);
-                    zos.finish();
+                    decompressStream.Read(data, 0, (int)dataBlock.RealSize);
                 }
 
-                return dst;
+                return data;
             }
             // otherwise if not compressed 
             else
@@ -238,6 +278,22 @@ namespace FOnlineDatRipper
                 // and write all the bytes from the data block (it's extracted if necessary)
                 File.WriteAllBytes(path, Data(dataBlock));
             }
+        }
+
+        /// <summary>
+        /// Extract all the files to the output directory.
+        /// </summary>
+        /// <param name="outdir">Output directory.</param>
+        public void ExtractAll(string outdir)
+        {
+            progress = 0.0;
+            foreach (DataBlock dataBlock in dataBlocks)
+            {
+                Extract(outdir, dataBlock);
+                progress += 100.0 / (double)dataBlocks.Count;
+                OnProgressUpdate(progress);
+            }
+            progress = 100.0;
         }
 
         /// <summary>
@@ -303,10 +359,89 @@ namespace FOnlineDatRipper
             foreach (DataBlock dataBlock in dataBlocks)
             {
                 BuildTree(dataBlock.Filename.Split('\\'));
-                progress += 100.0 / dataBlocks.Count;
+                progress += 100.0 / (double)dataBlocks.Count;
+                OnProgressUpdate(progress);
             }
 
             progress = 100.0;
+        }
+
+        /// <summary>
+        /// Gets data block from string building filename of dat node.
+        /// </summary>
+        /// <param name="datNode">.</param>
+        /// <returns>.</returns>
+        public DataBlock GetDataBlock(Node<string> datNode)
+        {
+            string fileNameKey = GetAlternativeFileName(datNode);
+            Predicate<DataBlock> predicate = new Predicate<DataBlock>(db => { return db.Filename.Equals(fileNameKey); });
+            return dataBlocks.Find(predicate);
+        }
+
+        /// <summary>
+        /// Gets full filename from the dat archive file.
+        /// </summary>
+        /// <param name="datNode">.</param>
+        /// <returns>full filename.</returns>
+        public static string GetFileName(Node<string> datNode)
+        {
+            // create path list in reverse order
+            Node<string> inode = datNode;
+            List<string> pathList = new List<string>();
+            while (inode != null)
+            {
+                pathList.Add(inode.Data);
+                inode = inode.Parent;
+            }
+            pathList.Reverse();
+
+            // build string from the list -> txtBoxPathInfo
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            foreach (string part in pathList)
+            {
+                sb.Append(part);
+                if (index != pathList.Count - 1)
+                {
+                    sb.Append('/');
+                }
+                index++;
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Gets alternative filename from the dat archive file for data block search.
+        /// </summary>
+        /// <param name="datNode">.</param>
+        /// <returns>exact datblock filename.</returns>
+        public string GetAlternativeFileName(Node<string> datNode)
+        {
+            // create path list in reverse order
+            Node<string> inode = datNode;
+            List<string> pathList = new List<string>();
+            while (inode != null && inode != Tree.Root)
+            {
+                pathList.Add(inode.Data);
+                inode = inode.Parent;
+            }
+            pathList.Reverse();
+
+            // build string from the list -> txtBoxPathInfo
+            StringBuilder sb = new StringBuilder();
+            int index = 0;
+            foreach (string part in pathList)
+            {
+                sb.Append(part);
+                if (index != pathList.Count - 1)
+                {
+                    sb.Append('\\');
+                }
+                index++;
+            }
+
+            return sb.ToString();
         }
     }
 }
