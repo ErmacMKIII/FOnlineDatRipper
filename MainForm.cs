@@ -28,12 +28,12 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the DarkBackground.
         /// </summary>
-        public static readonly Color DarkBackground = Color.FromArgb(0x40, 0x40, 0x40);
+        public static readonly Color DarkBackground = Color.FromArgb(0x1E, 0x1E, 0x1E);
 
         /// <summary>
         /// Defines the DarkForeground.
         /// </summary>
-        public static readonly Color DarkForeground = Color.Orange;
+        public static readonly Color DarkForeground = Color.FromArgb(0xFF, 0x7F, 0x50);
 
         /// <summary>
         /// Defines the ClosedRootIndex.
@@ -480,11 +480,13 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="CacheVirtualItemsEventArgs"/>.</param>
         private void listViewDat_CacheVirtualItems(object sender, CacheVirtualItemsEventArgs e)
         {
+            // base case - no need to rebuild cache
             if (e.StartIndex >= datCacheIndex || e.EndIndex <= datCacheIndex + datCache.Length)
             {
                 return;
             }
 
+            // if file is not in the cache (cache miss occurred)
             if (datCacheMiss)
             {
                 datCacheIndex = e.StartIndex;
@@ -507,22 +509,41 @@ namespace FOnlineDatRipper
         {
             ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
 
-            // create FRM array for the subform
-            FRM[] fRMs = new FRM[selectedIndices.Count];
-            int index = 0;
+            // create ACM list (sound files)
+            List<ACM> acms = new List<ACM>();
+            // create FRM list (image files)
+            List<FRM> fRMs = new List<FRM>();            
+            
             foreach (int selectedIndex in selectedIndices)
             {
                 ListViewItem selItem = datListViewItems[selectedIndex];
                 Node<string> datNode = (Node<string>)selItem.Tag;
                 DataBlock dataBlock = dat.GetDataBlock(datNode);
                 byte[] bytes = dat.Data(dataBlock);
-                fRMs[index++] = new FRM(dataBlock.Filename, bytes);
+                string filename = dataBlock.Filename;
+                if (filename.ToLower().EndsWith(".acm"))
+                {
+                    ACM acm = new ACM(dataBlock.Filename, bytes);
+                    acms.Add(acm);
+                } 
+                else if (filename.ToLower().EndsWith(".frm"))
+                {
+                    FRM frm = new FRM(dataBlock.Filename, bytes);
+                    fRMs.Add(frm);
+                }
+                                
             }
 
             // create and use the subform
-            using (FrmForm frmForm = new FrmForm(fRMs))
+            using (FRMForm frmForm = new FRMForm(fRMs))
             {
                 frmForm.ShowDialog();
+            }
+
+            // create and use the subform
+            using (ACMForm acmForm = new ACMForm(acms))
+            {
+                acmForm.ShowDialog();
             }
         }
 

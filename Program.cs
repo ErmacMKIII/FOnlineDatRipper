@@ -12,7 +12,10 @@
 
 namespace FOnlineDatRipper
 {
+    using NAudio.Wave;
+    using NAudio.Wave.Compression;
     using System;
+    using System.Text;
     using System.Windows.Forms;
 
     /// <summary>
@@ -29,8 +32,11 @@ namespace FOnlineDatRipper
             // Init palette (load 256 colors)
             Palette.Init();
 
+            // Init Marko's Tables!
+            Tables.Init();
+
             // Create and display the form
-            // Application.EnableVisualStyles();            
+            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
             Application.Run(new MainForm());
         }

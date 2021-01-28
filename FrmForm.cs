@@ -14,20 +14,21 @@ namespace FOnlineDatRipper
 {
     using FOnlineDatRipper.Properties;
     using System;
+    using System.Collections.Generic;
     using System.Windows.Forms;
 
     /// <summary>
-    /// Defines the <see cref="FrmForm" />.
+    /// Defines the <see cref="FRMForm" />.
     /// </summary>
-    internal class FrmForm : Form
+    internal class FRMForm : Form
     {
         /// <summary>
-        /// frame list which is equal to the number of tabs.
+        /// frame array which is equal to the number of tabs.
         /// </summary>
-        private readonly FRM[] frms;
+        private readonly List<FRM> frms;
 
         /// <summary>
-        /// index of frame list to display frame.
+        /// index of frame array to display frame.
         /// </summary>
         private int frmDisplayIndex = 0;
 
@@ -52,10 +53,10 @@ namespace FOnlineDatRipper
         private readonly Button btnReset = new Button();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FrmForm"/> class.
+        /// Initializes a new instance of the <see cref="FRMForm"/> class.
         /// </summary>
         /// <param name="fRMs">The fRMs<see cref="FRM[]"/>.</param>
-        public FrmForm(FRM[] fRMs)
+        public FRMForm(List<FRM> fRMs)
         {
             frms = fRMs;
             Init();
