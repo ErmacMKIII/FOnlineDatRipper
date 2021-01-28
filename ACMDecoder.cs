@@ -190,15 +190,12 @@ namespace FOnlineDatRipper
                 return;
             }
 
+            sPtr = 0;
             int counter = packAttrs2;
-            int sPtr = this.sPtr;
-            int[] someBuff = this.someBuff;
 
             while (counter > 0)
             {
-                int[] decBuff = this.decBuff;
-                int dPtr = this.dPtr;
-
+                dPtr = 0;
                 int loc_blocks = blocks;
                 int loc_someSize = someSize / 2;
 
@@ -208,7 +205,7 @@ namespace FOnlineDatRipper
                 }
 
                 loc_blocks *= 2;
-                Sub_4d3fcc(decBuff, dPtr, someBuff, sPtr, loc_someSize, loc_blocks);
+                Sub_4d3fcc(ref decBuff, dPtr, ref someBuff, sPtr, loc_someSize, loc_blocks);
                 dPtr += loc_someSize;
 
                 for (int i = 0; i < loc_blocks; i++)
@@ -221,7 +218,7 @@ namespace FOnlineDatRipper
 
                 while (loc_someSize != 0)
                 {
-                    Sub_4d420c(decBuff, dPtr, someBuff, sPtr, loc_someSize, loc_blocks);
+                    Sub_4d420c(ref decBuff, dPtr, ref someBuff, sPtr, loc_someSize, loc_blocks);
                     dPtr += loc_someSize * 2;
 
                     loc_someSize /= 2;
@@ -366,10 +363,11 @@ namespace FOnlineDatRipper
             }
             UnpackValues();
             
-            valCnt = (someSize2 > valsToGo) ? valsToGo : someSize2;
-            valsToGo -= valCnt;
-            Array.Copy(someBuff, sPtr, values, vPtr, valCnt);
+            valCnt = Math.Min(valsToGo, someSize2);            
+            Array.Copy(someBuff, 0, values, vPtr, valCnt);
             vPtr += valCnt;
+
+            valsToGo -= valCnt;
 
             return true;
         }
@@ -392,17 +390,23 @@ namespace FOnlineDatRipper
                 Console.WriteLine("ValsToGo = " + valsToGo);
             }
 
+            // copy decoded values into the buffer
+            int bPtr = 0;
             for (int i = 0; i < values.Length; i++)
             {
-                byte val = (byte) (values[i] >> packAttrs);
-                buffer[i] = val;
+                short x = (short) (values[i] >> packAttrs);
+                buffer[bPtr] = (byte)(x & 0xFF);
+                buffer[bPtr + 1] = (byte)((x >> 8) & 0xFF);
+
+                bPtr += 2;
             }
 
-            Console.WriteLine("Read Bytes = " + values.Length);
-            return values.Length;
+            // return buffer length
+            Console.WriteLine("Read Bytes = " + bPtr);
+            return bPtr;
         }
 
-        private void Sub_4d3fcc(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        private void Sub_4d3fcc(ref int[] decBuff, int dPtr, ref int[] someBuff, int sPtr, int someSize, int blocks)
         {
             int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
             if (blocks == 2)
@@ -484,7 +488,7 @@ namespace FOnlineDatRipper
             }
         }
 
-        private void Sub_4d420c(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        private void Sub_4d420c(ref int[] decBuff, int dPtr, ref int[] someBuff, int sPtr, int someSize, int blocks)
         {
             int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
             if (blocks == 4)
