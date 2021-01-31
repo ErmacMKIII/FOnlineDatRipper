@@ -88,7 +88,6 @@ namespace FOnlineDatRipper
         /// </summary>
         private readonly uint[] offset = new uint[6];// unsigned
 
-        // image composed of frames (but frame 0 is primarily used)
         /// <summary>
         /// Defines the frames.
         /// </summary>
@@ -99,7 +98,6 @@ namespace FOnlineDatRipper
         /// </summary>
         private uint frameSize = 0;
 
-        // 16 MB Buffer
         /// <summary>
         /// Defines the BufferSize.
         /// </summary>
@@ -111,18 +109,15 @@ namespace FOnlineDatRipper
         private readonly byte[] buffer = new byte[BufferSize];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example).
+        /// Read only tag as a display name (on the tab for example)...
         /// </summary>
         private readonly string tag;
 
-        // position in the buffer for reading/writing operation
-        // they're mostly big endian operations
         /// <summary>
         /// Defines the pos.
         /// </summary>
         private int pos = 0x0000;
 
-        // maximum positon for read/write operations
         /// <summary>
         /// Defines the pos_max.
         /// </summary>

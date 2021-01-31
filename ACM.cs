@@ -1,5 +1,4 @@
-﻿#region copyright
-// Copyright (C) 2021 Alexander Stojanovich
+﻿// Copyright (C) 2021 Alexander Stojanovich
 //
 // This file is part of FOnlineDatRipper.
 //
@@ -10,61 +9,65 @@
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License along with FOnlineDatRipper. If not, see http://www.gnu.org/licenses/.
-#endregion
-using NAudio.Wave;
-using NAudio.Wave.Compression;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FOnlineDatRipper
 {
-    class ACM
+    using NAudio.Wave;
+    using System.IO;
+
+    /// <summary>
+    /// Defines the <see cref="ACM" />.
+    /// </summary>
+    internal class ACM
     {
         /// <summary>
-        /// Represents decoded data (1 MB buffer)
+        /// Represents decoded data (1 MB buffer)..
         /// </summary>
         private readonly byte[] content = new byte[0x100000];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example).
+        /// Read only tag as a display name (on the tab for example)...
         /// </summary>
         private readonly string tag;
 
         /// <summary>
-        /// Tag for this acm (for display)
+        /// Gets the Tag
+        /// Tag for this acm (for display)..
         /// </summary>
         public string Tag => tag;
 
         /// <summary>
-        /// Decoded bytes
+        /// Gets the Content
+        /// Decoded bytes..
         /// </summary>
-        public byte[] Content => content;                    
+        public byte[] Content => content;
 
         /// <summary>
-        /// Content as Wave Stream
+        /// Content as Wave Stream..
         /// </summary>
         private RawSourceWaveStream waveStream;
+
+        /// <summary>
+        /// Gets the WaveStream.
+        /// </summary>
         public RawSourceWaveStream WaveStream { get => waveStream; }
 
         /// <summary>
-        /// Length of Content Buffer
+        /// Length of Content Buffer..
         /// </summary>
         private int length = 0;
 
         /// <summary>
-        /// Length of Content Buffer
+        /// Gets the Length
+        /// Length of Content Buffer..
         /// </summary>
         public int Length { get => length; }
 
         /// <summary>
-        /// Initialized new ACM instance with decoded data
+        /// Initializes a new instance of the <see cref="ACM"/> class.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="bytes"></param>
+        /// <param name="filename">.</param>
+        /// <param name="bytes">.</param>
         public ACM(string filename, byte[] bytes)
         {
             this.tag = filename;
@@ -72,12 +75,12 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Decode packed bytes
+        /// Decode packed bytes.
         /// </summary>
-        /// <param name="acmBytes"></param>
+        /// <param name="acmBytes">.</param>
         private void Decode(byte[] acmBytes)
         {
-            ACMDecoder acmDecoder = new ACMDecoder(acmBytes);            
+            ACMDecoder acmDecoder = new ACMDecoder(acmBytes);
             this.length = acmDecoder.Decode(this.content);
 
             this.waveStream = new RawSourceWaveStream(
@@ -87,6 +90,5 @@ namespace FOnlineDatRipper
 
             File.WriteAllBytes("thisIS", content);
         }
-        	
     }
 }

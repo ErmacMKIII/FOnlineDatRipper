@@ -21,7 +21,6 @@ namespace FOnlineDatRipper
     /// </summary>
     internal static class Palette
     {
-        // palette is represented by color array
         /// <summary>
         /// Defines the colors.
         /// </summary>
@@ -32,7 +31,6 @@ namespace FOnlineDatRipper
         /// </summary>
         public static Color[] Colors => colors;
 
-        // buffer size is equal to 256 * 3
         /// <summary>
         /// Defines the buffer.
         /// </summary>

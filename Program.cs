@@ -13,9 +13,9 @@
 namespace FOnlineDatRipper
 {
     using NAudio.Wave;
-    using NAudio.Wave.Compression;
     using System;
-    using System.Text;
+    using System.IO;
+    using System.Threading;
     using System.Windows.Forms;
 
     /// <summary>
@@ -34,6 +34,22 @@ namespace FOnlineDatRipper
 
             // Init Marko's Tables!
             Tables.Init();
+
+            byte[] buffer;
+            buffer = File.ReadAllBytes("08VATS.ACM");
+
+            byte[] Raw = new byte[0x2000000];
+            ACMDecoder decoder = new ACMDecoder(buffer);
+            int len = decoder.Decode(Raw);
+
+            RawSourceWaveStream rawSourceWave = new RawSourceWaveStream(new MemoryStream(Raw, 0, len), new WaveFormat(22050, 2));
+            WaveOutEvent wo = new WaveOutEvent();
+            if (wo.PlaybackState != PlaybackState.Playing)
+            {
+                wo.Init(rawSourceWave);
+                wo.Play();
+            }
+            Thread.Sleep(3600 * 1000);
 
             // Create and display the form
             Application.EnableVisualStyles();

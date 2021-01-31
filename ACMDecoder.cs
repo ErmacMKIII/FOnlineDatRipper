@@ -1,5 +1,4 @@
-﻿#region copyright
-// Copyright (C) 2021 Alexander Stojanovich
+﻿// Copyright (C) 2021 Alexander Stojanovich
 //
 // This file is part of FOnlineDatRipper.
 //
@@ -10,52 +9,140 @@
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License along with FOnlineDatRipper. If not, see http://www.gnu.org/licenses/.
-#endregion
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FOnlineDatRipper
 {
+    using System;
+    using System.IO;
+
+    /// <summary>
+    /// Defines the <see cref="ACMInfo" />.
+    /// </summary>
     struct ACMInfo
     {
-        uint samples;
-        uint channels;        
-        uint bitrate;
-        uint id;
-        uint version;        
+        /// <summary>
+        /// Defines the samples.
+        /// </summary>
+        internal uint samples;
 
+        /// <summary>
+        /// Defines the channels.
+        /// </summary>
+        internal uint channels;
+
+        /// <summary>
+        /// Defines the bitrate.
+        /// </summary>
+        internal uint bitrate;
+
+        /// <summary>
+        /// Defines the id.
+        /// </summary>
+        internal uint id;
+
+        /// <summary>
+        /// Defines the version.
+        /// </summary>
+        internal uint version;
+
+        /// <summary>
+        /// Gets or sets the Samples.
+        /// </summary>
         public uint Samples { get => samples; set => samples = value; }
+
+        /// <summary>
+        /// Gets or sets the Channels.
+        /// </summary>
         public uint Channels { get => channels; set => channels = value; }
+
+        /// <summary>
+        /// Gets or sets the Bitrate.
+        /// </summary>
         public uint Bitrate { get => bitrate; set => bitrate = value; }
+
+        /// <summary>
+        /// Gets or sets the Id.
+        /// </summary>
         public uint Id { get => id; set => id = value; }
+
+        /// <summary>
+        /// Gets or sets the Version.
+        /// </summary>
         public uint Version { get => version; set => version = value; }
-        
     }
-    class ACMDecoder
+
+    /// <summary>
+    /// Defines the <see cref="ACMDecoder" />.
+    /// </summary>
+    internal class ACMDecoder
     {
+        /// <summary>
+        /// Defines the Filler.
+        /// </summary>
         public enum Filler
         {
+            /// <summary>
+            /// Defines the ZeroFill.
+            /// </summary>
             ZeroFill,
-	        Return0,
-	        LinearFill,	 
+            /// <summary>
+            /// Defines the Return0.
+            /// </summary>
+            Return0,
+            /// <summary>
+            /// Defines the LinearFill.
+            /// </summary>
+            LinearFill,
+            /// <summary>
+            /// Defines the k1_3bits.
+            /// </summary>
             k1_3bits,
+            /// <summary>
+            /// Defines the k1_2bits.
+            /// </summary>
             k1_2bits,
+            /// <summary>
+            /// Defines the t1_5bits.
+            /// </summary>
             t1_5bits,
+            /// <summary>
+            /// Defines the k2_4bits.
+            /// </summary>
             k2_4bits,
+            /// <summary>
+            /// Defines the k2_3bits.
+            /// </summary>
             k2_3bits,
+            /// <summary>
+            /// Defines the t2_7bits.
+            /// </summary>
             t2_7bits,
+            /// <summary>
+            /// Defines the k3_5bits.
+            /// </summary>
             k3_5bits,
+            /// <summary>
+            /// Defines the k3_4bits.
+            /// </summary>
             k3_4bits,
+            /// <summary>
+            /// Defines the k4_5bits.
+            /// </summary>
             k4_5bits,
+            /// <summary>
+            /// Defines the k4_4bits.
+            /// </summary>
             k4_4bits,
+            /// <summary>
+            /// Defines the t3_7bits.
+            /// </summary>
             t3_7bits
         }
 
-        private Filler[] fillers =
+        /// <summary>
+        /// Defines the fillers.
+        /// </summary>
+        private readonly Filler[] fillers =
         {
             Filler.ZeroFill,
             Filler.Return0,
@@ -91,54 +178,106 @@ namespace FOnlineDatRipper
             Filler.Return0
         };
 
-        // some relevant information
+        /// <summary>
+        /// Defines the info.
+        /// </summary>
         private ACMInfo info = new ACMInfo();
-        // source buffer (parsed from constructor and is file buffer)
+
+        /// <summary>
+        /// Defines the srcBuff.
+        /// </summary>
         private readonly byte[] srcBuff;
-        // source buffer position
+
+        /// <summary>
+        /// Defines the srcBuffPos.
+        /// </summary>
         private int srcBuffPos = 0;
 
-        // mid buffer (always 0x200 in size)
-        private readonly byte[] midBuff = new byte[0x200];
-        private int mPtr = 0;
-
-        // Parameters of ACM stream
+        /// <summary>
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2..
+        /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
-        //// destination buffer (contains decoded data)
-        //private byte[] dstBuffer;
-        //// destination buffer position
-        //private int dstBuffPos = 0;
+        /// <summary>
+        /// Defines the MidBuffSize.
+        /// </summary>
+        private const int MidBuffSize = 0x200;
 
-        // helpers
-        private int bufferSize; // size of file buffer
-        private int availBytes; // new (not yet processed) unsigned chars in file buffer
-        private int[] decBuff, someBuff; // decBuff is decoded output and some buff is some buff
+        /// <summary>
+        /// Defines the midBuff.
+        /// </summary>
+        private readonly byte[] midBuff = new byte[MidBuffSize];
 
-        private int dPtr = 0, sPtr = 0; // indexes of prior arrays
+        /// <summary>
+        /// Defines the mPtr.
+        /// </summary>
+        private int mPtr = 0;
 
+        /// <summary>
+        /// Defines the decBuff, someBuff..
+        /// </summary>
+        private int[] decBuff, someBuff;
+
+        /// <summary>
+        /// Defines the blocks, totBlSize..
+        /// </summary>
         private int blocks, totBlSize;
-        private int valsToGo; // samples left to decompress        
-        private int valCnt; // count of decompressed samples
-        int[] values; // pointer to decompressed samples
-        int vPtr = 0;
 
-        // bits
-        uint nextBits; // new bits
-        int availBits; // count of new bits        
+        /// <summary>
+        /// Defines the valsToGo.
+        /// </summary>
+        private int valsToGo;// samples left to decompress
 
+        /// <summary>
+        /// Defines the valCnt.
+        /// </summary>
+        private int valCnt;// count of decompressed samples
+
+        /// <summary>
+        /// Defines the values.
+        /// </summary>
+        internal int[] values;
+
+        /// <summary>
+        /// Defines the vPtr.
+        /// </summary>
+        internal int vPtr = 0;
+
+        /// <summary>
+        /// Defines the availBytes.
+        /// </summary>
+        internal int availBytes = 0;
+
+        /// <summary>
+        /// Defines the nextBits.
+        /// </summary>
+        internal int nextBits;// new bits
+
+        /// <summary>
+        /// Defines the availBits.
+        /// </summary>
+        internal int availBits;// count of new bits
+
+        /// <summary>
+        /// Gets or sets the Info.
+        /// </summary>
         internal ACMInfo Info { get => info; set => info = value; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ACMDecoder"/> class.
+        /// </summary>
+        /// <param name="rawData">The rawData<see cref="byte[]"/>.</param>
         public ACMDecoder(byte[] rawData)
         {
             this.srcBuff = rawData;
             Init();
         }
 
+        /// <summary>
+        /// The Init.
+        /// </summary>
         private void Init()
         {
-            bufferSize = 0x200;
-            availBytes = 0;
             nextBits = 0;
             availBits = 0;
 
@@ -158,8 +297,8 @@ namespace FOnlineDatRipper
             info.Bitrate = (uint)GetBits(16) & 0xFFFF;
             Console.WriteLine("Bitrate = " + info.Bitrate);
 
-            packAttrs = GetBits(4) & 0xF;
-            packAttrs2 = GetBits(12) & 0xFFF;
+            packAttrs = GetBits(4) & 0xF; // known as acm_level
+            packAttrs2 = GetBits(12) & 0xFFF; // known as rows
 
             someSize = 1 << packAttrs;
             someSize2 = someSize * packAttrs2;
@@ -183,6 +322,9 @@ namespace FOnlineDatRipper
             values = new int[valsToGo];
         }
 
+        /// <summary>
+        /// The UnpackValues.
+        /// </summary>
         private void UnpackValues()
         {
             if (packAttrs == 0)
@@ -190,12 +332,16 @@ namespace FOnlineDatRipper
                 return;
             }
 
-            sPtr = 0;
+            int[] xBuff = someBuff;
+            int xPtr = 0;
+
             int counter = packAttrs2;
 
             while (counter > 0)
             {
-                dPtr = 0;
+                int[] yBuff = decBuff;
+                int yPtr = 0;
+
                 int loc_blocks = blocks;
                 int loc_someSize = someSize / 2;
 
@@ -205,12 +351,12 @@ namespace FOnlineDatRipper
                 }
 
                 loc_blocks *= 2;
-                Sub_4d3fcc(ref decBuff, dPtr, ref someBuff, sPtr, loc_someSize, loc_blocks);
-                dPtr += loc_someSize;
+                Juggle(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                yPtr += loc_someSize;
 
                 for (int i = 0; i < loc_blocks; i++)
                 {
-                    someBuff[i * loc_someSize]++; 
+                    someBuff[i * loc_someSize]++;
                 }
 
                 loc_someSize /= 2;
@@ -218,37 +364,46 @@ namespace FOnlineDatRipper
 
                 while (loc_someSize != 0)
                 {
-                    Sub_4d420c(ref decBuff, dPtr, ref someBuff, sPtr, loc_someSize, loc_blocks);
-                    dPtr += loc_someSize * 2;
+                    Juggle(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                    yPtr += loc_someSize * 2;
 
                     loc_someSize /= 2;
                     loc_blocks *= 2;
                 }
 
                 counter -= blocks;
-                sPtr += totBlSize;
+                xPtr += totBlSize;
             }
         }
 
+        /// <summary>
+        /// The ReadNextPortion.
+        /// </summary>
+        /// <returns>The <see cref="byte"/>.</returns>
         private byte ReadNextPortion()
-        {            
-            availBytes = Math.Min(srcBuff.Length - srcBuffPos, bufferSize);
-            mPtr = 0;
+        {
+            availBytes = Math.Min(MidBuffSize, srcBuff.Length - srcBuffPos);
+
             if (availBytes > 0)
-            {                
+            {
+                mPtr = 0;
                 Array.Copy(srcBuff, srcBuffPos, midBuff, 0, availBytes);
                 srcBuffPos += availBytes;
-            }            
-
+            }
             availBytes--;
+
             return midBuff[mPtr++];
         }
 
+        /// <summary>
+        /// The PrepareBits.
+        /// </summary>
+        /// <param name="bits">The bits<see cref="int"/>.</param>
         private void PrepareBits(int bits)
         {
             while (bits > availBits)
             {
-                int oneByte;
+                byte oneByte;
                 availBytes--;
                 if (availBytes >= 0)
                 {
@@ -259,22 +414,31 @@ namespace FOnlineDatRipper
                     oneByte = ReadNextPortion();
                 }
 
-                nextBits |= ((uint) oneByte << availBits);
+                nextBits |= oneByte << availBits;
                 availBits += 8;
             }
         }
 
+        /// <summary>
+        /// The GetBits.
+        /// </summary>
+        /// <param name="bits">The bits<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
         private int GetBits(int bits)
         {
             PrepareBits(bits);
-            int res = (int) nextBits;
+            int res = nextBits;
             availBits -= bits;
             nextBits >>= bits;
             return res;
         }
 
+        /// <summary>
+        /// The CreateAmplitudeDictionary.
+        /// </summary>
+        /// <returns>The <see cref="bool"/>.</returns>
         private bool CreateAmplitudeDictionary()
-        {            
+        {
             int pwr = GetBits(4) & 0xF;
             int val = GetBits(16) & 0xFFFF;
             int count = 1 << pwr;
@@ -283,14 +447,14 @@ namespace FOnlineDatRipper
             int i;
             for (i = 0; i < count; i++)
             {
-                AmplitudeBuffer.Middle(i, v);
+                AmplitudeBuffer.Middle((short)i, (short)v);
                 v += val;
             }
 
             v = -val;
             for (i = 0; i < count; i++)
             {
-                AmplitudeBuffer.Middle(-i - 1, v);                
+                AmplitudeBuffer.Middle((short)(-i - 1), (short)v);
                 v -= val;
             }
 
@@ -300,8 +464,10 @@ namespace FOnlineDatRipper
             {
                 int ind = GetBits(5) & 0x1F;
                 int res = 0;
-                switch (fillers[ind])
-                {                   
+                Filler filler = fillers[ind];
+
+                switch (filler)
+                {
                     case Filler.k1_2bits:
                         res = K1_2bits(pass, ind);
                         break;
@@ -331,7 +497,7 @@ namespace FOnlineDatRipper
                         break;
                     case Filler.Return0:
                         res = Return0(pass, ind);
-                        break;                    
+                        break;
                     case Filler.t1_5bits:
                         res = T1_5bits(pass, ind);
                         break;
@@ -346,6 +512,8 @@ namespace FOnlineDatRipper
                         break;
                 }
 
+                Console.WriteLine(filler.ToString());
+
                 if (res == 0)
                 {
                     return false;
@@ -355,6 +523,10 @@ namespace FOnlineDatRipper
             return true;
         }
 
+        /// <summary>
+        /// The MakeNewValues.
+        /// </summary>
+        /// <returns>The <see cref="bool"/>.</returns>
         private bool MakeNewValues()
         {
             if (!CreateAmplitudeDictionary())
@@ -362,8 +534,8 @@ namespace FOnlineDatRipper
                 return false;
             }
             UnpackValues();
-            
-            valCnt = Math.Min(valsToGo, someSize2);            
+
+            valCnt = Math.Min(valsToGo, someSize2);
             Array.Copy(someBuff, 0, values, vPtr, valCnt);
             vPtr += valCnt;
 
@@ -373,28 +545,28 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Decode given ACM by reading into buffer (output)
+        /// Decode given ACM by reading into buffer (output).
         /// </summary>
-        /// <param name="buffer"> acm buffer </param>
-        /// <returns></returns>
+        /// <param name="buffer"> acm buffer .</param>
+        /// <returns>.</returns>
         public int Decode(byte[] buffer)
-        {            
+        {
             // while it's not fully read
             while (valsToGo != 0)
             {
-                if (valCnt == 0)
-                {
-                    MakeNewValues();
-                }
-                valCnt--;
+                MakeNewValues();
                 Console.WriteLine("ValsToGo = " + valsToGo);
             }
 
             // copy decoded values into the buffer
             int bPtr = 0;
-            for (int i = 0; i < values.Length; i++)
+
+            int i = 0;
+            foreach (int value in values)
             {
-                short x = (short) (values[i] >> packAttrs);
+                if (++i <= 1000)
+                    Console.WriteLine(i + ". value = " + (value >> packAttrs));
+                short x = (short)(value >> packAttrs);
                 buffer[bPtr] = (byte)(x & 0xFF);
                 buffer[bPtr + 1] = (byte)((x >> 8) & 0xFF);
 
@@ -403,146 +575,65 @@ namespace FOnlineDatRipper
 
             // return buffer length
             Console.WriteLine("Read Bytes = " + bPtr);
+
+            File.WriteAllBytes("tst.dat", buffer);
             return bPtr;
         }
 
-        private void Sub_4d3fcc(ref int[] decBuff, int dPtr, ref int[] someBuff, int sPtr, int someSize, int blocks)
+        /// <summary>
+        /// Marko's method of block decomposition; 
+        /// Source: Libacm github by Marko Kreen.
+        /// </summary>
+        /// <param name="decBuff">unpacking buffer.</param>
+        /// <param name="dPtr">.</param>
+        /// <param name="someBuff">buffer with decompressed samples.</param>
+        /// <param name="sPtr">index of some buffer.</param>
+        /// <param name="someSize">number of iterations.</param>
+        /// <param name="blocks">number of blocks.</param>
+        private void Juggle(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
         {
-            int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
-            if (blocks == 2)
+            int i, j;
+            int[] x;
+            int xPtr;
+            int row0, row1, row2, row3;
+            for (i = 0; i < someSize; i++)
             {
-                for (int i = 0; i < someSize; i++)
+                x = someBuff;
+                xPtr = sPtr;
+                row0 = decBuff[dPtr];
+                row1 = decBuff[dPtr + 1];
+                for (j = 0; j < blocks / 2; j++)
                 {
-                    row_0 = someBuff[sPtr];
-                    row_1 = someBuff[sPtr + someSize];
-                    someBuff[sPtr] = someBuff[sPtr] + decBuff[dPtr] + 2 * decBuff[dPtr + 1];
-                    someBuff[sPtr + someSize] = 2 * row_0 - decBuff[dPtr + 1] - someBuff[sPtr + someSize];
-                    decBuff[dPtr] = row_0;
-                    decBuff[dPtr + 1] = row_1;
-
-                    dPtr += 2;
-                    sPtr++;
+                    row2 = x[xPtr]; x[xPtr] = row1 * 2 + (row0 + row2); xPtr += someSize;
+                    row3 = x[xPtr]; x[xPtr] = row2 * 2 - (row1 + row3); xPtr += someSize;
+                    row0 = row2; row1 = row3;
                 }
-            }
-            else if (blocks == 4)
-            {
-                for (int i = 0; i < someSize; i++)
-                {
-                    row_0 = someBuff[sPtr];
-                    row_1 = someBuff[sPtr + someSize];
-                    row_2 = someBuff[sPtr + 2 * someSize];
-                    row_3 = someBuff[sPtr + 3 * someSize];
 
-                    someBuff[sPtr] = decBuff[dPtr] + 2 * decBuff[dPtr + 1] + row_0;
-                    someBuff[sPtr + someSize] = -decBuff[dPtr + 1] + 2 * row_0 - row_1;
-                    someBuff[sPtr + 2 * someSize] = row_0 + 2 * row_1 + row_2;
-                    someBuff[sPtr + 3 * someSize] = -row_1 + 2 * row_2 - row_3;
+                decBuff[dPtr] = row0;
+                decBuff[dPtr + 1] = row1;
 
-                    decBuff[dPtr] = row_2;
-                    decBuff[dPtr+1] = row_3;
-
-                    dPtr += 2;
-                    sPtr++;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < someSize; i++)
-                {
-                    int[] x = someBuff;
-                    int xPtr = sPtr; // some pointer
-                    if (((blocks >> 1) & 1) != 0)
-                    {
-                        row_0 = x[xPtr];
-                        row_1 = x[xPtr + someSize];
-
-                        x[xPtr] = decBuff[dPtr] + 2 * decBuff[dPtr + 1] + row_0;
-                        x[xPtr + someSize] = -decBuff[dPtr + 1] + 2 * row_0 - row_1;
-                        xPtr += 2 * someSize;
-
-                        db_0 = row_0;
-                        db_1 = row_1;
-                    }
-                    else
-                    {
-                        db_0 = decBuff[dPtr];
-                        db_1 = decBuff[dPtr + 1];
-                    }
-
-                    for (int j = 0; j < blocks >> 2; j++)
-                    {
-                        row_0 = x[xPtr]; x[xPtr] = db_0 + 2 * db_1 + row_0; xPtr += someSize;
-                        row_1 = x[xPtr]; x[xPtr] = -db_1 + 2 * row_0 - row_1; xPtr += someSize;
-                        row_2 = x[xPtr]; x[xPtr] = row_0 + 2 * row_1 + row_2; xPtr += someSize;
-                        row_3 = x[xPtr]; x[xPtr] = -row_1 + 2 * row_2 - row_3; xPtr += someSize;
-
-                        db_0 = row_2;
-                        db_1 = row_3;
-                    }
-                    decBuff[dPtr] = row_2;
-                    decBuff[dPtr + 1] = row_3;
-
-                    dPtr += 2;
-                    sPtr++;
-                }
+                dPtr += 2;
+                sPtr++;
             }
         }
 
-        private void Sub_4d420c(ref int[] decBuff, int dPtr, ref int[] someBuff, int sPtr, int someSize, int blocks)
-        {
-            int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
-            if (blocks == 4)
-            {
-                for (int i = 0; i < someSize; i++)
-                {
-                    row_0 = someBuff[sPtr];
-                    row_1 = someBuff[sPtr + someSize];
-                    row_2 = someBuff[sPtr + 2 * someSize];
-                    row_3 = someBuff[sPtr + 3 * someSize];
-
-                    someBuff[sPtr] = decBuff[sPtr] + 2 * decBuff[sPtr + 1] + row_0;
-                    someBuff[sPtr + someSize] = -decBuff[sPtr + 1] + 2 * row_0 - row_1;
-                    someBuff[sPtr + 2 * someSize] = row_0 + 2 * row_1 + row_2;
-                    someBuff[sPtr + 3 * someSize] = -row_1 + 2 * row_2 - row_3;
-
-                    decBuff[dPtr] = row_2;
-                    decBuff[dPtr + 1] = row_3;
-
-                    dPtr += 2;
-                    sPtr++;
-                }
-            }
-            else
-            {
-                for (int i = 0; i < someSize; i++)
-                {
-                    int[] x = someBuff;
-                    int xPtr = sPtr; // some pointer again!                    
-                    db_0 = decBuff[dPtr]; db_1 = decBuff[dPtr + 1];
-                    for (int j = 0; j < blocks >> 2; j++)
-                    {
-                        row_0 = x[xPtr]; x[xPtr] = db_0 + 2 * db_1 + row_0; xPtr += someSize;
-                        row_1 = x[xPtr]; x[xPtr] = -db_1 + 2 * row_0 - row_1; xPtr += someSize;
-                        row_2 = x[xPtr]; x[xPtr] = row_0 + 2 * row_1 + row_2; xPtr += someSize;
-                        row_3 = x[xPtr]; x[xPtr] = -row_1 + 2 * row_2 - row_3; xPtr += someSize;
-
-                        db_0 = row_2;
-                        db_1 = row_3;
-                    }
-                    decBuff[dPtr] = row_2;
-                    decBuff[dPtr + 1] = row_3;
-
-                    dPtr += 2;
-                    sPtr++;
-                }
-            }
-        }
-
-
+        /// <summary>
+        /// The Return0.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
         private int Return0(int pass, int ind)
         {
             return 0;
         }
+
+        /// <summary>
+        /// The ZeroFill.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
         private int ZeroFill(int pass, int ind)
         {
             //Eng: used when the whole column #pass is zero-filled            
@@ -560,22 +651,40 @@ namespace FOnlineDatRipper
             return 1;
         }
 
+        /// <summary>
+        /// The LinearFill.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
         private int LinearFill(int pass, int ind)
         {
+            int mask = (1 << ind) - 1;
+            int middle = 1 << (ind - 1);
+
             for (int i = 0; i < packAttrs2; i++)
             {
-                int val = GetBits(ind);
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(val);
+                int b = GetBits(ind) & mask;
+                int index = b - middle;
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)index);
             }
 
             return 1;
         }
 
-        private int K1_3bits(int pass, int ind)
+        /// <summary>
+        /// The K1_3bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K1_3bits(int pass, int ind)
         {
-            // Eng: column with number pass is filled with zeros, and also +/-1, zeros are repeated frequently            
+            //Eng: column with number pass is filled with zeros, and also +/-1, zeros are repeated frequently
+            //Rus: c������ pass �������� ������, � ����� +/- 1, �� ���� ����� ���� ������
             // efficiency (bits per value): 3-p0-2.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
-            // Eng: it makes sense to use, when the freqnecy of paired zeros (p00) is greater than 2/3            
+            //Eng: it makes sense to use, when the freqnecy of paired zeros (p00) is greater than 2/3
+            //Rus: ����� ����� ������������, ����� ����������� ������ ����� (p00) ������ 2/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 PrepareBits(3);
@@ -583,7 +692,11 @@ namespace FOnlineDatRipper
                 {
                     availBits--;
                     nextBits >>= 1;
-                    someBuff[i * someSize + pass] = 0; if ((++i) == packAttrs2) break;
+                    someBuff[i * someSize + pass] = 0;
+                    if ((++i) == packAttrs2)
+                    {
+                        break;
+                    }
                     someBuff[i * someSize + pass] = 0;
                 }
                 else if ((nextBits & 2) == 0)
@@ -594,20 +707,27 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    someBuff[i * someSize + pass] = ((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(1) : AmplitudeBuffer.Middle(-1);
+                    someBuff[i * someSize + pass] = (nextBits & 4) != 0 ? AmplitudeBuffer.Middle(1) : AmplitudeBuffer.Middle(-1);
                     availBits -= 3;
                     nextBits >>= 3;
                 }
             }
-
             return 1;
         }
 
-       private int K1_2bits(int pass, int ind)
+        /// <summary>
+        /// The K1_2bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K1_2bits(int pass, int ind)
         {
-            // Eng: column is filled with zero and +/-1
+            //Eng: column is filled with zero and +/-1
+            //Rus: c������ pass �������� ������, � ����� +/- 1
             // efficiency: 2-P0. P0 - cnt of any zero (P0 = p0 + p00)
-            // Eng: use it when P0 > 1/3
+            //Eng: use it when P0 > 1/3
+            //Rus: ����� ����� ������������, ����� ����������� ���� ������ 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 PrepareBits(2);
@@ -624,36 +744,55 @@ namespace FOnlineDatRipper
                     nextBits >>= 2;
                 }
             }
-
             return 1;
         }
 
-        private int T1_5bits(int pass, int ind)
+        /// <summary>
+        /// The T1_5bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int T1_5bits(int pass, int ind)
         {
-            // Eng: all the -1, 0, +1 triplets
+            //Eng: all the -1, 0, +1 triplets
+            //Rus: ��� ���������� ����� -1, 0, +1.
             // efficiency: always 5/3 bits per value
             // use it when P0 <= 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
-                byte bits = (byte)(GetBits(5) & 0x1F);
+                byte bits = (byte)(GetBits(5) & 0x1f);
                 bits = (byte)Tables.Table1[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + (bits & 3));
-                if ((++i) == packAttrs2) break;
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + (bits & 3)));
+                if ((++i) == packAttrs2)
+                {
+                    break;
+                }
                 bits >>= 2;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + (bits & 3));
-                if ((++i) == packAttrs2) break;
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + (bits & 3)));
+                if ((++i) == packAttrs2)
+                {
+                    break;
+                }
                 bits >>= 2;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + bits);
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + bits));
             }
-
             return 1;
         }
-        private int K2_4bits(int pass, int ind)
+
+        /// <summary>
+        /// The K2_4bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K2_4bits(int pass, int ind)
         {
             // -2, -1, 0, 1, 2, and repeating zeros
             // efficiency: 4-2*p0-3.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
             //Eng: makes sense to use when p00>2/3
+            //Rus: ����� ����� ������������, ����� ����������� ������ ����� (p00) ������ 2/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 PrepareBits(4);
@@ -661,7 +800,11 @@ namespace FOnlineDatRipper
                 {
                     availBits--;
                     nextBits >>= 1;
-                    someBuff[i * someSize + pass] = 0; if ((++i) == packAttrs2) break;
+                    someBuff[i * someSize + pass] = 0;
+                    if ((++i) == packAttrs2)
+                    {
+                        break;
+                    }
                     someBuff[i * someSize + pass] = 0;
                 }
                 else if ((nextBits & 2) == 0)
@@ -672,23 +815,27 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    someBuff[i * someSize + pass] =
-                       ((nextBits & 8) != 0) ?
-                            (((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(2) : AmplitudeBuffer.Middle(1)) :
-                            (((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(-1) : AmplitudeBuffer.Middle(-2));
+                    someBuff[i * someSize + pass] = (nextBits & 8) != 0 ? (((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(2) : AmplitudeBuffer.Middle(1))
+                        : (((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(-1) : AmplitudeBuffer.Middle(-2));
                     availBits -= 4;
                     nextBits >>= 4;
                 }
             }
-
             return 1;
         }
 
-        private int K2_3bits(int pass, int ind)
+        /// <summary>
+        /// The K2_3bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K2_3bits(int pass, int ind)
         {
             // -2, -1, 0, 1, 2
             // efficiency: 3-2*P0, P0 - cnt of any zero (P0 = p0 + p00)
-            // Eng: use when P0>1/3
+            //Eng: use when P0>1/3
+            //Rus: ����� ����� ������������, ����� ����������� ���� ������ 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 PrepareBits(3);
@@ -700,40 +847,58 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    someBuff[i * someSize + pass] =
-                            ((nextBits & 4) != 0) ?
-                            (((nextBits & 2) != 0) ? AmplitudeBuffer.Middle(2) : AmplitudeBuffer.Middle(1)) :
-                            (((nextBits & 2) != 0) ? AmplitudeBuffer.Middle(-1) : AmplitudeBuffer.Middle(-2));
+                    someBuff[i * someSize + pass] = ((nextBits & 4) != 0) ?
+                        (((nextBits & 2) != 0) ? AmplitudeBuffer.Middle(2) : AmplitudeBuffer.Middle(1))
+                        : (((nextBits & 2) != 0) ? AmplitudeBuffer.Middle(-1) : AmplitudeBuffer.Middle(-2));
                     availBits -= 3;
                     nextBits >>= 3;
                 }
             }
-
             return 1;
         }
 
-        private int T2_7bits(int pass, int ind)
+        /// <summary>
+        /// The T2_7bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int T2_7bits(int pass, int ind)
         {
-            // Eng: all the +/-2, +/-1, 0  triplets
-            // efficiency: always 7/3 bits per value            
+            //Eng: all the +/-2, +/-1, 0  triplets
+            // efficiency: always 7/3 bits per value
+            //Rus: ��� ���������� ����� -2, -1, 0, +1, 2.
+            // �������������: 7/3 ���� �� �������� - ������
             // use it when p0 <= 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 byte bits = (byte)(GetBits(7) & 0x7F);
                 short val = (short)Tables.Table2[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + (val & 7));
-                if ((++i) == packAttrs2) break;
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + (val & 7)));
+                if ((++i) == packAttrs2)
+                {
+                    break;
+                }
                 val >>= 3;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + (val & 7));
-                if ((++i) == packAttrs2) break;
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + (val & 7)));
+                if ((++i) == packAttrs2)
+                {
+                    break;
+                }
                 val >>= 3;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + val);
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + val));
             }
-
             return 1;
         }
-        private int K3_5bits(int pass, int ind)
+
+        /// <summary>
+        /// The K3_5bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K3_5bits(int pass, int ind)
         {
             // fills with values: -3, -2, -1, 0, 1, 2, 3, and double zeros
             // efficiency: 5-3*p0-4.5*p00-p1, p00 - cnt of paired zeros, p0 - cnt of single zeros, p1 - cnt of +/- 1.
@@ -745,7 +910,11 @@ namespace FOnlineDatRipper
                 {
                     availBits--;
                     nextBits >>= 1;
-                    someBuff[i * someSize + pass] = 0; if ((++i) == packAttrs2) break;
+                    someBuff[i * someSize + pass] = 0;
+                    if ((++i) == packAttrs2)
+                    {
+                        break;
+                    }
                     someBuff[i * someSize + pass] = 0;
                 }
                 else if ((nextBits & 2) == 0)
@@ -763,16 +932,25 @@ namespace FOnlineDatRipper
                 else
                 {
                     availBits -= 5;
-                    int val = (int)((nextBits & 0x18) >> 3);
+                    int val = (nextBits & 0x18) >> 3;
                     nextBits >>= 5;
-                    if (val >= 2) val += 3;
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-3 + val);
+                    if (val >= 2)
+                    {
+                        val += 3;
+                    }
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-3 + val));
                 }
             }
-
             return 1;
         }
-        private int K3_4bits(int pass, int ind)
+
+        /// <summary>
+        /// The K3_4bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K3_4bits(int pass, int ind)
         {
             // fills with values: -3, -2, -1, 0, 1, 2, 3.
             // efficiency: 4-3*P0-p1, P0 - cnt of all zeros (P0 = p0 + p00), p1 - cnt of +/- 1.
@@ -793,22 +971,31 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    int val = (int)((nextBits & 0xC) >> 2);
+                    int val = (nextBits & 0xC) >> 2;
                     availBits -= 4;
                     nextBits >>= 4;
-                    if (val >= 2) val += 3;
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-3 + val);
+                    if (val >= 2)
+                    {
+                        val += 3;
+                    }
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-3 + val));
                 }
             }
-
             return 1;
         }
 
-        private int K4_5bits(int pass, int ind)
+        /// <summary>
+        /// The K4_5bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K4_5bits(int pass, int ind)
         {
             // fills with values: +/-4, +/-3, +/-2, +/-1, 0, and double zeros
             // efficiency: 5-3*p0-4.5*p00, p00 - cnt of paired zeros, p0 - cnt of single zeros.
-            // Eng: makes sense to use when p00>2/3
+            //Eng: makes sense to use when p00>2/3
+            //Rus: ����� ����� ������������, ����� ����������� ������ ����� (p00) ������ 2/3
             for (int i = 0; i < packAttrs2; i++)
             {
                 PrepareBits(5);
@@ -816,7 +1003,11 @@ namespace FOnlineDatRipper
                 {
                     availBits--;
                     nextBits >>= 1;
-                    someBuff[i * someSize + pass] = 0; if ((++i) == packAttrs2) break;
+                    someBuff[i * someSize + pass] = 0;
+                    if ((++i) == packAttrs2)
+                    {
+                        break;
+                    }
                     someBuff[i * someSize + pass] = 0;
                 }
                 else if ((nextBits & 2) == 0)
@@ -827,18 +1018,26 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    int val = (int)((nextBits & 0x1C) >> 2);
-                    if (val >= 4) val++;
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-4 + val);
+                    int val = (nextBits & 0x1C) >> 2;
+                    if (val >= 4)
+                    {
+                        val++;
+                    }
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-4 + val));
                     availBits -= 5;
                     nextBits >>= 5;
                 }
             }
-
             return 1;
         }
 
-        private int K4_4bits(int pass, int ind)
+        /// <summary>
+        /// The K4_4bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int K4_4bits(int pass, int ind)
         {
             // fills with values: +/-4, +/-3, +/-2, +/-1, 0, and double zeros
             // efficiency: 4-3*P0, P0 - cnt of all zeros (both single and paired).
@@ -853,37 +1052,45 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    int val = (int)((nextBits & 0xE) >> 1);
+                    int val = (nextBits & 0xE) >> 1;
                     availBits -= 4;
                     nextBits >>= 4;
-                    if (val >= 4) val++;
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-4 + val);
+                    if (val >= 4)
+                    {
+                        val++;
+                    }
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-4 + val));
                 }
             }
-
             return 1;
         }
 
-        private int T3_7bits(int pass, int ind)
+        /// <summary>
+        /// The T3_7bits.
+        /// </summary>
+        /// <param name="pass">The pass<see cref="int"/>.</param>
+        /// <param name="ind">The ind<see cref="int"/>.</param>
+        /// <returns>The <see cref="int"/>.</returns>
+        public int T3_7bits(int pass, int ind)
         {
             //Eng: all the pairs of values from -5 to +5
-            // efficiency: 7/2 bits per value            
+            // efficiency: 7/2 bits per value
+            //Rus: ��� ���������� ��� �� -5 �� +5
+            // �������������: 7/2 ���� �� �������� - ������
             for (int i = 0; i < packAttrs2; i++)
             {
-                byte bits = (byte)(GetBits(7) & 0x7F);
-                byte val = (byte)Tables.Table3[bits];
+                byte bits = (byte)(GetBits(7) & 0x7f);
+                byte val = Tables.Table3[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-5 + (val & 0xF));
-                if ((++i) == packAttrs2) {
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-5 + (val & 0xF)));
+                if ((++i) == packAttrs2)
+                {
                     break;
                 }
                 val >>= 4;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-5 + val);                
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-5 + val));
             }
-
             return 1;
         }
-
     }
-
 }

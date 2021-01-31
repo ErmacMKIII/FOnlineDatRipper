@@ -1,5 +1,4 @@
-﻿#region copyright
-// Copyright (C) 2021 Alexander Stojanovich
+﻿// Copyright (C) 2021 Alexander Stojanovich
 //
 // This file is part of FOnlineDatRipper.
 //
@@ -10,32 +9,44 @@
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License along with FOnlineDatRipper. If not, see http://www.gnu.org/licenses/.
-#endregion
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FOnlineDatRipper
 {
-    static class AmplitudeBuffer
+    /// <summary>
+    /// Defines the <see cref="AmplitudeBuffer" />.
+    /// </summary>
+    internal static class AmplitudeBuffer
     {
-        private static readonly int[] amplitureBuffer = new int[0x10000];
+        /// <summary>
+        /// Defines the amplitureBuffer.
+        /// </summary>
+        private static readonly short[] amplitureBuffer = new short[0x10000];
 
-        public static int[] AmplitureBuffer => amplitureBuffer;        
+        /// <summary>
+        /// Gets the AmplitureBuffer.
+        /// </summary>
+        public static short[] AmplitureBuffer => amplitureBuffer;
 
-        public static int Middle(int index)
+        /// <summary>
+        /// The Middle.
+        /// </summary>
+        /// <param name="index">The index<see cref="short"/>.</param>
+        /// <returns>The <see cref="short"/>.</returns>
+        public static short Middle(short index)
         {
-            int amplIndex = (short) index + 0x7FFF;
+            int amplIndex = index + 0x8000;
             return amplitureBuffer[amplIndex];
         }
 
-        public static void Middle(int index, int val)
+        /// <summary>
+        /// The Middle.
+        /// </summary>
+        /// <param name="index">The index<see cref="short"/>.</param>
+        /// <param name="val">The val<see cref="short"/>.</param>
+        public static void Middle(short index, short val)
         {
-            int amplIndex = (short) index + 0x7FFF;
+            int amplIndex = index + 0x8000;
             amplitureBuffer[amplIndex] = val;
         }
-
     }
 }

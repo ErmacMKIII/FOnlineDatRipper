@@ -24,7 +24,6 @@ namespace FOnlineDatRipper
     /// </summary>
     internal partial class MainForm : Form
     {
-        // Colors for dark theme
         /// <summary>
         /// Defines the DarkBackground.
         /// </summary>
@@ -71,7 +70,7 @@ namespace FOnlineDatRipper
         internal const int FRMIndex = 6;
 
         /// <summary>
-        /// Defines the Fallout dat..
+        /// Defines the Fallout dat....
         /// </summary>
         private readonly Dat dat = new Dat();
 
@@ -81,7 +80,7 @@ namespace FOnlineDatRipper
         private string datfile;
 
         /// <summary>
-        /// Defines the output directory to extract the data.
+        /// Defines the output directory to extract the data...
         /// </summary>
         private string outDir;
 
@@ -91,12 +90,12 @@ namespace FOnlineDatRipper
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
-        /// Defines the loading worker..
+        /// Defines the loading worker....
         /// </summary>
         private readonly BackgroundWorker reader = new BackgroundWorker();
 
         /// <summary>
-        /// Defines the extractor worker..
+        /// Defines the extractor worker....
         /// </summary>
         private readonly BackgroundWorker extractor = new BackgroundWorker();
 
@@ -106,17 +105,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred...
+        /// Tells if cache miss has occurred.....
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length...
+        /// Defines the begin index of the item block and it's always 1000 in length.....
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items...
+        /// Defines the the dat list view items.....
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -512,8 +511,8 @@ namespace FOnlineDatRipper
             // create ACM list (sound files)
             List<ACM> acms = new List<ACM>();
             // create FRM list (image files)
-            List<FRM> fRMs = new List<FRM>();            
-            
+            List<FRM> fRMs = new List<FRM>();
+
             foreach (int selectedIndex in selectedIndices)
             {
                 ListViewItem selItem = datListViewItems[selectedIndex];
@@ -525,13 +524,13 @@ namespace FOnlineDatRipper
                 {
                     ACM acm = new ACM(dataBlock.Filename, bytes);
                     acms.Add(acm);
-                } 
+                }
                 else if (filename.ToLower().EndsWith(".frm"))
                 {
                     FRM frm = new FRM(dataBlock.Filename, bytes);
                     fRMs.Add(frm);
                 }
-                                
+
             }
 
             // create and use the subform

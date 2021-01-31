@@ -1,5 +1,4 @@
-﻿#region copyright
-// Copyright (C) 2021 Alexander Stojanovich
+﻿// Copyright (C) 2021 Alexander Stojanovich
 //
 // This file is part of FOnlineDatRipper.
 //
@@ -10,56 +9,59 @@
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License along with FOnlineDatRipper. If not, see http://www.gnu.org/licenses/.
-#endregion
-using FOnlineDatRipper.Properties;
-using NAudio.Wave;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
 namespace FOnlineDatRipper
 {
-    class ACMForm : Form
+    using FOnlineDatRipper.Properties;
+    using NAudio.Wave;
+    using System;
+    using System.Collections.Generic;
+    using System.Windows.Forms;
+
+    /// <summary>
+    /// Defines the <see cref="ACMForm" />.
+    /// </summary>
+    internal class ACMForm : Form
     {
         /// <summary>
-        /// acm sound files array which is equal to the number of tabs.
+        /// acm sound files array which is equal to the number of tabs...
         /// </summary>
         private readonly List<ACM> acms;
 
         /// <summary>
-        /// button for playing current track or music file
+        /// button for playing current track or music file..
         /// </summary>
         private readonly Button btnPlay = new Button();
 
         /// <summary>
-        /// button for pausing current track or music file
+        /// button for pausing current track or music file..
         /// </summary>
         private readonly Button btnPause = new Button();
 
         /// <summary>
-        /// button to reset current track or music file
+        /// button to reset current track or music file..
         /// </summary>
         private readonly Button btnStop = new Button();
 
         /// <summary>
-        /// list box contains tracks
+        /// list box contains tracks..
         /// </summary>
         private readonly ListBox listBox = new ListBox();
 
         /// <summary>
-        /// tab control with selected tab.
+        /// tab control with selected tab...
         /// </summary>
         private readonly TabControl tabControl = new TabControl();
 
         /// <summary>
-        /// Wave sound player
+        /// Wave sound player..
         /// </summary>
         private readonly WaveOutEvent wo = new WaveOutEvent();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ACMForm"/> class.
+        /// </summary>
+        /// <param name="acms">The acms<see cref="List{ACM}"/>.</param>
         public ACMForm(List<ACM> acms)
         {
             this.acms = acms;
@@ -98,8 +100,8 @@ namespace FOnlineDatRipper
             listBox.Dock = DockStyle.Fill;
             // add each ACM to the list box
             foreach (ACM acm in acms)
-            {              
-                listBox.Items.Add(acm.Tag);                
+            {
+                listBox.Items.Add(acm.Tag);
             }
             this.Controls.Add(listBox);
 
@@ -122,16 +124,31 @@ namespace FOnlineDatRipper
             this.Controls.Add(btnStop);
         }
 
+        /// <summary>
+        /// The BtnStop_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnStop_Click(object sender, EventArgs e)
         {
             wo.Stop();
         }
 
+        /// <summary>
+        /// The BtnPause_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnPause_Click(object sender, EventArgs e)
         {
             wo.Pause();
         }
 
+        /// <summary>
+        /// The BtnPlay_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnPlay_Click(object sender, EventArgs e)
         {
             int index = listBox.SelectedIndex;
@@ -140,7 +157,7 @@ namespace FOnlineDatRipper
                 if (wo.PlaybackState != PlaybackState.Playing)
                 {
                     wo.Init(acms[index].WaveStream);
-                    wo.Play();                
+                    wo.Play();
                 }
             }
         }
