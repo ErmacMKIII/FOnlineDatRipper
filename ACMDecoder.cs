@@ -194,7 +194,7 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2...
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2....
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
@@ -214,9 +214,14 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the decBuff.
+        /// Defines the unpacking buffer..
         /// </summary>
         private int[] decBuff;
+
+        /// <summary>
+        /// Size of unpacking buffer..
+        /// </summary>
+        private int decBuffSize = 0;
 
         /// <summary>
         /// Defines the someBuff.
@@ -224,7 +229,7 @@ namespace FOnlineDatRipper
         private int[] someBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize...
+        /// Defines the blocks, totBlSize....
         /// </summary>
         private int blocks, totBlSize;
 
@@ -308,19 +313,22 @@ namespace FOnlineDatRipper
             someSize = 1 << packAttrs; // known as columns
             someSize2 = someSize * packAttrs2;
 
-            int decBuf_size = 0;
+            decBuffSize = 0;
             if (packAttrs != 0)
             {
-                decBuf_size = 2 * someSize - 2;
+                decBuffSize = 2 * someSize - 2;
             }
 
             this.blocks = 0x800 / someSize - 2;
-            if (blocks < 1) blocks = 1;
+            if (blocks < 1)
+            {
+                blocks = 1;
+            }
             this.totBlSize = blocks * someSize;
 
-            if (decBuf_size != 0)
+            if (decBuffSize != 0)
             {
-                this.decBuff = new int[decBuf_size];
+                this.decBuff = new int[decBuffSize];
             }
 
             this.someBuff = new int[someSize2];
@@ -358,7 +366,7 @@ namespace FOnlineDatRipper
                 }
 
                 loc_blocks *= 2;
-                Juggle(Convert(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                Sub_4d3fcc(Convert(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
                 yPtr += loc_someSize;
 
                 for (int i = 0; i < loc_blocks; i++)
@@ -371,7 +379,7 @@ namespace FOnlineDatRipper
 
                 while (loc_someSize != 0)
                 {
-                    Juggle(SimplePass(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                    Sub_4d420c(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
                     yPtr += loc_someSize * 2;
 
                     loc_someSize /= 2;
@@ -618,43 +626,154 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Marko's method of block decomposition; 
-        /// Source: Libacm github by Marko Kreen.
+        /// First decompressing subroutine by Rotators.
         /// </summary>
-        /// <param name="decBuff">unpacking buffer.</param>
+        /// <param name="decBuff">.</param>
         /// <param name="dPtr">.</param>
-        /// <param name="someBuff">buffer with decompressed samples.</param>
-        /// <param name="sPtr">index of some buffer.</param>
-        /// <param name="someSize">number of iterations.</param>
-        /// <param name="blocks">number of blocks.</param>
-        /// <returns>The <see cref="short[]"/>.</returns>
-        private static short[] Juggle(short[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        /// <param name="someBuff">.</param>
+        /// <param name="sPtr">.</param>
+        /// <param name="someSize">.</param>
+        /// <param name="blocks">.</param>
+        private static void Sub_4d3fcc(short[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
         {
-            int i, j;
-            int[] x;
-            int xPtr;
-            int row0, row1, row2, row3;
-            for (i = 0; i < someSize; i++)
+            int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
+            if (blocks == 2)
             {
-                x = someBuff;
-                xPtr = sPtr;
-                row0 = decBuff[dPtr];
-                row1 = decBuff[dPtr + 1];
-                for (j = 0; j < blocks / 2; j++)
+                for (int i = 0; i < someSize; i++)
                 {
-                    row2 = x[xPtr]; x[xPtr] = row1 * 2 + (row0 + row2); xPtr += someSize;
-                    row3 = x[xPtr]; x[xPtr] = row2 * 2 - (row1 + row3); xPtr += someSize;
-                    row0 = row2; row1 = row3;
+                    row_0 = someBuff[sPtr];
+                    row_1 = someBuff[sPtr + someSize];
+                    someBuff[sPtr] = someBuff[sPtr] + decBuff[dPtr] + 2 * decBuff[dPtr + 1];
+                    someBuff[sPtr + someSize] = 2 * row_0 - decBuff[dPtr + 1] - someBuff[sPtr + someSize];
+                    decBuff[dPtr] = (short)row_0;
+                    decBuff[dPtr + 1] = (short)row_1;
+
+                    dPtr += 2;
+                    sPtr++;
+                }
+            }
+            else if (blocks == 4)
+            {
+                for (int i = 0; i < someSize; i++)
+                {
+                    row_0 = someBuff[sPtr];
+                    row_1 = someBuff[sPtr + someSize];
+                    row_2 = someBuff[sPtr + 2 * someSize];
+                    row_3 = someBuff[sPtr + 3 * someSize];
+
+                    someBuff[sPtr] = decBuff[dPtr] + 2 * decBuff[dPtr + 1] + row_0;
+                    someBuff[sPtr + someSize] = -decBuff[dPtr + 1] + 2 * row_0 - row_1;
+                    someBuff[sPtr + 2 * someSize] = row_0 + 2 * row_1 + row_2;
+                    someBuff[sPtr + 3 * someSize] = -row_1 + 2 * row_2 - row_3;
+
+                    decBuff[dPtr] = (short)row_2;
+                    decBuff[dPtr + 1] = (short)row_3;
+
+                    dPtr += 2;
+                    sPtr++;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < someSize; i++)
+                {
+                    int[] x = someBuff;
+                    int xPtr = sPtr; // some pointer
+                    if (((blocks >> 1) & 1) != 0)
+                    {
+                        row_0 = x[xPtr];
+                        row_1 = x[xPtr + someSize];
+
+                        x[xPtr] = decBuff[dPtr] + 2 * decBuff[dPtr + 1] + row_0;
+                        x[xPtr + someSize] = -decBuff[dPtr + 1] + 2 * row_0 - row_1;
+                        xPtr += 2 * someSize;
+
+                        db_0 = row_0;
+                        db_1 = row_1;
+                    }
+                    else
+                    {
+                        db_0 = decBuff[dPtr];
+                        db_1 = decBuff[dPtr + 1];
+                    }
+
+                    for (int j = 0; j < blocks >> 2; j++)
+                    {
+                        row_0 = x[xPtr]; x[xPtr] = db_0 + 2 * db_1 + row_0; xPtr += someSize;
+                        row_1 = x[xPtr]; x[xPtr] = -db_1 + 2 * row_0 - row_1; xPtr += someSize;
+                        row_2 = x[xPtr]; x[xPtr] = row_0 + 2 * row_1 + row_2; xPtr += someSize;
+                        row_3 = x[xPtr]; x[xPtr] = -row_1 + 2 * row_2 - row_3; xPtr += someSize;
+
+                        db_0 = row_2;
+                        db_1 = row_3;
+                    }
+                    decBuff[dPtr] = (short)row_2;
+                    decBuff[dPtr + 1] = (short)row_3;
+
+                    dPtr += 2;
+                    sPtr++;
                 }
 
-                decBuff[dPtr] = (short)row0;
-                decBuff[dPtr + 1] = (short)row1;
-
-                dPtr += 2;
-                sPtr++;
             }
+        }
 
-            return decBuff;
+        /// <summary>
+        /// Second decompressing subroutine by Rotators.
+        /// </summary>
+        /// <param name="decBuff">.</param>
+        /// <param name="dPtr">.</param>
+        /// <param name="someBuff">.</param>
+        /// <param name="sPtr">.</param>
+        /// <param name="someSize">.</param>
+        /// <param name="blocks">.</param>
+        private static void Sub_4d420c(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        {
+            int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
+            if (blocks == 4)
+            {
+                for (int i = 0; i < someSize; i++)
+                {
+                    row_0 = someBuff[sPtr];
+                    row_1 = someBuff[sPtr + someSize];
+                    row_2 = someBuff[sPtr + 2 * someSize];
+                    row_3 = someBuff[sPtr + 3 * someSize];
+
+                    someBuff[sPtr] = decBuff[dPtr] + 2 * decBuff[dPtr + 1] + row_0;
+                    someBuff[sPtr + someSize] = -decBuff[dPtr + 1] + 2 * row_0 - row_1;
+                    someBuff[sPtr + 2 * someSize] = row_0 + 2 * row_1 + row_2;
+                    someBuff[sPtr + 3 * someSize] = -row_1 + 2 * row_2 - row_3;
+
+                    decBuff[dPtr] = row_2;
+                    decBuff[dPtr + 1] = row_3;
+
+                    dPtr += 2;
+                    sPtr++;
+                }
+            }
+            else
+            {
+                for (int i = 0; i < someSize; i++)
+                {
+                    int[] x = someBuff;
+                    int xPtr = sPtr; // some pointer again!                    
+                    db_0 = decBuff[dPtr]; db_1 = decBuff[dPtr + 1];
+                    for (int j = 0; j < blocks >> 2; j++)
+                    {
+                        row_0 = x[xPtr]; x[xPtr] = db_0 + 2 * db_1 + row_0; xPtr += someSize;
+                        row_1 = x[xPtr]; x[xPtr] = -db_1 + 2 * row_0 - row_1; xPtr += someSize;
+                        row_2 = x[xPtr]; x[xPtr] = row_0 + 2 * row_1 + row_2; xPtr += someSize;
+                        row_3 = x[xPtr]; x[xPtr] = -row_1 + 2 * row_2 - row_3; xPtr += someSize;
+
+                        db_0 = row_2;
+                        db_1 = row_3;
+                    }
+                    decBuff[dPtr] = row_2;
+                    decBuff[dPtr + 1] = row_3;
+
+                    dPtr += 2;
+                    sPtr++;
+                }
+            }
         }
 
         /// <summary>
