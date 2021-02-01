@@ -36,13 +36,13 @@ namespace FOnlineDatRipper
             Tables.Init();
 
             byte[] buffer;
-            buffer = File.ReadAllBytes("08VATS.ACM");
+            buffer = File.ReadAllBytes("08VATS.acm");
 
             byte[] Raw = new byte[0x2000000];
             ACMDecoder decoder = new ACMDecoder(buffer);
             int len = decoder.Decode(Raw);
 
-            RawSourceWaveStream rawSourceWave = new RawSourceWaveStream(new MemoryStream(Raw, 0, len), new WaveFormat(22050, 2));
+            RawSourceWaveStream rawSourceWave = new RawSourceWaveStream(new MemoryStream(Raw, 0, len), new WaveFormat(22050, 16, 2));
             WaveOutEvent wo = new WaveOutEvent();
             if (wo.PlaybackState != PlaybackState.Playing)
             {

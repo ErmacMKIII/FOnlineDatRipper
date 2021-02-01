@@ -18,6 +18,21 @@ namespace FOnlineDatRipper
     internal static class Tables
     {
         /// <summary>
+        /// Mask for selecting table 1 entries.
+        /// </summary>
+        public const int Table1Mask = 0x1A;
+
+        /// <summary>
+        /// Mask for selecting table 2 entries.
+        /// </summary>
+        public const int Table2Mask = 0x7C;
+
+        /// <summary>
+        /// Mask for selecting table 3 entries.
+        /// </summary>
+        public const int Table3Mask = 0x78;
+
+        /// <summary>
         /// Defines the table1.
         /// </summary>
         private static readonly byte[] table1 = new byte[27];
@@ -59,11 +74,13 @@ namespace FOnlineDatRipper
                     for (x1 = 0; x1 < 3; x1++)
                         table1[x1 + x2 * 3 + x3 * 3 * 3] =
                             (byte)(x1 + (x2 << 4) + (x3 << 8));
+
             for (x3 = 0; x3 < 5; x3++)
                 for (x2 = 0; x2 < 5; x2++)
                     for (x1 = 0; x1 < 5; x1++)
                         table2[x1 + x2 * 5 + x3 * 5 * 5] =
                             (short)(x1 + (x2 << 4) + (x3 << 8));
+
             for (x2 = 0; x2 < 11; x2++)
                 for (x1 = 0; x1 < 11; x1++)
                     table3[x1 + x2 * 11] = (byte)(x1 + (x2 << 4));

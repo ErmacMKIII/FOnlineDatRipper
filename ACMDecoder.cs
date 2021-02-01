@@ -194,14 +194,14 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2..
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2...
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
         /// <summary>
         /// Defines the MidBuffSize.
         /// </summary>
-        private const int MidBuffSize = 0x200;
+        private const int MidBuffSize = 0x800;
 
         /// <summary>
         /// Defines the midBuff.
@@ -214,12 +214,17 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the decBuff, someBuff..
+        /// Defines the decBuff.
         /// </summary>
-        private int[] decBuff, someBuff;
+        private int[] decBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize..
+        /// Defines the someBuff.
+        /// </summary>
+        private int[] someBuff;
+
+        /// <summary>
+        /// Defines the blocks, totBlSize...
         /// </summary>
         private int blocks, totBlSize;
 
@@ -266,10 +271,10 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Initializes a new instance of the <see cref="ACMDecoder"/> class.
         /// </summary>
-        /// <param name="rawData">The rawData<see cref="byte[]"/>.</param>
-        public ACMDecoder(byte[] rawData)
+        /// <param name="acmData">The rawData<see cref="byte[]"/>.</param>
+        public ACMDecoder(byte[] acmData)
         {
-            this.srcBuff = rawData;
+            this.srcBuff = acmData;
             Init();
         }
 
@@ -300,12 +305,14 @@ namespace FOnlineDatRipper
             packAttrs = GetBits(4) & 0xF; // known as acm_level
             packAttrs2 = GetBits(12) & 0xFFF; // known as rows
 
-            someSize = 1 << packAttrs;
+            someSize = 1 << packAttrs; // known as columns
             someSize2 = someSize * packAttrs2;
 
             int decBuf_size = 0;
             if (packAttrs != 0)
-                decBuf_size = 3 * someSize / 2 - 2;
+            {
+                decBuf_size = 2 * someSize - 2;
+            }
 
             this.blocks = 0x800 / someSize - 2;
             if (blocks < 1) blocks = 1;
@@ -351,12 +358,12 @@ namespace FOnlineDatRipper
                 }
 
                 loc_blocks *= 2;
-                Juggle(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                Juggle(Convert(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
                 yPtr += loc_someSize;
 
                 for (int i = 0; i < loc_blocks; i++)
                 {
-                    someBuff[i * loc_someSize]++;
+                    xBuff[i * loc_someSize]++;
                 }
 
                 loc_someSize /= 2;
@@ -364,7 +371,7 @@ namespace FOnlineDatRipper
 
                 while (loc_someSize != 0)
                 {
-                    Juggle(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                    Juggle(SimplePass(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
                     yPtr += loc_someSize * 2;
 
                     loc_someSize /= 2;
@@ -390,7 +397,6 @@ namespace FOnlineDatRipper
                 Array.Copy(srcBuff, srcBuffPos, midBuff, 0, availBytes);
                 srcBuffPos += availBytes;
             }
-            availBytes--;
 
             return midBuff[mPtr++];
         }
@@ -405,7 +411,7 @@ namespace FOnlineDatRipper
             {
                 byte oneByte;
                 availBytes--;
-                if (availBytes >= 0)
+                if (availBytes > 0)
                 {
                     oneByte = midBuff[mPtr++];
                 }
@@ -413,7 +419,6 @@ namespace FOnlineDatRipper
                 {
                     oneByte = ReadNextPortion();
                 }
-
                 nextBits |= oneByte << availBits;
                 availBits += 8;
             }
@@ -427,7 +432,7 @@ namespace FOnlineDatRipper
         private int GetBits(int bits)
         {
             PrepareBits(bits);
-            int res = nextBits;
+            int res = nextBits & ((1 << bits) - 1);
             availBits -= bits;
             nextBits >>= bits;
             return res;
@@ -512,8 +517,6 @@ namespace FOnlineDatRipper
                         break;
                 }
 
-                Console.WriteLine(filler.ToString());
-
                 if (res == 0)
                 {
                     return false;
@@ -555,18 +558,15 @@ namespace FOnlineDatRipper
             while (valsToGo != 0)
             {
                 MakeNewValues();
-                Console.WriteLine("ValsToGo = " + valsToGo);
+                // Console.WriteLine("ValsToGo = " + valsToGo);
             }
 
             // copy decoded values into the buffer
             int bPtr = 0;
 
-            int i = 0;
             foreach (int value in values)
             {
-                if (++i <= 1000)
-                    Console.WriteLine(i + ". value = " + (value >> packAttrs));
-                short x = (short)(value >> packAttrs);
+                int x = value >> packAttrs;
                 buffer[bPtr] = (byte)(x & 0xFF);
                 buffer[bPtr + 1] = (byte)((x >> 8) & 0xFF);
 
@@ -581,6 +581,43 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
+        /// Converts integer aray to short array, twice the size of original.
+        /// </summary>
+        /// <param name="sourceArray">original integer array.</param>
+        /// <returns>destination short array.</returns>
+        private static short[] Convert(int[] sourceArray)
+        {
+            short[] result = new short[sourceArray.Length * 2];
+            int resPtr = 0;
+            foreach (int src in sourceArray)
+            {
+                byte[] bytes = BitConverter.GetBytes(src);
+                result[resPtr] = BitConverter.ToInt16(bytes, 0);
+                result[resPtr + 1] = BitConverter.ToInt16(bytes, 2);
+                resPtr += 2;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Make destination array as simple pass of source array.
+        /// </summary>
+        /// <param name="sourceArray">original integer array.</param>
+        /// <returns>destination short array.</returns>
+        private static short[] SimplePass(int[] sourceArray)
+        {
+            short[] result = new short[sourceArray.Length];
+            int resPtr = 0;
+            foreach (int src in sourceArray)
+            {
+                result[resPtr++] = (short)src;
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Marko's method of block decomposition; 
         /// Source: Libacm github by Marko Kreen.
         /// </summary>
@@ -590,7 +627,8 @@ namespace FOnlineDatRipper
         /// <param name="sPtr">index of some buffer.</param>
         /// <param name="someSize">number of iterations.</param>
         /// <param name="blocks">number of blocks.</param>
-        private void Juggle(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        /// <returns>The <see cref="short[]"/>.</returns>
+        private static short[] Juggle(short[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
         {
             int i, j;
             int[] x;
@@ -609,12 +647,14 @@ namespace FOnlineDatRipper
                     row0 = row2; row1 = row3;
                 }
 
-                decBuff[dPtr] = row0;
-                decBuff[dPtr + 1] = row1;
+                decBuff[dPtr] = (short)row0;
+                decBuff[dPtr + 1] = (short)row1;
 
                 dPtr += 2;
                 sPtr++;
             }
+
+            return decBuff;
         }
 
         /// <summary>
@@ -707,7 +747,7 @@ namespace FOnlineDatRipper
                 }
                 else
                 {
-                    someBuff[i * someSize + pass] = (nextBits & 4) != 0 ? AmplitudeBuffer.Middle(1) : AmplitudeBuffer.Middle(-1);
+                    someBuff[i * someSize + pass] = ((nextBits & 4) != 0) ? AmplitudeBuffer.Middle(1) : AmplitudeBuffer.Middle(-1);
                     availBits -= 3;
                     nextBits >>= 3;
                 }
@@ -761,8 +801,8 @@ namespace FOnlineDatRipper
             // use it when P0 <= 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
-                byte bits = (byte)(GetBits(5) & 0x1f);
-                bits = (byte)Tables.Table1[bits];
+                int bits = GetBits(5) & Tables.Table1Mask;
+                bits = Tables.Table1[bits];
 
                 someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + (bits & 3)));
                 if ((++i) == packAttrs2)
@@ -872,8 +912,8 @@ namespace FOnlineDatRipper
             // use it when p0 <= 1/3
             for (int i = 0; i < packAttrs2; i++)
             {
-                byte bits = (byte)(GetBits(7) & 0x7F);
-                short val = (short)Tables.Table2[bits];
+                int bits = GetBits(7) & Tables.Table2Mask;
+                short val = Tables.Table2[bits];
 
                 someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + (val & 7)));
                 if ((++i) == packAttrs2)
@@ -1079,7 +1119,7 @@ namespace FOnlineDatRipper
             // �������������: 7/2 ���� �� �������� - ������
             for (int i = 0; i < packAttrs2; i++)
             {
-                byte bits = (byte)(GetBits(7) & 0x7f);
+                int bits = GetBits(7) & Tables.Table3Mask;
                 byte val = Tables.Table3[bits];
 
                 someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-5 + (val & 0xF)));
