@@ -194,7 +194,7 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2....
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2.....
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
@@ -214,12 +214,12 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the unpacking buffer..
+        /// Defines the unpacking buffer...
         /// </summary>
         private int[] decBuff;
 
         /// <summary>
-        /// Size of unpacking buffer..
+        /// Size of unpacking buffer...
         /// </summary>
         private int decBuffSize = 0;
 
@@ -229,7 +229,7 @@ namespace FOnlineDatRipper
         private int[] someBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize....
+        /// Defines the blocks, totBlSize.....
         /// </summary>
         private int blocks, totBlSize;
 
@@ -316,7 +316,7 @@ namespace FOnlineDatRipper
             decBuffSize = 0;
             if (packAttrs != 0)
             {
-                decBuffSize = 2 * someSize - 2;
+                decBuffSize = 3 * someSize / 2 - 2;
             }
 
             this.blocks = 0x800 / someSize - 2;
@@ -460,14 +460,14 @@ namespace FOnlineDatRipper
             int i;
             for (i = 0; i < count; i++)
             {
-                AmplitudeBuffer.Middle((short)i, (short)v);
+                AmplitudeBuffer.Middle(i, (short)v);
                 v += val;
             }
 
             v = -val;
             for (i = 0; i < count; i++)
             {
-                AmplitudeBuffer.Middle((short)(-i - 1), (short)v);
+                AmplitudeBuffer.Middle(-i - 1, (short)v);
                 v -= val;
             }
 
@@ -825,7 +825,7 @@ namespace FOnlineDatRipper
             {
                 int b = GetBits(ind) & mask;
                 int index = b - middle;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)index);
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(index);
             }
 
             return 1;
@@ -923,19 +923,19 @@ namespace FOnlineDatRipper
                 int bits = GetBits(5) & Tables.Table1Mask;
                 bits = Tables.Table1[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + (bits & 3)));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + (bits & 3));
                 if ((++i) == packAttrs2)
                 {
                     break;
                 }
                 bits >>= 2;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + (bits & 3)));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + (bits & 3));
                 if ((++i) == packAttrs2)
                 {
                     break;
                 }
                 bits >>= 2;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-1 + bits));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-1 + bits);
             }
             return 1;
         }
@@ -1034,19 +1034,19 @@ namespace FOnlineDatRipper
                 int bits = GetBits(7) & Tables.Table2Mask;
                 short val = Tables.Table2[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + (val & 7)));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + (val & 7));
                 if ((++i) == packAttrs2)
                 {
                     break;
                 }
                 val >>= 3;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + (val & 7)));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + (val & 7));
                 if ((++i) == packAttrs2)
                 {
                     break;
                 }
                 val >>= 3;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-2 + val));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-2 + val);
             }
             return 1;
         }
@@ -1097,7 +1097,7 @@ namespace FOnlineDatRipper
                     {
                         val += 3;
                     }
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-3 + val));
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-3 + val);
                 }
             }
             return 1;
@@ -1137,7 +1137,7 @@ namespace FOnlineDatRipper
                     {
                         val += 3;
                     }
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-3 + val));
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-3 + val);
                 }
             }
             return 1;
@@ -1182,7 +1182,7 @@ namespace FOnlineDatRipper
                     {
                         val++;
                     }
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-4 + val));
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-4 + val);
                     availBits -= 5;
                     nextBits >>= 5;
                 }
@@ -1218,7 +1218,7 @@ namespace FOnlineDatRipper
                     {
                         val++;
                     }
-                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-4 + val));
+                    someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-4 + val);
                 }
             }
             return 1;
@@ -1241,13 +1241,13 @@ namespace FOnlineDatRipper
                 int bits = GetBits(7) & Tables.Table3Mask;
                 byte val = Tables.Table3[bits];
 
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-5 + (val & 0xF)));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-5 + (val & 0xF));
                 if ((++i) == packAttrs2)
                 {
                     break;
                 }
                 val >>= 4;
-                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle((short)(-5 + val));
+                someBuff[i * someSize + pass] = AmplitudeBuffer.Middle(-5 + val);
             }
             return 1;
         }

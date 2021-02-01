@@ -32,7 +32,7 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="index">The index<see cref="short"/>.</param>
         /// <returns>The <see cref="short"/>.</returns>
-        public static short Middle(short index)
+        public static short Middle(int index)
         {
             int amplIndex = index + 0x8000;
             return amplitureBuffer[amplIndex];
@@ -43,7 +43,7 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="index">The index<see cref="short"/>.</param>
         /// <param name="val">The val<see cref="short"/>.</param>
-        public static void Middle(short index, short val)
+        public static void Middle(int index, short val)
         {
             int amplIndex = index + 0x8000;
             amplitureBuffer[amplIndex] = val;
