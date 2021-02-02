@@ -13,7 +13,6 @@
 namespace FOnlineDatRipper
 {
     using System;
-    using System.IO;
 
     /// <summary>
     /// Defines the <see cref="ACMInfo" />.
@@ -194,7 +193,7 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2.....
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2......
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
@@ -214,12 +213,12 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the unpacking buffer...
+        /// Defines the unpacking buffer....
         /// </summary>
         private int[] decBuff;
 
         /// <summary>
-        /// Size of unpacking buffer...
+        /// Size of unpacking buffer....
         /// </summary>
         private int decBuffSize = 0;
 
@@ -229,7 +228,7 @@ namespace FOnlineDatRipper
         private int[] someBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize.....
+        /// Defines the blocks, totBlSize......
         /// </summary>
         private int blocks, totBlSize;
 
@@ -269,9 +268,10 @@ namespace FOnlineDatRipper
         internal int availBits;// count of new bits
 
         /// <summary>
-        /// Gets or sets the Info.
+        /// Gets the Info
+        /// Gets or sets the Info..
         /// </summary>
-        internal ACMInfo Info { get => info; set => info = value; }
+        internal ACMInfo Info { get => info; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ACMDecoder"/> class.
@@ -284,7 +284,7 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The Init.
+        /// The Initialization which takes place in constructor.
         /// </summary>
         private void Init()
         {
@@ -292,20 +292,15 @@ namespace FOnlineDatRipper
             availBits = 0;
 
             info.Id = (uint)(GetBits(24) & 0xFFFFFF);
-            Console.WriteLine("Id = " + info.Id);
             info.Version = ((uint)(GetBits(8) & 0xFF));
-            Console.WriteLine("Ver = " + info.Version);
 
             valsToGo = (GetBits(16) & 0xFFFF);
             valsToGo |= ((GetBits(16) & 0xFFFF) << 16);
 
             info.Samples = (uint)valsToGo;
-            Console.WriteLine("Samples = " + info.Samples);
 
             info.Channels = (uint)GetBits(16) & 0xFFFF;
-            Console.WriteLine("Channels = " + info.Channels);
             info.Bitrate = (uint)GetBits(16) & 0xFFFF;
-            Console.WriteLine("Bitrate = " + info.Bitrate);
 
             packAttrs = GetBits(4) & 0xF; // known as acm_level
             packAttrs2 = GetBits(12) & 0xFFF; // known as rows
@@ -316,7 +311,8 @@ namespace FOnlineDatRipper
             decBuffSize = 0;
             if (packAttrs != 0)
             {
-                decBuffSize = 3 * someSize / 2 - 2;
+                decBuffSize = 3 * someSize / 2 - 2; // original
+                decBuffSize *= 2; // ermac modification
             }
 
             this.blocks = 0x800 / someSize - 2;
@@ -338,7 +334,37 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The UnpackValues.
+        /// Decode given ACM by reading into buffer (output).
+        /// </summary>
+        /// <param name="buffer"> acm buffer .</param>
+        /// <returns>.</returns>
+        public int Decode(byte[] buffer)
+        {
+            // while there's still values
+            while (valsToGo != 0)
+            {
+                MakeNewValues();
+            }
+
+            // copy decoded values into the buffer
+            int bPtr = 0;
+
+            foreach (int value in values)
+            {
+                int x = value >> packAttrs;
+                buffer[bPtr] = (byte)(x & 0xFF);
+                buffer[bPtr + 1] = (byte)((x >> 8) & 0xFF);
+
+                bPtr += 2;
+            }
+
+            return bPtr;
+        }
+
+        /// <summary>
+        /// Modified Rotators unpacker.
+        /// Namely this is supposed to unpack values,
+        /// and store them in some buff.
         /// </summary>
         private void UnpackValues()
         {
@@ -366,8 +392,8 @@ namespace FOnlineDatRipper
                 }
 
                 loc_blocks *= 2;
-                Sub_4d3fcc(Convert(yBuff), yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
-                yPtr += loc_someSize;
+                Sub_4d3fcc(yBuff, yPtr, xBuff, xPtr, loc_someSize, loc_blocks);
+                yPtr += 2 * loc_someSize; // ermac modification, it is this!
 
                 for (int i = 0; i < loc_blocks; i++)
                 {
@@ -392,7 +418,8 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The ReadNextPortion.
+        /// If running out of bytes from mid buffer, 
+        /// another portion is gonna be read.
         /// </summary>
         /// <returns>The <see cref="byte"/>.</returns>
         private byte ReadNextPortion()
@@ -535,7 +562,8 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The MakeNewValues.
+        /// Creates new values and copies them to the values array.
+        /// Values array will be scaled.
         /// </summary>
         /// <returns>The <see cref="bool"/>.</returns>
         private bool MakeNewValues()
@@ -556,76 +584,6 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Decode given ACM by reading into buffer (output).
-        /// </summary>
-        /// <param name="buffer"> acm buffer .</param>
-        /// <returns>.</returns>
-        public int Decode(byte[] buffer)
-        {
-            // while it's not fully read
-            while (valsToGo != 0)
-            {
-                MakeNewValues();
-                // Console.WriteLine("ValsToGo = " + valsToGo);
-            }
-
-            // copy decoded values into the buffer
-            int bPtr = 0;
-
-            foreach (int value in values)
-            {
-                int x = value >> packAttrs;
-                buffer[bPtr] = (byte)(x & 0xFF);
-                buffer[bPtr + 1] = (byte)((x >> 8) & 0xFF);
-
-                bPtr += 2;
-            }
-
-            // return buffer length
-            Console.WriteLine("Read Bytes = " + bPtr);
-
-            File.WriteAllBytes("tst.dat", buffer);
-            return bPtr;
-        }
-
-        /// <summary>
-        /// Converts integer aray to short array, twice the size of original.
-        /// </summary>
-        /// <param name="sourceArray">original integer array.</param>
-        /// <returns>destination short array.</returns>
-        private static short[] Convert(int[] sourceArray)
-        {
-            short[] result = new short[sourceArray.Length * 2];
-            int resPtr = 0;
-            foreach (int src in sourceArray)
-            {
-                byte[] bytes = BitConverter.GetBytes(src);
-                result[resPtr] = BitConverter.ToInt16(bytes, 0);
-                result[resPtr + 1] = BitConverter.ToInt16(bytes, 2);
-                resPtr += 2;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Make destination array as simple pass of source array.
-        /// </summary>
-        /// <param name="sourceArray">original integer array.</param>
-        /// <returns>destination short array.</returns>
-        private static short[] SimplePass(int[] sourceArray)
-        {
-            short[] result = new short[sourceArray.Length];
-            int resPtr = 0;
-            foreach (int src in sourceArray)
-            {
-                result[resPtr++] = (short)src;
-            }
-
-            return result;
-        }
-
-        /// <summary>
         /// First decompressing subroutine by Rotators.
         /// </summary>
         /// <param name="decBuff">.</param>
@@ -634,7 +592,7 @@ namespace FOnlineDatRipper
         /// <param name="sPtr">.</param>
         /// <param name="someSize">.</param>
         /// <param name="blocks">.</param>
-        private static void Sub_4d3fcc(short[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
+        private static void Sub_4d3fcc(int[] decBuff, int dPtr, int[] someBuff, int sPtr, int someSize, int blocks)
         {
             int row_0 = 0, row_1 = 0, row_2 = 0, row_3 = 0, db_0 = 0, db_1 = 0;
             if (blocks == 2)
@@ -645,8 +603,8 @@ namespace FOnlineDatRipper
                     row_1 = someBuff[sPtr + someSize];
                     someBuff[sPtr] = someBuff[sPtr] + decBuff[dPtr] + 2 * decBuff[dPtr + 1];
                     someBuff[sPtr + someSize] = 2 * row_0 - decBuff[dPtr + 1] - someBuff[sPtr + someSize];
-                    decBuff[dPtr] = (short)row_0;
-                    decBuff[dPtr + 1] = (short)row_1;
+                    decBuff[dPtr] = row_0;
+                    decBuff[dPtr + 1] = row_1;
 
                     dPtr += 2;
                     sPtr++;
@@ -666,8 +624,8 @@ namespace FOnlineDatRipper
                     someBuff[sPtr + 2 * someSize] = row_0 + 2 * row_1 + row_2;
                     someBuff[sPtr + 3 * someSize] = -row_1 + 2 * row_2 - row_3;
 
-                    decBuff[dPtr] = (short)row_2;
-                    decBuff[dPtr + 1] = (short)row_3;
+                    decBuff[dPtr] = row_2;
+                    decBuff[dPtr + 1] = row_3;
 
                     dPtr += 2;
                     sPtr++;
@@ -707,8 +665,8 @@ namespace FOnlineDatRipper
                         db_0 = row_2;
                         db_1 = row_3;
                     }
-                    decBuff[dPtr] = (short)row_2;
-                    decBuff[dPtr + 1] = (short)row_3;
+                    decBuff[dPtr] = row_2;
+                    decBuff[dPtr + 1] = row_3;
 
                     dPtr += 2;
                     sPtr++;
@@ -811,7 +769,7 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The LinearFill.
+        /// Modified linear Fill with Marko's and Rotators combined.
         /// </summary>
         /// <param name="pass">The pass<see cref="int"/>.</param>
         /// <param name="ind">The ind<see cref="int"/>.</param>

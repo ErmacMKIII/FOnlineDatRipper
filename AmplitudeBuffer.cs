@@ -28,9 +28,9 @@ namespace FOnlineDatRipper
         public static short[] AmplitureBuffer => amplitureBuffer;
 
         /// <summary>
-        /// The Middle.
+        /// Get The Amplitude Middle.
         /// </summary>
-        /// <param name="index">The index<see cref="short"/>.</param>
+        /// <param name="index">The index<see cref="int"/>.</param>
         /// <returns>The <see cref="short"/>.</returns>
         public static short Middle(int index)
         {
@@ -39,9 +39,9 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The Middle.
+        /// Set The Amplitude Middle.
         /// </summary>
-        /// <param name="index">The index<see cref="short"/>.</param>
+        /// <param name="index">The index<see cref="int"/>.</param>
         /// <param name="val">The val<see cref="short"/>.</param>
         public static void Middle(int index, short val)
         {

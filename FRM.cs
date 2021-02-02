@@ -109,7 +109,7 @@ namespace FOnlineDatRipper
         private readonly byte[] buffer = new byte[BufferSize];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example)......
+        /// Read only tag as a display name (on the tab for example).......
         /// </summary>
         private readonly string tag;
 
