@@ -91,6 +91,7 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="MyMenuRenderer.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Palette.cs" />
     <Compile Include="Program.cs" />
@@ -137,7 +138,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="res\gplv3_logo.png" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="res\acm_icon.png" />
   </ItemGroup>
@@ -167,6 +170,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\root_icon_opened.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\dir_out_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\extract_all_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\exit_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

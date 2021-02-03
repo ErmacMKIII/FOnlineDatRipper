@@ -12,30 +12,22 @@
 
 namespace FOnlineDatRipper
 {
-    using System;
     using System.Windows.Forms;
 
     /// <summary>
-    /// Defines the <see cref="Program" />.
+    /// Defines the <see cref="MyMenuRenderer" />.
     /// </summary>
-    internal static class Program
+    internal class MyMenuRenderer : ToolStripRenderer
     {
         /// <summary>
-        /// The main entry point for the application.
+        /// The OnRenderItemText.
         /// </summary>
-        [STAThread]
-        internal static void Main()
+        /// <param name="e">The e<see cref="ToolStripItemTextRenderEventArgs"/>.</param>
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
         {
-            // Init palette (load 256 colors)
-            Palette.Init();
-
-            // Init Marko's Tables!
-            Tables.Init();
-
-            // Create and display the form            
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(true);
-            Application.Run(new MainForm());
+            e.ToolStrip.BackColor = MainForm.DarkBackground;
+            e.TextColor = MainForm.DarkForeground;
+            base.OnRenderItemText(e);
         }
     }
 }

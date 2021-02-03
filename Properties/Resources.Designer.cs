@@ -38,7 +38,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the ResourceManager
-        /// Returns the cached ResourceManager instance used by this class........
+        /// Returns the cached ResourceManager instance used by this class..
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager
@@ -57,7 +57,7 @@ namespace FOnlineDatRipper.Properties
         /// <summary>
         /// Gets or sets the Culture
         /// Overrides the current thread's CurrentUICulture property for all
-        ///   resource lookups using this strongly typed resource class........
+        ///   resource lookups using this strongly typed resource class..
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Globalization.CultureInfo Culture
@@ -74,7 +74,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the acm_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap acm_icon
         {
@@ -87,7 +87,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the app
-        /// Looks up a localized resource of type System.Drawing.Icon similar to (Icon)........
+        /// Looks up a localized resource of type System.Drawing.Icon similar to (Icon)..
         /// </summary>
         internal static System.Drawing.Icon app
         {
@@ -100,7 +100,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the dir_icon_closed
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap dir_icon_closed
         {
@@ -113,7 +113,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the dir_icon_opened
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap dir_icon_opened
         {
@@ -125,8 +125,47 @@ namespace FOnlineDatRipper.Properties
         }
 
         /// <summary>
+        /// Gets the dir_out_icon
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
+        /// </summary>
+        internal static System.Drawing.Bitmap dir_out_icon
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("dir_out_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        /// Gets the exit_icon
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
+        /// </summary>
+        internal static System.Drawing.Bitmap exit_icon
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("exit_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        /// Gets the extract_all_icon
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
+        /// </summary>
+        internal static System.Drawing.Bitmap extract_all_icon
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("extract_all_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
         /// Gets the extract_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap extract_icon
         {
@@ -139,7 +178,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the eye_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap eye_icon
         {
@@ -152,7 +191,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the Fallout_Palette
-        /// Looks up a localized resource of type System.Byte[]........
+        /// Looks up a localized resource of type System.Byte[]..
         /// </summary>
         internal static byte[] Fallout_Palette
         {
@@ -165,7 +204,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the file_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap file_icon
         {
@@ -178,7 +217,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the frm_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap frm_icon
         {
@@ -190,8 +229,21 @@ namespace FOnlineDatRipper.Properties
         }
 
         /// <summary>
+        /// Gets the gplv3_logo
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
+        /// </summary>
+        internal static System.Drawing.Bitmap gplv3_logo
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("gplv3_logo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
         /// Gets the load_icon
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap load_icon
         {
@@ -204,7 +256,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the root_icon_closed
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap root_icon_closed
         {
@@ -217,7 +269,7 @@ namespace FOnlineDatRipper.Properties
 
         /// <summary>
         /// Gets the root_icon_opened
-        /// Looks up a localized resource of type System.Drawing.Bitmap........
+        /// Looks up a localized resource of type System.Drawing.Bitmap..
         /// </summary>
         internal static System.Drawing.Bitmap root_icon_opened
         {

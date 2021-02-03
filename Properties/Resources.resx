@@ -130,6 +130,15 @@
   <data name="dir_icon_opened" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\dir_icon_opened.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="dir_out_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\dir_out_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="exit_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\exit_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="extract_all_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\extract_all_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="extract_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\extract_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -144,6 +153,9 @@
   </data>
   <data name="frm_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\frm_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="gplv3_logo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\res\gplv3_logo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="load_icon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\res\load_icon.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

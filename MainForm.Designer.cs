@@ -18,7 +18,7 @@ namespace FOnlineDatRipper
     internal partial class MainForm
     {
         /// <summary>
-        /// Required designer variable...............
+        /// Required designer variable................
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
@@ -56,7 +56,7 @@ namespace FOnlineDatRipper
             this.groupBoxDatArchive = new System.Windows.Forms.GroupBox();
             this.btnOutDir = new System.Windows.Forms.Button();
             this.txtBoxOutDir = new System.Windows.Forms.TextBox();
-            this.btnExtract = new System.Windows.Forms.Button();
+            this.btnExtractAll = new System.Windows.Forms.Button();
             this.lblOutDir = new System.Windows.Forms.Label();
             this.txtBoxInArch = new System.Windows.Forms.TextBox();
             this.lblInArchive = new System.Windows.Forms.Label();
@@ -64,12 +64,24 @@ namespace FOnlineDatRipper
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
+            this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.indexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cntxtMenuStrip.SuspendLayout();
             this.pnlTree.SuspendLayout();
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
             this.groupBoxWorkProgress.SuspendLayout();
+            this.mainMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // imgLstDatStruct
@@ -157,28 +169,32 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.groupBoxDatArchive, "groupBoxDatArchive");
             this.groupBoxDatArchive.Controls.Add(this.pnlView);
             this.groupBoxDatArchive.Controls.Add(this.pnlTree);
+            this.groupBoxDatArchive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxDatArchive.Name = "groupBoxDatArchive";
             this.groupBoxDatArchive.TabStop = false;
             // 
             // btnOutDir
             // 
             resources.ApplyResources(this.btnOutDir, "btnOutDir");
+            this.btnOutDir.Image = global::FOnlineDatRipper.Properties.Resources.dir_out_icon;
             this.btnOutDir.Name = "btnOutDir";
             this.btnOutDir.UseVisualStyleBackColor = true;
             this.btnOutDir.Click += new System.EventHandler(this.btnOutDir_Click);
             // 
             // txtBoxOutDir
             // 
+            this.txtBoxOutDir.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.txtBoxOutDir, "txtBoxOutDir");
             this.txtBoxOutDir.Name = "txtBoxOutDir";
             this.txtBoxOutDir.ReadOnly = true;
             // 
-            // btnExtract
+            // btnExtractAll
             // 
-            resources.ApplyResources(this.btnExtract, "btnExtract");
-            this.btnExtract.Name = "btnExtract";
-            this.btnExtract.UseVisualStyleBackColor = true;
-            this.btnExtract.Click += new System.EventHandler(this.btnExtract_Click);
+            resources.ApplyResources(this.btnExtractAll, "btnExtractAll");
+            this.btnExtractAll.Image = global::FOnlineDatRipper.Properties.Resources.extract_all_icon;
+            this.btnExtractAll.Name = "btnExtractAll";
+            this.btnExtractAll.UseVisualStyleBackColor = true;
+            this.btnExtractAll.Click += new System.EventHandler(this.btnExtract_Click);
             // 
             // lblOutDir
             // 
@@ -187,6 +203,7 @@ namespace FOnlineDatRipper
             // 
             // txtBoxInArch
             // 
+            this.txtBoxInArch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.txtBoxInArch, "txtBoxInArch");
             this.txtBoxInArch.Name = "txtBoxInArch";
             this.txtBoxInArch.ReadOnly = true;
@@ -199,6 +216,7 @@ namespace FOnlineDatRipper
             // btnInArch
             // 
             resources.ApplyResources(this.btnInArch, "btnInArch");
+            this.btnInArch.Image = global::FOnlineDatRipper.Properties.Resources.dir_icon_opened;
             this.btnInArch.Name = "btnInArch";
             this.btnInArch.UseVisualStyleBackColor = true;
             this.btnInArch.Click += new System.EventHandler(this.btnInArch_Click);
@@ -210,9 +228,10 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.Controls.Add(this.lblInArchive);
             this.groupBoxPaths.Controls.Add(this.txtBoxInArch);
             this.groupBoxPaths.Controls.Add(this.lblOutDir);
-            this.groupBoxPaths.Controls.Add(this.btnExtract);
+            this.groupBoxPaths.Controls.Add(this.btnExtractAll);
             this.groupBoxPaths.Controls.Add(this.txtBoxOutDir);
             this.groupBoxPaths.Controls.Add(this.btnOutDir);
+            this.groupBoxPaths.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
             // 
@@ -226,8 +245,84 @@ namespace FOnlineDatRipper
             // 
             resources.ApplyResources(this.groupBoxWorkProgress, "groupBoxWorkProgress");
             this.groupBoxWorkProgress.Controls.Add(this.taskProgressBar);
+            this.groupBoxWorkProgress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxWorkProgress.Name = "groupBoxWorkProgress";
             this.groupBoxWorkProgress.TabStop = false;
+            // 
+            // mainMenuStrip
+            // 
+            this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.helpToolStripMenuItem});
+            resources.ApplyResources(this.mainMenuStrip, "mainMenuStrip");
+            this.mainMenuStrip.Name = "mainMenuStrip";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.toolStripSeparator,
+            this.saveToolStripMenuItem,
+            this.saveAsToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.dir_icon_opened;
+            resources.ApplyResources(this.openToolStripMenuItem, "openToolStripMenuItem");
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator
+            // 
+            this.toolStripSeparator.Name = "toolStripSeparator";
+            resources.ApplyResources(this.toolStripSeparator, "toolStripSeparator");
+            // 
+            // saveToolStripMenuItem
+            // 
+            this.saveToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
+            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
+            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+            // 
+            // saveAsToolStripMenuItem
+            // 
+            this.saveAsToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_all_icon;
+            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
+            resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            resources.ApplyResources(this.toolStripSeparator1, "toolStripSeparator1");
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.exit_icon;
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem,
+            this.indexToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // indexToolStripMenuItem
+            // 
+            this.indexToolStripMenuItem.Name = "indexToolStripMenuItem";
+            resources.ApplyResources(this.indexToolStripMenuItem, "indexToolStripMenuItem");
             // 
             // MainForm
             // 
@@ -236,6 +331,7 @@ namespace FOnlineDatRipper
             this.Controls.Add(this.groupBoxDatArchive);
             this.Controls.Add(this.groupBoxPaths);
             this.Controls.Add(this.groupBoxWorkProgress);
+            this.Controls.Add(this.mainMenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "MainForm";
             this.cntxtMenuStrip.ResumeLayout(false);
@@ -248,6 +344,8 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.ResumeLayout(false);
             this.groupBoxPaths.PerformLayout();
             this.groupBoxWorkProgress.ResumeLayout(false);
+            this.mainMenuStrip.ResumeLayout(false);
+            this.mainMenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -319,9 +417,9 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.TextBox txtBoxOutDir;
 
         /// <summary>
-        /// Defines the btnExtract.
+        /// Defines the btnExtractAll.
         /// </summary>
-        private System.Windows.Forms.Button btnExtract;
+        private System.Windows.Forms.Button btnExtractAll;
 
         /// <summary>
         /// Defines the lblOutDir.
@@ -357,5 +455,60 @@ namespace FOnlineDatRipper
         /// Defines the groupBoxWorkProgress.
         /// </summary>
         private System.Windows.Forms.GroupBox groupBoxWorkProgress;
+
+        /// <summary>
+        /// Defines the mainMenuStrip.
+        /// </summary>
+        private System.Windows.Forms.MenuStrip mainMenuStrip;
+
+        /// <summary>
+        /// Defines the fileToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the openToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the toolStripSeparator.
+        /// </summary>
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
+
+        /// <summary>
+        /// Defines the saveToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the saveAsToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the toolStripSeparator1.
+        /// </summary>
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+
+        /// <summary>
+        /// Defines the exitToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the helpToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the aboutToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the indexToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
     }
 }
