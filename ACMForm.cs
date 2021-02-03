@@ -24,37 +24,37 @@ namespace FOnlineDatRipper
     internal class ACMForm : Form
     {
         /// <summary>
-        /// acm sound files array which is equal to the number of tabs.......
+        /// acm sound files array which is equal to the number of tabs........
         /// </summary>
         private readonly List<ACM> acms;
 
         /// <summary>
-        /// button for playing current track or music file......
+        /// button for playing current track or music file.......
         /// </summary>
         private readonly Button btnPlay = new Button();
 
         /// <summary>
-        /// button for pausing current track or music file......
+        /// button for pausing current track or music file.......
         /// </summary>
         private readonly Button btnPause = new Button();
 
         /// <summary>
-        /// button to reset current track or music file......
+        /// button to reset current track or music file.......
         /// </summary>
         private readonly Button btnStop = new Button();
 
         /// <summary>
-        /// list box contains tracks......
+        /// list box contains tracks.......
         /// </summary>
         private readonly ListBox listBox = new ListBox();
 
         /// <summary>
-        /// tab control with selected tab.......
+        /// tab control with selected tab........
         /// </summary>
         private readonly TabControl tabControl = new TabControl();
 
         /// <summary>
-        /// Wave sound player......
+        /// Wave sound player.......
         /// </summary>
         private readonly WaveOutEvent wo = new WaveOutEvent();
 
@@ -98,6 +98,8 @@ namespace FOnlineDatRipper
             this.FormBorderStyle = FormBorderStyle.Fixed3D;
 
             listBox.Dock = DockStyle.Fill;
+            this.listBox.SelectedIndexChanged += ListBox_SelectedIndexChanged;
+
             // add each ACM to the list box
             foreach (ACM acm in acms)
             {
@@ -125,13 +127,45 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
+        /// The ListBox_SelectedIndexChanged.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void ListBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int index = listBox.SelectedIndex;
+            if (index != -1)
+            {
+                ACM acm = acms[index];
+                if (acm.WaveStream != null)
+                {
+                    using (acm.WaveStream)
+                    {
+                        wo.Init(acms[index].WaveStream);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// The BtnStop_Click.
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnStop_Click(object sender, EventArgs e)
         {
-            wo.Stop();
+            int index = listBox.SelectedIndex;
+            if (index != -1)
+            {
+                ACM acm = acms[index];
+                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Stopped)
+                {
+                    using (acm.WaveStream)
+                    {
+                        wo.Stop();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -141,7 +175,18 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnPause_Click(object sender, EventArgs e)
         {
-            wo.Pause();
+            int index = listBox.SelectedIndex;
+            if (index != -1)
+            {
+                ACM acm = acms[index];
+                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Paused)
+                {
+                    using (acm.WaveStream)
+                    {
+                        wo.Pause();
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -154,12 +199,24 @@ namespace FOnlineDatRipper
             int index = listBox.SelectedIndex;
             if (index != -1)
             {
-                if (wo.PlaybackState != PlaybackState.Playing)
+                ACM acm = acms[index];
+                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Playing)
                 {
-                    wo.Init(acms[index].WaveStream);
-                    wo.Play();
+                    using (acm.WaveStream)
+                    {
+                        wo.Play();
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// The Dispose.
+        /// </summary>
+        /// <param name="disposing">The disposing<see cref="bool"/>.</param>
+        protected override void Dispose(bool disposing)
+        {
+            wo.Dispose();
         }
     }
 }

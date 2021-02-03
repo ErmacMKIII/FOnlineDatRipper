@@ -21,12 +21,23 @@ namespace FOnlineDatRipper
     /// <summary>
     /// Defines the <see cref="Dat" />.
     /// </summary>
-    internal class Dat
+    internal class Dat : FOnlineFile
     {
+        /// <summary>
+        /// The ProgressUpdate.
+        /// </summary>
+        /// <param name="progress">The value<see cref="double"/>.</param>
+        public delegate void ProgressUpdate(double progress);
+
+        /// <summary>
+        /// Defines the OnProgressUpdate.
+        /// </summary>
+        public event ProgressUpdate OnProgressUpdate;
+
         /// <summary>
         /// Defines the BufferSize.
         /// </summary>
-        public const int BufferSize = 256 * 1024 * 1024;
+        public const int BufferSize = 0x10000000;// 256 MB Buffer
 
         /// <summary>
         /// Defines the buffer.
@@ -54,7 +65,7 @@ namespace FOnlineDatRipper
         private readonly Tree<string> tree = new Tree<string>(new Node<string>("root"));
 
         /// <summary>
-        /// Defines the scope for nodes...........
+        /// Defines the scope for nodes............
         /// </summary>
         private readonly List<List<Node<string>>> scope = new List<List<Node<string>>>();
 
@@ -71,53 +82,64 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the progress.
         /// </summary>
-        private double progress = 0.0f;
+        private double progress = 0.0;
 
         /// <summary>
-        /// Gets or sets the Progress.
+        /// Gets the Progress
+        /// Gets or sets the Progress..
         /// </summary>
-        public double Progress { get => progress; set => progress = value; }
+        public double Progress { get => progress; }
 
         /// <summary>
-        /// Is error occurred?.......
+        /// Is error occurred?........
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message to display.......
+        /// Error message to display........
         /// </summary>
         private string errorMessage = "";
 
         /// <summary>
-        /// Gets or sets a value indicating whether Error.
+        /// Gets a value indicating whether Error.
         /// </summary>
-        public bool Error { get => error; set => error = value; }
+        public bool Error { get => error; }
 
         /// <summary>
-        /// Gets or sets the ErrorMessage.
+        /// Gets the ErrorMessage.
         /// </summary>
-        public string ErrorMessage { get => errorMessage; set => errorMessage = value; }
+        public string ErrorMessage { get => errorMessage; }
 
         /// <summary>
-        /// The ProgressUpdate.
+        /// Tag used to associtate this (e.g. filename).
         /// </summary>
-        /// <param name="value">The value<see cref="double"/>.</param>
-        public delegate void ProgressUpdate(double value);
+        private readonly string tag;
 
         /// <summary>
-        /// Defines the OnProgressUpdate.
+        /// Gets the Tag
+        /// Tag used to associtate this (e.g. filename).
         /// </summary>
-        public event ProgressUpdate OnProgressUpdate;
+        public string Tag { get => tag; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dat"/> class.
+        /// </summary>
+        /// <param name="filepath">The filepath<see cref="string"/>.</param>
+        public Dat(string filepath)
+        {
+            int lastIndex = filepath.LastIndexOf('\\');
+            this.tag = filepath.Substring(lastIndex + 1);
+        }
 
         /// <summary>
         /// Loads from the file into the memory.
         /// </summary>
         /// <param name="filename"> filename binary.</param>
-        private void LoadFromFile(String filename)
+        private void LoadFromFile(string filename)
         {
             using (BinaryReader br = new BinaryReader(File.OpenRead(filename)))
             {
-                datSize = br.Read(buffer, 0, BufferSize);
+                datSize = br.Read(this.buffer, 0, BufferSize);
                 br.Close();
             }
         }
@@ -125,10 +147,12 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Reads the binary data from the input file, store into the memory and creates data blocks.
         /// </summary>
-        /// <param name="filepath">.</param>
-        public void Read(string filepath)
+        /// <param name="filepath">The filepath<see cref="string"/>.</param>
+        public override void ReadFile(string filepath)
         {
             progress = 0.0;
+
+            this.tree.Root.Data = tag;
 
             // inits buffer with zeroes
             buffer.Initialize();
@@ -156,7 +180,7 @@ namespace FOnlineDatRipper
             }
 
             // reading from the buffer (stored in the memory) ...
-            using (BinaryReader br = new BinaryReader(new MemoryStream(buffer)))
+            using (BinaryReader br = new BinaryReader(new MemoryStream(buffer, 0, datSize)))
             {
                 br.BaseStream.Position = datSize - 4;
                 // reading real dat size to check if it's ok
@@ -180,7 +204,10 @@ namespace FOnlineDatRipper
                 uint fileCount = br.ReadUInt32();
 
                 progress += 5.0;
-                OnProgressUpdate(progress);
+                if (OnProgressUpdate != null)
+                {
+                    OnProgressUpdate(progress);
+                }
 
                 // iterating through the files (they can be compressed or uncompressed)
                 for (uint i = 0; i < fileCount; i++)
@@ -205,7 +232,10 @@ namespace FOnlineDatRipper
                     dataBlocks.Add(dataBlock);
 
                     progress += 95.0 / (double)fileCount;
-                    OnProgressUpdate(progress);
+                    if (OnProgressUpdate != null)
+                    {
+                        OnProgressUpdate(progress);
+                    }
                 }
 
                 if (br.BaseStream.Position > datSize)
@@ -291,7 +321,10 @@ namespace FOnlineDatRipper
             {
                 Extract(outdir, dataBlock);
                 progress += 100.0 / (double)dataBlocks.Count;
-                OnProgressUpdate(progress);
+                if (OnProgressUpdate != null)
+                {
+                    OnProgressUpdate(progress);
+                }
             }
             progress = 100.0;
         }
@@ -360,7 +393,10 @@ namespace FOnlineDatRipper
             {
                 BuildTree(dataBlock.Filename.Split('\\'));
                 progress += 100.0 / (double)dataBlocks.Count;
-                OnProgressUpdate(progress);
+                if (OnProgressUpdate != null)
+                {
+                    OnProgressUpdate(progress);
+                }
             }
 
             progress = 100.0;
@@ -442,6 +478,42 @@ namespace FOnlineDatRipper
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Gets the tag (filename).
+        /// </summary>
+        /// <returns>.</returns>
+        public override string GetTag()
+        {
+            return Tag;
+        }
+
+        /// <summary>
+        /// Tells if error ocurred.
+        /// </summary>
+        /// <returns>.</returns>
+        public override bool IsError()
+        {
+            return error;
+        }
+
+        /// <summary>
+        /// Shows the error message.
+        /// </summary>
+        /// <returns>.</returns>
+        public override string GetErrorMessage()
+        {
+            return errorMessage;
+        }
+
+        /// <summary>
+        /// The GetProgress.
+        /// </summary>
+        /// <returns>The <see cref="double"/>.</returns>
+        public override double GetProgress()
+        {
+            return progress;
         }
     }
 }

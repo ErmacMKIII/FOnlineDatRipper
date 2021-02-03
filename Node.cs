@@ -23,7 +23,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the data.
         /// </summary>
-        private readonly T data;
+        private T data;
 
         /// <summary>
         /// Defines the parent.
@@ -46,9 +46,9 @@ namespace FOnlineDatRipper
         public Node<T> Parent { get => parent; set => parent = value; }
 
         /// <summary>
-        /// Gets the Data.
+        /// Gets or sets the data of this node.
         /// </summary>
-        public T Data => data;
+        public T Data { get => data; set => data = value; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Node{T}"/> class.

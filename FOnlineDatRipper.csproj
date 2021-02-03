@@ -84,6 +84,7 @@
     <Compile Include="DataBlock.cs" />
     <Compile Include="Frame.cs" />
     <Compile Include="FRM.cs" />
+    <Compile Include="FOnlineFile.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

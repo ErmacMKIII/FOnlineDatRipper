@@ -73,13 +73,13 @@ namespace FOnlineDatRipper
                 for (x2 = 0; x2 < 3; x2++)
                     for (x1 = 0; x1 < 3; x1++)
                         table1[x1 + x2 * 3 + x3 * 3 * 3] =
-                            (byte)(x1 + (x2 << 4) + (x3 << 8));
+                            (byte)(x1 + (x2 << 2) + (x3 << 4));
 
             for (x3 = 0; x3 < 5; x3++)
                 for (x2 = 0; x2 < 5; x2++)
                     for (x1 = 0; x1 < 5; x1++)
                         table2[x1 + x2 * 5 + x3 * 5 * 5] =
-                            (short)(x1 + (x2 << 4) + (x3 << 8));
+                            (short)(x1 + (x2 << 3) + (x3 << 6));
 
             for (x2 = 0; x2 < 11; x2++)
                 for (x1 = 0; x1 < 11; x1++)

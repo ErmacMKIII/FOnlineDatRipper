@@ -20,8 +20,19 @@ namespace FOnlineDatRipper
     /// <summary>
     /// Defines the <see cref="FRM" />.
     /// </summary>
-    internal class FRM
+    internal class FRM : FOnlineFile
     {
+        /// <summary>
+        /// The ProgressUpdate.
+        /// </summary>
+        /// <param name="progress">The value<see cref="double"/>.</param>
+        public delegate void ProgressUpdate(double progress);
+
+        /// <summary>
+        /// Defines the OnProgressUpdate.
+        /// </summary>
+        public event ProgressUpdate OnProgressUpdate;
+
         /// <summary>
         /// Direction for the frames
         /// </summary>
@@ -76,12 +87,12 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the shiftX.
         /// </summary>
-        private int[] shiftX = new int[6];// signed
+        private readonly int[] shiftX = new int[6];// signed
 
         /// <summary>
         /// Defines the shiftY.
         /// </summary>
-        private int[] shiftY = new int[6];// signed
+        private readonly int[] shiftY = new int[6];// signed
 
         /// <summary>
         /// Defines the offset.
@@ -101,7 +112,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the BufferSize.
         /// </summary>
-        internal const int BufferSize = 0x1000000;
+        internal const int BufferSize = 0x1000000; // 16 MB Buffer Size
 
         /// <summary>
         /// Defines the buffer.
@@ -154,6 +165,31 @@ namespace FOnlineDatRipper
         public string Tag => tag;
 
         /// <summary>
+        /// Did error occurred?
+        /// </summary>
+        private bool error = false;
+
+        /// <summary>
+        /// Error message for display
+        /// </summary>
+        private string errorMessage = "";
+
+        /// <summary>
+        /// Did error occurred?
+        /// </summary>
+        public bool Error { get => error;  }
+
+        /// <summary>
+        /// Error message for display
+        /// </summary>
+        public string ErrorMessage { get => errorMessage;  }
+        
+
+        private double progress = 0.0;
+
+        public double Progress { get => progress; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="FRM"/> class.
         /// </summary>
         /// <param name="frmFile"> frm binary file.</param>
@@ -162,21 +198,7 @@ namespace FOnlineDatRipper
             int lastIndex = frmFile.LastIndexOf('\\');
             this.tag = frmFile.Substring(lastIndex + 1);
             ReadFile(frmFile);
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FRM"/> class.
-        /// </summary>
-        /// <param name="filename">The filename<see cref="string"/>.</param>
-        /// <param name="bytes"> frm as byte array (unpacked) .</param>
-        public FRM(string filename, byte[] bytes)
-        {
-            int lastIndex = filename.LastIndexOf('\\');
-            this.tag = filename.Substring(lastIndex + 1);
-            pos_max = bytes.Length;
-            Array.Copy(bytes, buffer, bytes.Length);
-            ReadBuffer();
-        }
+        }        
 
         /// <summary>
         /// Loads from the file into the memory.
@@ -195,7 +217,7 @@ namespace FOnlineDatRipper
         /// Reads frm file and create frames.
         /// </summary>
         /// <param name="frmFile">.</param>
-        private void ReadFile(string frmFile)
+        public override void ReadFile(string frmFile)
         {
             buffer.Initialize();
             frames.Clear();
@@ -205,8 +227,20 @@ namespace FOnlineDatRipper
             }
             else
             {
+                error = true;
+                errorMessage = "Error - file not exist!";
                 return;
             }
+            ReadBuffer();
+        }
+
+        /// <summary>
+        /// Reads frm file and create frames.
+        /// </summary>
+        /// <param name="frmBytes"></param>
+        public void ReadBytes(byte[] frmBytes)
+        {
+            Array.Copy(frmBytes, buffer, frmBytes.Length);
             ReadBuffer();
         }
 
@@ -215,6 +249,7 @@ namespace FOnlineDatRipper
         /// </summary>
         private void ReadBuffer()
         {
+            this.progress = 0.0;
             //----------------------------------------------------------------------
             pos = 0x0000;
             // big endian motorola
@@ -226,6 +261,11 @@ namespace FOnlineDatRipper
             pos += 2;
             FramesPerDirection = (uint)(((buffer[pos] & 0xFF) << 8) | ((buffer[pos + 1] & 0xFF)));
             pos += 2;
+            this.progress = 10.0;
+            if (OnProgressUpdate != null)
+            {
+                OnProgressUpdate(progress);
+            }
             //----------------------------------------------------------------------                
             for (uint i = 0; i < 6; i++)
             {
@@ -235,7 +275,7 @@ namespace FOnlineDatRipper
 
             for (uint i = 0; i < 6; i++)
             {
-                shiftX[i] = (buffer[pos] << 8) | buffer[pos + 1];
+                shiftY[i] = (buffer[pos] << 8) | buffer[pos + 1];
                 pos += 2;
             }
             //----------------------------------------------------------------------        
@@ -246,7 +286,17 @@ namespace FOnlineDatRipper
             }
             //----------------------------------------------------------------------
             frameSize = (uint)(((buffer[pos] & 0xFF) << 24) | ((buffer[pos + 1] & 0xFF) << 16) | ((buffer[pos + 2] & 0xFF) << 8) | (buffer[pos + 3] & 0xFF));
+            if (framesPerDirection != 0 && frameSize % framesPerDirection != 0) {
+                error = true;
+                errorMessage = "Error - FRM has invalid frames per direction or invalid frame size!";
+                return;
+            }
             pos += 4;
+            this.progress = 20.0;
+            if (OnProgressUpdate != null)
+            {
+                OnProgressUpdate(progress);
+            }
             //----------------------------------------------------------------------
             uint total = 0;
             while (total < frameSize)
@@ -257,6 +307,12 @@ namespace FOnlineDatRipper
                     pos += 2;
                     uint height = (uint)(((buffer[pos] & 0xFF) << 8) | (buffer[pos + 1] & 0xFF));
                     pos += 2;
+                    if (width == 0 || height == 0)
+                    {
+                        error = true;
+                        errorMessage = "Error - Invalid Frame pixel width or height!";
+                        return;
+                    }
                     //--------------------------------------------------------------
                     pos += 4;
                     //--------------------------------------------------------------
@@ -265,19 +321,33 @@ namespace FOnlineDatRipper
                     int offsetY = (buffer[pos] << 8) | (buffer[pos + 1]);
                     pos += 2;
                     //--------------------------------------------------------------
+                    
                     Frame frame = new Frame(width, height, offsetX, offsetY);
                     for (uint py = 0; py < frame.Height; py++)
                     {
                         for (uint px = 0; px < frame.Width; px++)
                         {
                             byte index = buffer[pos++];
+                            if (index < 0 || index > 255)
+                            {
+                                error = true;
+                                errorMessage = "Error - Invalid palette entry!";
+                                return;
+                            }
                             frame.SetPixel(px, py, index);
                         }
                     }
                     frames.Add(frame);
-                    total += 12 + width * height;
+                    total += 12 + width * height;                    
+                    this.progress = 30.0 + 70.0 * (total / (double)frameSize);
+                    if (OnProgressUpdate != null)
+                    {
+                        OnProgressUpdate(progress);
+                    }
                 }
             }
+
+            this.progress = 100.0;
         }
 
         /// <summary>
@@ -322,6 +392,26 @@ namespace FOnlineDatRipper
         public Direction GetDirection(Frame frame)
         {
             return (Direction)(frames.IndexOf(frame) / framesPerDirection);
+        }
+
+        public override string GetTag()
+        {
+            return Tag;
+        }
+
+        public override bool IsError()
+        {
+            return Error;
+        }
+
+        public override string GetErrorMessage()
+        {
+            return errorMessage;
+        }
+
+        public override double GetProgress()
+        {
+            return progress;
         }
     }
 }

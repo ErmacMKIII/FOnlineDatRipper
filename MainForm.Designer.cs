@@ -250,6 +250,7 @@ namespace FOnlineDatRipper
             this.groupBoxWorkProgress.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         /// <summary>

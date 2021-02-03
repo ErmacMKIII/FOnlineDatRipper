@@ -17,6 +17,7 @@ namespace FOnlineDatRipper
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
+    using System.IO;
     using System.Windows.Forms;
 
     /// <summary>
@@ -24,6 +25,21 @@ namespace FOnlineDatRipper
     /// </summary>
     internal partial class MainForm : Form
     {
+        private FOnlineFile fOnlineFile;
+
+        /// <summary>
+        /// How application should behave
+        /// </summary>
+        public enum Behavior
+        {
+            DO_NOTH, DO_DAT, DO_ACM, DO_FRM
+        }
+
+        /// <summary>
+        /// Application behavior
+        /// </summary>
+        private Behavior behavior = Behavior.DO_NOTH;
+
         /// <summary>
         /// Defines the DarkBackground.
         /// </summary>
@@ -52,32 +68,27 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the OpenedDirIndex.
         /// </summary>
-        internal const int OpenedDirIndex = 3;
-
-        /// <summary>
-        /// Defines the FileIndex.
-        /// </summary>
-        internal const int FileIndex = 4;
+        internal const int OpenedDirIndex = 3;        
 
         /// <summary>
         /// Defines the ACMIndex.
         /// </summary>
-        internal const int ACMIndex = 5;
+        internal const int ACMIndex = 4;
 
         /// <summary>
         /// Defines the FRMIndex.
         /// </summary>
-        internal const int FRMIndex = 6;
+        internal const int FRMIndex = 5;
 
         /// <summary>
-        /// Defines the Fallout dat........
+        /// Defines the FileIndex.
         /// </summary>
-        private readonly Dat dat = new Dat();
+        internal const int FileIndex = 6;        
 
         /// <summary>
-        /// Defines the datfile.
+        /// Defines the input file.
         /// </summary>
-        private string datfile;
+        private string inputFile;
 
         /// <summary>
         /// Defines the output directory to extract the data.......
@@ -130,7 +141,6 @@ namespace FOnlineDatRipper
         public MainForm()
         {
             InitializeComponent();
-            SubToDatEvents();
             InitDarkTheme(this);
         }
 
@@ -147,33 +157,26 @@ namespace FOnlineDatRipper
             {
                 InitDarkTheme(ctrl);
             }
-        }
-
-        /// <summary>
-        /// The SubToDatEvents.
-        /// </summary>
-        private void SubToDatEvents()
-        {
-            dat.OnProgressUpdate += Dat_OnProgressUpdate;
-        }
+        }        
 
         /// <summary>
         /// The Dat_OnProgressUpdate.
         /// </summary>
         /// <param name="value">The value<see cref="double"/>.</param>
-        private void Dat_OnProgressUpdate(double value)
+        private void FOnlineFile_OnProgressUpdate(double value)
         {
             // its in another thread so invoke back to UI thread
             base.Invoke((Action)delegate
             {
-                this.taskProgressBar.Value = (int)Math.Round(dat.Progress);
+                this.taskProgressBar.Value = (fOnlineFile == null) ? 0 : (int)Math.Round(fOnlineFile.GetProgress());
             });
         }
 
         /// <summary>
         /// Builds tree for the form based on data tree structure.
         /// </summary>
-        private void BuildTreeView()
+        /// <param name="dat">dat archive</param>
+        private void BuildTreeView(Dat dat)
         {
             treeViewDat.BeginUpdate();
             // then call preorder
@@ -229,12 +232,13 @@ namespace FOnlineDatRipper
             treeViewDat.EndUpdate();
         }
 
-        /// <summary>
+        /// <summary>        
         /// Builds the list view.
-        /// Tree child nodes are displayed as items in the view.
+        /// Tree child nodes are displayed as items in the view.        
         /// </summary>
+        /// <param name="dat">dat archive</param>
         /// <param name="datNode"> dat node to start building from .</param>
-        private void BuildListView(Node<string> datNode)
+        private void BuildListView(Dat dat, Node<string> datNode)
         {
             datCacheMiss = true;
             datListViewItems.Clear();
@@ -290,13 +294,17 @@ namespace FOnlineDatRipper
         /// Reads the dat file, builds dat tree
         /// Basically does all. Doesn't involve any windows controls 
         /// Invoked from another thread beacuase it's expensive for perfomance.
+        /// Called from Background worker.
         /// </summary>
-        private void DatDoAll()
+        private void DatDoAll(Dat dat)
         {
+            // sub to the event
+            dat.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
+
             // start measuring the time
-            stopwatch.Start();
-            // call dat to read the file
-            dat.Read(datfile);
+            stopwatch.Start();            
+
+            dat.ReadFile(inputFile);
 
             // call dat to buld tree structure
             dat.BuildTreeStruct();
@@ -312,9 +320,62 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// The DatDoExtractAll.
+        /// Do Relevant stuff with FRM.
+        /// Called from Background worker.
         /// </summary>
-        private void DatDoExtractAll()
+        /// <param name="frm"></param>
+        private void FRMDoAll(FRM frm)
+        {   
+            // sub to the event
+            frm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
+
+            // start measuring the time
+            stopwatch.Start();
+
+            // read FRM
+            frm.ReadFile(inputFile);
+
+            // stop measuring the time
+            stopwatch.Stop();            
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
+        /// Do relevant stuff with ACM
+        /// Called from Background worker.
+        /// </summary>
+        /// <param name="acm"></param>
+        private void ACMDoAll(ACM acm)
+        {
+            // sub to the event
+            acm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
+
+            // start measuring the time
+            stopwatch.Start();
+            
+            // read acm
+            acm.ReadFile(inputFile);
+
+            // stop measuring the time
+            stopwatch.Stop();            
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
+        /// Extrall all from the dat.
+        /// Called from Background worker.
+        /// </summary>
+        private void DatDoExtractAll(Dat dat)
         {
             stopwatch.Start();
 
@@ -332,6 +393,43 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
+        /// Do something with FOnline File
+        /// </summary>
+        private void DoWith()
+        {
+            if (fOnlineFile != null)
+            {
+                switch (behavior)
+                {
+                    case Behavior.DO_DAT:
+                        Dat dat = (Dat)fOnlineFile;
+                        BuildTreeView(dat); // build left side, tree view
+                        BuildListView(dat, dat.Tree.Root); // build right side list view
+                        break;
+                    case Behavior.DO_ACM:
+                        List<ACM> acms = new List<ACM>();
+                        acms.Add((ACM)fOnlineFile);
+                        // create and use the subform
+                        using (ACMForm acmForm = new ACMForm(acms))
+                        {
+                            acmForm.ShowDialog();
+                        }
+                        break;
+                    case Behavior.DO_FRM:
+                        byte[] inputBytes = File.ReadAllBytes(inputFile);
+                        List<FRM> frms = new List<FRM>();
+                        frms.Add((FRM)fOnlineFile);
+                        // create and use the subform
+                        using (FRMForm frmForm = new FRMForm(frms))
+                        {
+                            frmForm.ShowDialog();
+                        }
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
         /// The btnInDir_Click.
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
@@ -340,13 +438,13 @@ namespace FOnlineDatRipper
         {
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
-                openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|All files (*.*)|*.*";
+                openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|FRM files (*.frm)|*.frm|ACM files (*.acm)|*.acm|All files (*.*)|*.*";
                 openFileDialog.RestoreDirectory = true;
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
-                    datfile = openFileDialog.FileName;
-                    txtBoxInArch.Text = datfile;
+                    inputFile = openFileDialog.FileName;
+                    txtBoxInArch.Text = inputFile;                    
 
                     reader.DoWork += Reader_DoWork;
                     reader.RunWorkerCompleted += Reader_RunWorkerCompleted;
@@ -362,18 +460,19 @@ namespace FOnlineDatRipper
         /// <param name="e">.</param>
         private void Reader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            if (dat.Error)
+            // Detect errors!
+            if (fOnlineFile.IsError())
             {
-                MessageBox.Show(dat.ErrorMessage + "(" + seconds + " seconds)", "Reading Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(fOnlineFile.GetErrorMessage() + " (" + seconds + " seconds)", "Reading File", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                MessageBox.Show("Dat File sucessfully loaded in " + seconds + " seconds!", "Reading Dat File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("File sucessfully loaded in " + seconds + " seconds!", "Reading File", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             this.taskProgressBar.Value = 0;
 
-            BuildTreeView(); // build left side, tree view
-            BuildListView(dat.Tree.Root); // build right side list view
+            // do something with FOnline File!
+            DoWith();
         }
 
         /// <summary>
@@ -383,7 +482,30 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Reader_DoWork(object sender, DoWorkEventArgs e)
         {
-            DatDoAll(); // read dat file, build dat tree            
+            string extension = Path.GetExtension(inputFile);
+            // choose behaviour based on file extension
+            switch (extension.ToLower())
+            {
+                case ".acm":
+                    behavior = Behavior.DO_ACM;
+                    fOnlineFile = new ACM(inputFile);                    
+                    ACMDoAll((ACM) fOnlineFile);
+                    break;
+                case ".frm":
+                    behavior = Behavior.DO_FRM;
+                    fOnlineFile = new FRM(inputFile);
+                    FRMDoAll((FRM) fOnlineFile);
+                    break;
+                case ".dat":
+                    behavior = Behavior.DO_DAT;
+                    fOnlineFile = new Dat(inputFile);                   
+                    DatDoAll((Dat)fOnlineFile); // read dat file, build dat tree  
+                    break;
+                default:
+                    behavior = Behavior.DO_NOTH;
+                    break;
+            }
+                        
         }
 
         /// <summary>
@@ -413,19 +535,22 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="TreeViewEventArgs"/>.</param>
         private void treeViewDat_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            IAsyncResult asyncResult = treeViewDat.BeginInvoke(new Action(() =>
+            if (behavior == Behavior.DO_DAT && fOnlineFile != null)
             {
-                if (e.Node.IsExpanded)
+                IAsyncResult asyncResult = treeViewDat.BeginInvoke(new Action(() =>
                 {
-                    e.Node.Collapse();
-                }
-                else
-                {
-                    e.Node.Expand();
-                }
-                BuildListView((Node<string>)e.Node.Tag);
-            }));
-            treeViewDat.EndInvoke(asyncResult);
+                    if (e.Node.IsExpanded)
+                    {
+                        e.Node.Collapse();
+                    }
+                    else
+                    {
+                        e.Node.Expand();
+                    }
+                    BuildListView((Dat) fOnlineFile, (Node<string>)e.Node.Tag);
+                }));
+                treeViewDat.EndInvoke(asyncResult);
+            }
         }
 
         /// <summary>
@@ -435,16 +560,19 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void listViewDat_DoubleClick(object sender, EventArgs e)
         {
-            IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
+            if (behavior == Behavior.DO_DAT && fOnlineFile != null)
             {
-                ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
-                foreach (int selectedIndex in selectedIndices)
+                IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
                 {
-                    ListViewItem selItem = datListViewItems[selectedIndex];
-                    BuildListView((Node<string>)selItem.Tag);
-                }
-            }));
-            listViewDat.EndInvoke(asyncResult);
+                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                    foreach (int selectedIndex in selectedIndices)
+                    {
+                        ListViewItem selItem = datListViewItems[selectedIndex];
+                        BuildListView((Dat) fOnlineFile, (Node<string>)selItem.Tag);
+                    }
+                }));
+                listViewDat.EndInvoke(asyncResult);
+            }
         }
 
         /// <summary>
@@ -508,41 +636,55 @@ namespace FOnlineDatRipper
         {
             ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
 
-            // create ACM list (sound files)
-            List<ACM> acms = new List<ACM>();
-            // create FRM list (image files)
-            List<FRM> fRMs = new List<FRM>();
-
-            foreach (int selectedIndex in selectedIndices)
+            if (behavior == Behavior.DO_DAT && fOnlineFile != null)
             {
-                ListViewItem selItem = datListViewItems[selectedIndex];
-                Node<string> datNode = (Node<string>)selItem.Tag;
-                DataBlock dataBlock = dat.GetDataBlock(datNode);
-                byte[] bytes = dat.Data(dataBlock);
-                string filename = dataBlock.Filename;
-                if (filename.ToLower().EndsWith(".acm"))
+                // make a cast
+                Dat dat = (Dat)fOnlineFile;
+
+                // create ACM list (sound files)
+                List<ACM> acms = new List<ACM>();
+                // create FRM list (image files)
+                List<FRM> fRMs = new List<FRM>();
+
+                foreach (int selectedIndex in selectedIndices)
                 {
-                    ACM acm = new ACM(dataBlock.Filename, bytes);
-                    acms.Add(acm);
+                    ListViewItem selItem = datListViewItems[selectedIndex];
+                    Node<string> datNode = (Node<string>)selItem.Tag;
+                    DataBlock dataBlock = dat.GetDataBlock(datNode);
+                    byte[] bytes = dat.Data(dataBlock);
+                    string filename = dataBlock.Filename;
+                    if (filename.ToLower().EndsWith(".acm"))
+                    {
+                        ACM acm = new ACM(dataBlock.Filename);
+                        acm.ReadBytes(bytes);
+                        acms.Add(acm);
+                    }
+                    else if (filename.ToLower().EndsWith(".frm"))
+                    {
+                        FRM frm = new FRM(dataBlock.Filename);
+                        frm.ReadBytes(bytes);
+                        fRMs.Add(frm);
+                    }
+
                 }
-                else if (filename.ToLower().EndsWith(".frm"))
+
+                if (fRMs.Count != 0)
                 {
-                    FRM frm = new FRM(dataBlock.Filename, bytes);
-                    fRMs.Add(frm);
+                    // create and use the subform
+                    using (FRMForm frmForm = new FRMForm(fRMs))
+                    {
+                        frmForm.ShowDialog();
+                    }
                 }
 
-            }
-
-            // create and use the subform
-            using (FRMForm frmForm = new FRMForm(fRMs))
-            {
-                frmForm.ShowDialog();
-            }
-
-            // create and use the subform
-            using (ACMForm acmForm = new ACMForm(acms))
-            {
-                acmForm.ShowDialog();
+                if (acms.Count != 0)
+                {
+                    // create and use the subform
+                    using (ACMForm acmForm = new ACMForm(acms))
+                    {
+                        acmForm.ShowDialog();
+                    }
+                }
             }
         }
 
@@ -570,13 +712,17 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void btnExtract_Click(object sender, EventArgs e)
         {
-            if (datfile == null)
+            if (inputFile == null)
             {
-                MessageBox.Show("There's no dat file. Make sure it's loaded first!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("There's no input file. Make sure it's loaded first!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else if (outDir == null)
             {
-                MessageBox.Show("Output directory is not selected!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (behavior != Behavior.DO_DAT)
+            {
+                MessageBox.Show("This file is not in archive!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
@@ -597,7 +743,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Extractor_DoWork(object sender, DoWorkEventArgs e)
         {
-            DatDoExtractAll();
+            DatDoExtractAll((Dat)(fOnlineFile));
         }
 
         /// <summary>
