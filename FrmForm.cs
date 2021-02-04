@@ -23,32 +23,32 @@ namespace FOnlineDatRipper
     internal class FRMForm : Form
     {
         /// <summary>
-        /// frame array which is equal to the number of tabs.........
+        /// frame array which is equal to the number of tabs..........
         /// </summary>
         private readonly List<FRM> frms;
 
         /// <summary>
-        /// index of frame array to display frame.........
+        /// index of frame array to display frame..........
         /// </summary>
         private int frmDisplayIndex = 0;
 
         /// <summary>
-        /// tab control with selected tab.........
+        /// tab control with selected tab..........
         /// </summary>
         private readonly TabControl tabControl = new TabControl();
 
         /// <summary>
-        /// Buttons for choosing the next frame.........
+        /// Buttons for choosing the next frame..........
         /// </summary>
         private readonly Button btnNextFrame = new Button();
 
         /// <summary>
-        /// Buttons for choosing the previous frame.........
+        /// Buttons for choosing the previous frame..........
         /// </summary>
         private readonly Button btnPrevFrame = new Button();
 
         /// <summary>
-        /// Resets display index to 0.........
+        /// Resets display index to 0..........
         /// </summary>
         private readonly Button btnReset = new Button();
 
@@ -118,11 +118,16 @@ namespace FOnlineDatRipper
                 listBox.SelectionMode = SelectionMode.None;
                 listBox.Items.Add("Version: " + frm.Version);
                 listBox.Items.Add("FPS: " + frm.Fps);
-                listBox.Items.Add("Action frame :" + frm.ActionFrame);
+                listBox.Items.Add("Action frame: " + frm.ActionFrame);
                 listBox.Items.Add("Frames per direction: " + frm.FramesPerDirection);
                 listBox.Items.Add("Total frames: " + frm.Frames.Count);
                 listBox.Items.Add("Index:" + frmDisplayIndex);
-                listBox.Items.Add("Direction: " + frm.GetDirection(frm.Frames[frmDisplayIndex]));
+
+                if (frm.Frames.Count > 0) // darn hotfix!
+                {
+                    listBox.Items.Add("Direction: " + frm.GetDirection(frm.Frames[frmDisplayIndex]));
+                }
+
                 tabPage.Controls.Add(listBox);
 
                 tabControl.TabPages.Add(tabPage);
@@ -132,18 +137,21 @@ namespace FOnlineDatRipper
             this.Controls.Add(tabControl);
 
             // next frame button
+            btnNextFrame.FlatStyle = FlatStyle.Flat;
             btnNextFrame.Dock = DockStyle.Bottom;
             btnNextFrame.Text = "Next Frame";
             btnNextFrame.Click += BtnNextFrame_Click;
             this.Controls.Add(btnNextFrame);
 
             // prev frame button
+            btnPrevFrame.FlatStyle = FlatStyle.Flat;
             btnPrevFrame.Dock = DockStyle.Bottom;
             btnPrevFrame.Text = "Previous Frame";
             btnPrevFrame.Click += BtnPrevFrame_Click;
             this.Controls.Add(btnPrevFrame);
 
             // reset index button
+            btnReset.FlatStyle = FlatStyle.Flat;
             btnReset.Dock = DockStyle.Bottom;
             btnReset.Text = "Reset";
             btnReset.Click += BtnReset_Click;

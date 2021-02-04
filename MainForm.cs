@@ -55,7 +55,7 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Application behavior..
+        /// Application behavior...
         /// </summary>
         private Behavior behavior = Behavior.DO_NOTH;
 
@@ -105,12 +105,12 @@ namespace FOnlineDatRipper
         internal const int FileIndex = 6;
 
         /// <summary>
-        /// Defines the input file...
+        /// Defines the input file....
         /// </summary>
         private string inputFile;
 
         /// <summary>
-        /// Defines the output directory to extract the data.........
+        /// Defines the output directory to extract the data..........
         /// </summary>
         private string outDir;
 
@@ -120,12 +120,12 @@ namespace FOnlineDatRipper
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
-        /// Defines the loading worker..........
+        /// Defines the loading worker...........
         /// </summary>
         private readonly BackgroundWorker reader = new BackgroundWorker();
 
         /// <summary>
-        /// Defines the extractor worker..........
+        /// Defines the extractor worker...........
         /// </summary>
         private readonly BackgroundWorker extractor = new BackgroundWorker();
 
@@ -135,17 +135,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred...........
+        /// Tells if cache miss has occurred............
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length...........
+        /// Defines the begin index of the item block and it's always 1000 in length............
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items...........
+        /// Defines the the dat list view items............
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -161,7 +161,10 @@ namespace FOnlineDatRipper
         {
             InitializeComponent();
             InitDarkTheme(this);
-            this.mainMenuStrip.Renderer = new MyMenuRenderer();
+
+            // dark renderer to the menu strip
+            this.mainMenuStrip.Renderer = new DarkRenderer();
+            this.cntxtMenuStrip.Renderer = new DarkRenderer();
         }
 
         /// <summary>
@@ -870,6 +873,63 @@ namespace FOnlineDatRipper
             sb.Append("\n");
 
             MessageBox.Show(sb.ToString(), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// The convertToolStripMenuItem_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void convertToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+
+            if (behavior == Behavior.DO_DAT && fOnlineFile != null)
+            {
+                // make a cast
+                Dat dat = (Dat)fOnlineFile;
+
+                // create ACM list (sound files)
+                List<ACM> acms = new List<ACM>();
+                // create FRM list (image files)
+                List<FRM> fRMs = new List<FRM>();
+
+                foreach (int selectedIndex in selectedIndices)
+                {
+                    ListViewItem selItem = datListViewItems[selectedIndex];
+                    Node<string> datNode = (Node<string>)selItem.Tag;
+                    DataBlock dataBlock = dat.GetDataBlock(datNode);
+                    byte[] bytes = dat.Data(dataBlock);
+                    string filename = dataBlock.Filename;
+                    if (filename.ToLower().EndsWith(".acm"))
+                    {
+                        ACM acm = new ACM(dataBlock.Filename);
+                        acm.ReadBytes(bytes);
+                        acms.Add(acm);
+                    }
+                    else if (filename.ToLower().EndsWith(".frm"))
+                    {
+                        FRM frm = new FRM(dataBlock.Filename);
+                        frm.ReadBytes(bytes);
+                        fRMs.Add(frm);
+                    }
+
+                }
+
+                if (fRMs.Count != 0)
+                {
+
+                }
+
+                if (acms.Count != 0)
+                {
+                    // create and use the subform
+                    using (ACMConversionForm acmConvForm = new ACMConversionForm(acms))
+                    {
+                        acmConvForm.ShowDialog();
+                    }
+                }
+            }
         }
     }
 }

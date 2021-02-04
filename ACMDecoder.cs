@@ -193,14 +193,14 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2.........
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2..........
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
         /// <summary>
         /// Defines the MidBuffSize.
         /// </summary>
-        private const int MidBuffSize = 0x800;
+        private const int MidBuffSize = 0x200;// 512 Bytes in size
 
         /// <summary>
         /// Defines the midBuff.
@@ -213,12 +213,12 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the unpacking buffer.......
+        /// Defines the unpacking buffer........
         /// </summary>
         private int[] decBuff;
 
         /// <summary>
-        /// Size of unpacking buffer.......
+        /// Size of unpacking buffer........
         /// </summary>
         private int decBuffSize = 0;
 
@@ -228,7 +228,7 @@ namespace FOnlineDatRipper
         private int[] someBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize.........
+        /// Defines the blocks, totBlSize..........
         /// </summary>
         private int blocks, totBlSize;
 
@@ -269,7 +269,7 @@ namespace FOnlineDatRipper
 
         /// <summary>
         /// Gets the Info
-        /// Gets or sets the Info.....
+        /// Gets or sets the Info......
         /// </summary>
         internal ACMInfo Info { get => info; }
 

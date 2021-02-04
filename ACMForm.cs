@@ -24,37 +24,32 @@ namespace FOnlineDatRipper
     internal class ACMForm : Form
     {
         /// <summary>
-        /// acm sound files array which is equal to the number of tabs..........
+        /// acm sound files array which is equal to the number of tabs...........
         /// </summary>
         private readonly List<ACM> acms;
 
         /// <summary>
-        /// button for playing current track or music file.........
+        /// button for playing current track or music file..........
         /// </summary>
         private readonly Button btnPlay = new Button();
 
         /// <summary>
-        /// button for pausing current track or music file.........
+        /// button for pausing current track or music file..........
         /// </summary>
         private readonly Button btnPause = new Button();
 
         /// <summary>
-        /// button to reset current track or music file.........
+        /// button to reset current track or music file..........
         /// </summary>
         private readonly Button btnStop = new Button();
 
         /// <summary>
-        /// list box contains tracks.........
+        /// list box contains tracks..........
         /// </summary>
         private readonly ListBox listBox = new ListBox();
 
         /// <summary>
-        /// tab control with selected tab..........
-        /// </summary>
-        private readonly TabControl tabControl = new TabControl();
-
-        /// <summary>
-        /// Wave sound player.........
+        /// Wave sound player..........
         /// </summary>
         private readonly WaveOutEvent wo = new WaveOutEvent();
 
@@ -108,18 +103,21 @@ namespace FOnlineDatRipper
             this.Controls.Add(listBox);
 
             // next frame button
+            btnPlay.FlatStyle = FlatStyle.Flat;
             btnPlay.Dock = DockStyle.Bottom;
             btnPlay.Text = "Play";
             btnPlay.Click += BtnPlay_Click;
             this.Controls.Add(btnPlay);
 
             // prev frame button
+            btnPause.FlatStyle = FlatStyle.Flat;
             btnPause.Dock = DockStyle.Bottom;
             btnPause.Text = "Pause";
             btnPause.Click += BtnPause_Click;
             this.Controls.Add(btnPause);
 
             // reset index button
+            btnStop.FlatStyle = FlatStyle.Flat;
             btnStop.Dock = DockStyle.Bottom;
             btnStop.Text = "Stop";
             btnStop.Click += BtnStop_Click;
@@ -136,13 +134,16 @@ namespace FOnlineDatRipper
             int index = listBox.SelectedIndex;
             if (index != -1)
             {
-                ACM acm = acms[index];
-                if (acm.WaveStream != null)
+                if (wo.PlaybackState != PlaybackState.Stopped)
                 {
-                    using (acm.WaveStream)
-                    {
-                        wo.Init(acms[index].WaveStream);
-                    }
+                    wo.Stop();
+                }
+
+                ACM acm = acms[index];
+                if (acm.WaveStream != null && wo.PlaybackState == PlaybackState.Stopped)
+                {
+                    acm.WaveStream.Position = 0;
+                    wo.Init(acm.WaveStream);
                 }
             }
         }
@@ -154,17 +155,9 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnStop_Click(object sender, EventArgs e)
         {
-            int index = listBox.SelectedIndex;
-            if (index != -1)
+            if (wo.PlaybackState != PlaybackState.Stopped)
             {
-                ACM acm = acms[index];
-                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Stopped)
-                {
-                    using (acm.WaveStream)
-                    {
-                        wo.Stop();
-                    }
-                }
+                wo.Stop();
             }
         }
 
@@ -175,17 +168,9 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnPause_Click(object sender, EventArgs e)
         {
-            int index = listBox.SelectedIndex;
-            if (index != -1)
+            if (wo.PlaybackState != PlaybackState.Paused)
             {
-                ACM acm = acms[index];
-                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Paused)
-                {
-                    using (acm.WaveStream)
-                    {
-                        wo.Pause();
-                    }
-                }
+                wo.Pause();
             }
         }
 
@@ -196,17 +181,25 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void BtnPlay_Click(object sender, EventArgs e)
         {
+            if (wo.PlaybackState != PlaybackState.Paused)
+            {
+                wo.Stop();
+            }
+
             int index = listBox.SelectedIndex;
             if (index != -1)
             {
                 ACM acm = acms[index];
-                if (acm.WaveStream != null && wo.PlaybackState != PlaybackState.Playing)
+                if (acm.WaveStream != null
+                    && acm.WaveStream.Position == acm.WaveStream.Length)
                 {
-                    using (acm.WaveStream)
-                    {
-                        wo.Play();
-                    }
+                    acm.WaveStream.Position = 0;
                 }
+            }
+
+            if (wo.PlaybackState != PlaybackState.Playing)
+            {
+                wo.Play();
             }
         }
 

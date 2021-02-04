@@ -16,9 +16,9 @@ namespace FOnlineDatRipper
     using System.Windows.Forms;
 
     /// <summary>
-    /// Defines the <see cref="MyMenuRenderer" />.
+    /// Defines the <see cref="DarkRenderer" />.
     /// </summary>
-    internal class MyMenuRenderer : ToolStripRenderer
+    internal class DarkRenderer : ToolStripRenderer
     {
         /// <summary>
         /// The OnRenderItemText.

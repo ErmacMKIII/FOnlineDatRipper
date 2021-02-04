@@ -18,7 +18,7 @@ namespace FOnlineDatRipper
     internal partial class MainForm
     {
         /// <summary>
-        /// Required designer variable.................
+        /// Required designer variable..................
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
@@ -46,6 +46,7 @@ namespace FOnlineDatRipper
             this.imgLstDatStruct = new System.Windows.Forms.ImageList(this.components);
             this.cntxtMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlTree = new System.Windows.Forms.Panel();
             this.treeViewDat = new System.Windows.Forms.TreeView();
@@ -100,18 +101,28 @@ namespace FOnlineDatRipper
             // 
             this.cntxtMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.previewToolStripMenuItem,
+            this.convertToolStripMenuItem,
             this.extractToolStripMenuItem});
             this.cntxtMenuStrip.Name = "cntxtMenuStrip";
             resources.ApplyResources(this.cntxtMenuStrip, "cntxtMenuStrip");
             // 
             // previewToolStripMenuItem
             // 
+            this.previewToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.eye_icon;
             this.previewToolStripMenuItem.Name = "previewToolStripMenuItem";
             resources.ApplyResources(this.previewToolStripMenuItem, "previewToolStripMenuItem");
             this.previewToolStripMenuItem.Click += new System.EventHandler(this.previewToolStripMenuItem_Click);
             // 
+            // convertToolStripMenuItem
+            // 
+            this.convertToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.convert_icon;
+            this.convertToolStripMenuItem.Name = "convertToolStripMenuItem";
+            resources.ApplyResources(this.convertToolStripMenuItem, "convertToolStripMenuItem");
+            this.convertToolStripMenuItem.Click += new System.EventHandler(this.convertToolStripMenuItem_Click);
+            // 
             // extractToolStripMenuItem
             // 
+            this.extractToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
             this.extractToolStripMenuItem.Name = "extractToolStripMenuItem";
             resources.ApplyResources(this.extractToolStripMenuItem, "extractToolStripMenuItem");
             // 
@@ -510,5 +521,10 @@ namespace FOnlineDatRipper
         /// Defines the HowToToolStripMenuItem.
         /// </summary>
         private System.Windows.Forms.ToolStripMenuItem HowToToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the convertToolStripMenuItem.
+        /// </summary>
+        private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
     }
 }
