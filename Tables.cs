@@ -18,17 +18,17 @@ namespace FOnlineDatRipper
     internal static class Tables
     {
         /// <summary>
-        /// Mask for selecting table 1 entries.....
+        /// Mask for selecting table 1 entries......
         /// </summary>
         public const int Table1Mask = 0x1A;
 
         /// <summary>
-        /// Mask for selecting table 2 entries.....
+        /// Mask for selecting table 2 entries......
         /// </summary>
         public const int Table2Mask = 0x7C;
 
         /// <summary>
-        /// Mask for selecting table 3 entries.....
+        /// Mask for selecting table 3 entries......
         /// </summary>
         public const int Table3Mask = 0x78;
 

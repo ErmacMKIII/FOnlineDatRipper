@@ -12,6 +12,7 @@
 
 namespace FOnlineDatRipper
 {
+    using System.Drawing;
     using System.Windows.Forms;
 
     /// <summary>
@@ -26,7 +27,7 @@ namespace FOnlineDatRipper
         protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
         {
             e.ToolStrip.BackColor = MainForm.DarkBackground;
-            e.TextColor = MainForm.DarkForeground;
+            e.TextColor = (e.Item.Selected) ? Color.DarkGray : MainForm.DarkForeground;
             base.OnRenderItemText(e);
         }
     }

@@ -46,7 +46,7 @@ namespace FOnlineDatRipper
         public Node<T> Parent { get => parent; set => parent = value; }
 
         /// <summary>
-        /// Gets or sets the data of this node..
+        /// Gets or sets the data of this node...
         /// </summary>
         public T Data { get => data; set => data = value; }
 

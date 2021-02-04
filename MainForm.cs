@@ -55,7 +55,7 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Application behavior.
+        /// Application behavior..
         /// </summary>
         private Behavior behavior = Behavior.DO_NOTH;
 
@@ -105,12 +105,12 @@ namespace FOnlineDatRipper
         internal const int FileIndex = 6;
 
         /// <summary>
-        /// Defines the input file..
+        /// Defines the input file...
         /// </summary>
         private string inputFile;
 
         /// <summary>
-        /// Defines the output directory to extract the data........
+        /// Defines the output directory to extract the data.........
         /// </summary>
         private string outDir;
 
@@ -120,12 +120,12 @@ namespace FOnlineDatRipper
         private readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
-        /// Defines the loading worker.........
+        /// Defines the loading worker..........
         /// </summary>
         private readonly BackgroundWorker reader = new BackgroundWorker();
 
         /// <summary>
-        /// Defines the extractor worker.........
+        /// Defines the extractor worker..........
         /// </summary>
         private readonly BackgroundWorker extractor = new BackgroundWorker();
 
@@ -135,17 +135,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred..........
+        /// Tells if cache miss has occurred...........
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length..........
+        /// Defines the begin index of the item block and it's always 1000 in length...........
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items..........
+        /// Defines the the dat list view items...........
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -754,7 +754,7 @@ namespace FOnlineDatRipper
             }
             else
             {
-                DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting Dat File", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
                 {
                     extractor.DoWork += Extractor_DoWork;
@@ -781,7 +781,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
         private void Extractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show("Dat File sucessfully extracted in " + seconds + " seconds!", "Extracting Dat File", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Dat File sucessfully extracted in " + seconds + " seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.taskProgressBar.Value = 0;
         }
 
@@ -793,15 +793,17 @@ namespace FOnlineDatRipper
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("VERSION v0.3 - CHROMIUM (PUBLIC BUILD reviewed on 2021-02-03 at 07:15).\n");
-            sb.Append("This software is free software,\n");
-            sb.Append("licensed under GNU General Public License (GPL).\n");
+            sb.Append("VERSION v0.3 - CHROMIUM\n");
+            sb.Append("\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-02-04 at 07:15).\n");
+            sb.Append("This software is free software.\n");
+            sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
             sb.Append("Changelog for v0.3 CHROMIUM:\n");
             sb.Append("\t- Initial pre-release.\n");
             sb.Append("\n");
             sb.Append("\n");
-            sb.Append("Copyright © 2021</b></html>\n");
+            sb.Append("Copyright © 2021\n");
             sb.Append("Alexander \"Ermac\" Stojanovich\n");
             sb.Append("\n");
 
@@ -826,6 +828,48 @@ namespace FOnlineDatRipper
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FileOpen();
+        }
+
+        /// <summary>
+        /// The HowToToolStripMenuItem_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void HowToToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("- FOR THE PURPOSE ABOUT THIS PROGRAM, \n");
+            sb.Append("check About. Make sure that you checked it first.\n");
+            sb.Append("\n");
+            sb.Append("- Opening file(s):\n");
+            sb.Append("\t1. Choose input input file\n");
+            sb.Append("\t   by clicking the button \"Open...\".\n");
+            sb.Append("\t   Or via the menus File > Open.\n");
+            sb.Append("\t   Supported files are Fallout 2 archive (*.dat),\n");
+            sb.Append("\t   FRM image file (*.frm) or ACM sound file (*.acm).\n");
+            sb.Append("\t2. Wait for task to complete\n");
+            sb.Append("\tand you will be prompted with message.\n");
+            sb.Append("\t3. View the file, enjoy.\n");
+            sb.Append("\n");
+            sb.Append("- Extracting file(s):\n");
+            sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
+            sb.Append("\t2. Perform step \"Opening file\".\n");
+            sb.Append("\t3. Using hierarchical tree view and list view find\n");
+            sb.Append("\t   and select designated files for extraction.\n");
+            sb.Append("\t4. You will be prompted where to extract them.\n");
+            sb.Append("\t5. Extract them.\n");
+            sb.Append("\n");
+            sb.Append("- Extracting all files:\n");
+            sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
+            sb.Append("\t2. Perform step \"Opening file\".\n");
+            sb.Append("\t3. Choose \"Output...\" by clicking on the button.\n");
+            sb.Append("\t4. Click on \"Extract All\".\n");
+            sb.Append("\t5. You will be prompted that \n");
+            sb.Append("\t   this operation may take time.\n");
+            sb.Append("\t6. Accept it with \"Yes\" and operation will commence.\n");
+            sb.Append("\n");
+
+            MessageBox.Show(sb.ToString(), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
     }
 }

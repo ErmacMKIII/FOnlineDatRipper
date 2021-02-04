@@ -65,7 +65,7 @@ namespace FOnlineDatRipper
         private readonly Tree<string> tree = new Tree<string>(new Node<string>("root"));
 
         /// <summary>
-        /// Defines the scope for nodes.............
+        /// Defines the scope for nodes..............
         /// </summary>
         private readonly List<List<Node<string>>> scope = new List<List<Node<string>>>();
 
@@ -86,17 +86,17 @@ namespace FOnlineDatRipper
 
         /// <summary>
         /// Gets the Progress
-        /// Gets or sets the Progress...
+        /// Gets or sets the Progress....
         /// </summary>
         public double Progress { get => progress; }
 
         /// <summary>
-        /// Is error occurred?.........
+        /// Is error occurred?..........
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message to display.........
+        /// Error message to display..........
         /// </summary>
         private string errorMessage = "";
 
@@ -111,13 +111,13 @@ namespace FOnlineDatRipper
         public string ErrorMessage { get => errorMessage; }
 
         /// <summary>
-        /// Tag used to associtate this (e.g. filename)..
+        /// Tag used to associtate this (e.g. filename)...
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// Gets the Tag
-        /// Tag used to associtate this (e.g. filename)..
+        /// Tag used to associtate this (e.g. filename)...
         /// </summary>
         public string Tag { get => tag; }
 

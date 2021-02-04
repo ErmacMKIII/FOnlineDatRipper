@@ -18,7 +18,7 @@ namespace FOnlineDatRipper
     internal partial class MainForm
     {
         /// <summary>
-        /// Required designer variable................
+        /// Required designer variable.................
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
@@ -74,7 +74,7 @@ namespace FOnlineDatRipper
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.indexToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cntxtMenuStrip.SuspendLayout();
             this.pnlTree.SuspendLayout();
             this.pnlView.SuspendLayout();
@@ -309,7 +309,7 @@ namespace FOnlineDatRipper
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.aboutToolStripMenuItem,
-            this.indexToolStripMenuItem});
+            this.HowToToolStripMenuItem});
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
             resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
             // 
@@ -319,10 +319,11 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // indexToolStripMenuItem
+            // HowToToolStripMenuItem
             // 
-            this.indexToolStripMenuItem.Name = "indexToolStripMenuItem";
-            resources.ApplyResources(this.indexToolStripMenuItem, "indexToolStripMenuItem");
+            this.HowToToolStripMenuItem.Name = "HowToToolStripMenuItem";
+            resources.ApplyResources(this.HowToToolStripMenuItem, "HowToToolStripMenuItem");
+            this.HowToToolStripMenuItem.Click += new System.EventHandler(this.HowToToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -348,7 +349,6 @@ namespace FOnlineDatRipper
             this.mainMenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         /// <summary>
@@ -507,8 +507,8 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
 
         /// <summary>
-        /// Defines the indexToolStripMenuItem.
+        /// Defines the HowToToolStripMenuItem.
         /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem indexToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem HowToToolStripMenuItem;
     }
 }
