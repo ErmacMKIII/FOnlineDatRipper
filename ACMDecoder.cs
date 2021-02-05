@@ -76,6 +76,27 @@ namespace FOnlineDatRipper
     internal class ACMDecoder
     {
         /// <summary>
+        /// The ProgressUpdate.
+        /// </summary>
+        /// <param name="progress">The value<see cref="double"/>.</param>
+        public delegate void ProgressUpdate(double progress);
+
+        /// <summary>
+        /// Defines the OnProgressUpdate.
+        /// </summary>
+        public event ProgressUpdate OnProgressUpdate;
+
+        /// <summary>
+        /// Defines the progress.
+        /// </summary>
+        private double progress = 0.0;
+
+        /// <summary>
+        /// Gets the Progress.
+        /// </summary>
+        public double Progress { get => progress; }
+
+        /// <summary>
         /// Defines the Filler.
         /// </summary>
         public enum Filler
@@ -193,7 +214,7 @@ namespace FOnlineDatRipper
         private int srcBuffPos = 0;
 
         /// <summary>
-        /// Defines the packAttrs, someSize, packAttrs2, someSize2..........
+        /// Defines the packAttrs, someSize, packAttrs2, someSize2...........
         /// </summary>
         private int packAttrs, someSize, packAttrs2, someSize2;
 
@@ -213,12 +234,12 @@ namespace FOnlineDatRipper
         private int mPtr = 0;
 
         /// <summary>
-        /// Defines the unpacking buffer........
+        /// Defines the unpacking buffer.........
         /// </summary>
         private int[] decBuff;
 
         /// <summary>
-        /// Size of unpacking buffer........
+        /// Size of unpacking buffer.........
         /// </summary>
         private int decBuffSize = 0;
 
@@ -228,7 +249,7 @@ namespace FOnlineDatRipper
         private int[] someBuff;
 
         /// <summary>
-        /// Defines the blocks, totBlSize..........
+        /// Defines the blocks, totBlSize...........
         /// </summary>
         private int blocks, totBlSize;
 
@@ -269,7 +290,7 @@ namespace FOnlineDatRipper
 
         /// <summary>
         /// Gets the Info
-        /// Gets or sets the Info......
+        /// Gets or sets the Info.......
         /// </summary>
         internal ACMInfo Info { get => info; }
 
@@ -277,9 +298,11 @@ namespace FOnlineDatRipper
         /// Initializes a new instance of the <see cref="ACMDecoder"/> class.
         /// </summary>
         /// <param name="acmData">The rawData<see cref="byte[]"/>.</param>
-        public ACMDecoder(byte[] acmData)
+        /// <param name="delget">The delget<see cref="ProgressUpdate"/>.</param>
+        public ACMDecoder(byte[] acmData, ProgressUpdate delget)
         {
             this.srcBuff = acmData;
+            this.OnProgressUpdate = delget;
             Init();
         }
 
@@ -297,7 +320,7 @@ namespace FOnlineDatRipper
             valsToGo = (GetBits(16) & 0xFFFF);
             valsToGo |= ((GetBits(16) & 0xFFFF) << 16);
 
-            info.Samples = (uint)valsToGo;
+            info.Samples = (uint)valsToGo; // number of shorts to create
 
             info.Channels = (uint)GetBits(16) & 0xFFFF;
             info.Bitrate = (uint)GetBits(16) & 0xFFFF;
@@ -306,7 +329,7 @@ namespace FOnlineDatRipper
             packAttrs2 = GetBits(12) & 0xFFF; // known as rows
 
             someSize = 1 << packAttrs; // known as columns
-            someSize2 = someSize * packAttrs2;
+            someSize2 = someSize * packAttrs2; // known as some buff size
 
             decBuffSize = 0;
             if (packAttrs != 0)
@@ -336,14 +359,22 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Decode given ACM by reading into buffer (output).
         /// </summary>
-        /// <param name="buffer"> acm buffer .</param>
-        /// <returns>.</returns>
+        /// <param name="buffer"> buffer that will contain decoded data (samples).</param>
+        /// <returns>number of bytes (output buffer length).</returns>
         public int Decode(byte[] buffer)
         {
+            progress = 0.0;
+
             // while there's still values
+            int initValsToGo = valsToGo; // purpose of this readonly var is for measuring the progress
             while (valsToGo != 0)
             {
                 MakeNewValues();
+                progress = 100.0 * ((initValsToGo - valsToGo) / (double)initValsToGo);
+                if (OnProgressUpdate != null)
+                {
+                    OnProgressUpdate(progress);
+                }
             }
 
             // copy decoded values into the buffer
@@ -358,6 +389,7 @@ namespace FOnlineDatRipper
                 bPtr += 2;
             }
 
+            progress = 100.0;
             return bPtr;
         }
 

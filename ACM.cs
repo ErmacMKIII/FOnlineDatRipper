@@ -21,40 +21,34 @@ namespace FOnlineDatRipper
     internal class ACM : FOnlineFile
     {
         /// <summary>
-        /// The ProgressUpdate.
-        /// </summary>
-        /// <param name="progress">The value<see cref="double"/>.</param>
-        public delegate void ProgressUpdate(double progress);
-
-        /// <summary>
         /// Defines the OnProgressUpdate.
         /// </summary>
-        public event ProgressUpdate OnProgressUpdate;
+        public event ACMDecoder.ProgressUpdate OnProgressUpdate;
 
         /// <summary>
-        /// Represents decoded data (64 MB buffer)..........
+        /// Represents decoded data (64 MB buffer)...........
         /// </summary>
         private readonly byte[] content = new byte[0x4000000];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example)...........
+        /// Read only tag as a display name (on the tab for example)............
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// Gets the Tag
-        /// Tag for this acm (for display)..........
+        /// Tag for this acm (for display)...........
         /// </summary>
         public string Tag => tag;
 
         /// <summary>
         /// Gets the Content
-        /// Decoded bytes..........
+        /// Decoded bytes...........
         /// </summary>
         public byte[] Content => content;
 
         /// <summary>
-        /// Content as Wave Stream..........
+        /// Content as Wave Stream...........
         /// </summary>
         private RawSourceWaveStream waveStream;
 
@@ -64,13 +58,13 @@ namespace FOnlineDatRipper
         public RawSourceWaveStream WaveStream { get => waveStream; }
 
         /// <summary>
-        /// Length of Content Buffer..........
+        /// Length of Content Buffer...........
         /// </summary>
         private int length = 0;
 
         /// <summary>
         /// Gets the Length
-        /// Length of Content Buffer..........
+        /// Length of Content Buffer...........
         /// </summary>
         public int Length { get => length; }
 
@@ -85,14 +79,19 @@ namespace FOnlineDatRipper
         public string ErrorMessage { get => errorMessage; }
 
         /// <summary>
-        /// Did error occurred?....
+        /// Did error occurred?.....
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message for display....
+        /// Error message for display.....
         /// </summary>
         private string errorMessage = "";
+
+        /// <summary>
+        /// ACM Decoder, each ACM has one!.
+        /// </summary>
+        private ACMDecoder acmDecoder;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ACM"/> class.
@@ -113,7 +112,7 @@ namespace FOnlineDatRipper
             bool ok = false;
             byte[] acmBytes = File.ReadAllBytes(acmFile);
 
-            ACMDecoder acmDecoder = new ACMDecoder(acmBytes);
+            this.acmDecoder = new ACMDecoder(acmBytes, OnProgressUpdate);
             if (acmDecoder.Info.Id != 0x32897)
             {
                 errorMessage = "Error - ACM file does not have valid Id!";
@@ -150,7 +149,7 @@ namespace FOnlineDatRipper
         {
             bool ok = false;
 
-            ACMDecoder acmDecoder = new ACMDecoder(acmBytes);
+            this.acmDecoder = new ACMDecoder(acmBytes, OnProgressUpdate);
             if (acmDecoder.Info.Id != 0x32897)
             {
                 errorMessage = "Error - ACM file does not have valid Id!";
@@ -212,7 +211,7 @@ namespace FOnlineDatRipper
         /// <returns>The <see cref="double"/>.</returns>
         public override double GetProgress()
         {
-            throw new System.NotImplementedException();
+            return (this.acmDecoder == null) ? 0 : acmDecoder.Progress;
         }
     }
 }
