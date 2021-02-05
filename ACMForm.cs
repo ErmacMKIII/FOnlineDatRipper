@@ -195,12 +195,15 @@ namespace FOnlineDatRipper
                 {
                     acm.WaveStream.Position = 0;
                 }
+
+                if (wo.PlaybackState != PlaybackState.Playing)
+                {
+                    wo.Play();
+                }
+
             }
 
-            if (wo.PlaybackState != PlaybackState.Playing)
-            {
-                wo.Play();
-            }
+            
         }
 
         /// <summary>

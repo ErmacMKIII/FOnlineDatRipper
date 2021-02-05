@@ -160,6 +160,13 @@ namespace FOnlineDatRipper
         public MainForm()
         {
             InitializeComponent();
+
+            reader.DoWork += Reader_DoWork;
+            reader.RunWorkerCompleted += Reader_RunWorkerCompleted;
+
+            extractor.DoWork += Extractor_DoWork;
+            extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+
             InitDarkTheme(this);
 
             // dark renderer to the menu strip
@@ -423,14 +430,18 @@ namespace FOnlineDatRipper
         {
             if (fOnlineFile != null)
             {
+                listViewDat.VirtualMode = false; // disables virtual mode
+                treeViewDat.Nodes.Clear();
+                datListViewItems.Clear();
                 switch (behavior)
                 {
                     case Behavior.DO_DAT:
-                        Dat dat = (Dat)fOnlineFile;
+                        Dat dat = (Dat)fOnlineFile;                        
                         BuildTreeView(dat); // build left side, tree view
-                        BuildListView(dat, dat.Tree.Root); // build right side list view
+                        BuildListView(dat, dat.Tree.Root); // build right side list view (enables virtual mode)
                         break;
-                    case Behavior.DO_ACM:
+                    case Behavior.DO_ACM:                        
+                        listViewDat.Items.Add(new ListViewItem(fOnlineFile.GetTag(), ACMIndex));
                         List<ACM> acms = new List<ACM>();
                         acms.Add((ACM)fOnlineFile);
                         // create and use the subform
@@ -440,6 +451,7 @@ namespace FOnlineDatRipper
                         }
                         break;
                     case Behavior.DO_FRM:
+                        listViewDat.Items.Add(new ListViewItem(fOnlineFile.GetTag(), FRMIndex));
                         byte[] inputBytes = File.ReadAllBytes(inputFile);
                         List<FRM> frms = new List<FRM>();
                         frms.Add((FRM)fOnlineFile);
@@ -467,9 +479,7 @@ namespace FOnlineDatRipper
                 {
                     inputFile = openFileDialog.FileName;
                     txtBoxInArch.Text = inputFile;
-
-                    reader.DoWork += Reader_DoWork;
-                    reader.RunWorkerCompleted += Reader_RunWorkerCompleted;
+                    
                     reader.RunWorkerAsync();
                 }
             }
@@ -759,9 +769,7 @@ namespace FOnlineDatRipper
             {
                 DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
                 if (dialogResult == DialogResult.Yes)
-                {
-                    extractor.DoWork += Extractor_DoWork;
-                    extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+                {                    
                     extractor.RunWorkerAsync();
                 }
             }

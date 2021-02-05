@@ -103,6 +103,12 @@ namespace FOnlineDatRipper
         {
             this.acms = acms;
             Init();
+
+            backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            backgroundWorker.WorkerReportsProgress = true;
+            backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
+            backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+
             InitDarkTheme(this);
         }
 
@@ -179,12 +185,7 @@ namespace FOnlineDatRipper
                 {
                     // perform encoding
                     this.outDir = openDirDialog.SelectedPath;
-                    audioFormat = (AudioFormat)Enum.Parse(typeof(AudioFormat), cmbBoxOutputFormat.SelectedItem.ToString());
-
-                    backgroundWorker.DoWork += BackgroundWorker_DoWork;
-                    backgroundWorker.WorkerReportsProgress = true;
-                    backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
-                    backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+                    audioFormat = (AudioFormat)Enum.Parse(typeof(AudioFormat), cmbBoxOutputFormat.SelectedItem.ToString());                    
 
                     backgroundWorker.RunWorkerAsync();
                 }
@@ -230,7 +231,7 @@ namespace FOnlineDatRipper
                 }
 
                 ACM acm = acms[index];
-                string outFile = outDir + Path.DirectorySeparatorChar + acm.Tag + "." + audioFormat.ToString().ToLower();
+                string outFile = outDir + Path.DirectorySeparatorChar + Path.GetFileNameWithoutExtension(acm.Tag) + "." + audioFormat.ToString().ToLower();
                 switch (audioFormat)
                 {
                     case AudioFormat.AAC:
@@ -259,6 +260,7 @@ namespace FOnlineDatRipper
         /// <param name="disposing">The disposing<see cref="bool"/>.</param>
         protected override void Dispose(bool disposing)
         {
+
         }
     }
 }
