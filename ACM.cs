@@ -213,5 +213,10 @@ namespace FOnlineDatRipper
         {
             return (this.acmDecoder == null) ? 0 : acmDecoder.Progress;
         }
+
+        public override FOType GetFOFileType()
+        {
+            return FOType.ACM;
+        }
     }
 }

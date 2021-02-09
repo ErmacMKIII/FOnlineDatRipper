@@ -59,10 +59,11 @@ namespace FOnlineDatRipper
             this.txtBoxOutDir = new System.Windows.Forms.TextBox();
             this.btnExtractAll = new System.Windows.Forms.Button();
             this.lblOutDir = new System.Windows.Forms.Label();
-            this.txtBoxInArch = new System.Windows.Forms.TextBox();
             this.lblInArchive = new System.Windows.Forms.Label();
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
+            this.pnlInputFiles = new System.Windows.Forms.Panel();
+            this.listBoxInputFiles = new System.Windows.Forms.ListBox();
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
@@ -81,6 +82,7 @@ namespace FOnlineDatRipper
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
+            this.pnlInputFiles.SuspendLayout();
             this.groupBoxWorkProgress.SuspendLayout();
             this.mainMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -135,6 +137,7 @@ namespace FOnlineDatRipper
             // 
             // treeViewDat
             // 
+            this.treeViewDat.ContextMenuStrip = this.cntxtMenuStrip;
             resources.ApplyResources(this.treeViewDat, "treeViewDat");
             this.treeViewDat.ImageList = this.imgLstDatStruct;
             this.treeViewDat.Name = "treeViewDat";
@@ -165,6 +168,7 @@ namespace FOnlineDatRipper
             this.listViewDat.Name = "listViewDat";
             this.listViewDat.SmallImageList = this.imgLstDatStruct;
             this.listViewDat.UseCompatibleStateImageBehavior = false;
+            this.listViewDat.VirtualMode = true;
             this.listViewDat.CacheVirtualItems += new System.Windows.Forms.CacheVirtualItemsEventHandler(this.listViewDat_CacheVirtualItems);
             this.listViewDat.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.listViewDat_RetrieveVirtualItem);
             this.listViewDat.DoubleClick += new System.EventHandler(this.listViewDat_DoubleClick);
@@ -194,7 +198,6 @@ namespace FOnlineDatRipper
             // 
             // txtBoxOutDir
             // 
-            this.txtBoxOutDir.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             resources.ApplyResources(this.txtBoxOutDir, "txtBoxOutDir");
             this.txtBoxOutDir.Name = "txtBoxOutDir";
             this.txtBoxOutDir.ReadOnly = true;
@@ -205,19 +208,12 @@ namespace FOnlineDatRipper
             this.btnExtractAll.Image = global::FOnlineDatRipper.Properties.Resources.extract_all_icon;
             this.btnExtractAll.Name = "btnExtractAll";
             this.btnExtractAll.UseVisualStyleBackColor = true;
-            this.btnExtractAll.Click += new System.EventHandler(this.btnExtract_Click);
+            this.btnExtractAll.Click += new System.EventHandler(this.btnExtractAll_Click);
             // 
             // lblOutDir
             // 
             resources.ApplyResources(this.lblOutDir, "lblOutDir");
             this.lblOutDir.Name = "lblOutDir";
-            // 
-            // txtBoxInArch
-            // 
-            this.txtBoxInArch.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            resources.ApplyResources(this.txtBoxInArch, "txtBoxInArch");
-            this.txtBoxInArch.Name = "txtBoxInArch";
-            this.txtBoxInArch.ReadOnly = true;
             // 
             // lblInArchive
             // 
@@ -235,9 +231,9 @@ namespace FOnlineDatRipper
             // groupBoxPaths
             // 
             resources.ApplyResources(this.groupBoxPaths, "groupBoxPaths");
+            this.groupBoxPaths.Controls.Add(this.pnlInputFiles);
             this.groupBoxPaths.Controls.Add(this.btnInArch);
             this.groupBoxPaths.Controls.Add(this.lblInArchive);
-            this.groupBoxPaths.Controls.Add(this.txtBoxInArch);
             this.groupBoxPaths.Controls.Add(this.lblOutDir);
             this.groupBoxPaths.Controls.Add(this.btnExtractAll);
             this.groupBoxPaths.Controls.Add(this.txtBoxOutDir);
@@ -245,6 +241,18 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
+            // 
+            // pnlInputFiles
+            // 
+            resources.ApplyResources(this.pnlInputFiles, "pnlInputFiles");
+            this.pnlInputFiles.Controls.Add(this.listBoxInputFiles);
+            this.pnlInputFiles.Name = "pnlInputFiles";
+            // 
+            // listBoxInputFiles
+            // 
+            resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
+            this.listBoxInputFiles.FormattingEnabled = true;
+            this.listBoxInputFiles.Name = "listBoxInputFiles";
             // 
             // taskProgressBar
             // 
@@ -355,11 +363,13 @@ namespace FOnlineDatRipper
             this.groupBoxDatArchive.PerformLayout();
             this.groupBoxPaths.ResumeLayout(false);
             this.groupBoxPaths.PerformLayout();
+            this.pnlInputFiles.ResumeLayout(false);
             this.groupBoxWorkProgress.ResumeLayout(false);
             this.mainMenuStrip.ResumeLayout(false);
             this.mainMenuStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         /// <summary>
@@ -436,11 +446,6 @@ namespace FOnlineDatRipper
         /// Defines the lblOutDir.
         /// </summary>
         private System.Windows.Forms.Label lblOutDir;
-
-        /// <summary>
-        /// Defines the txtBoxInArch.
-        /// </summary>
-        private System.Windows.Forms.TextBox txtBoxInArch;
 
         /// <summary>
         /// Defines the lblInArchive.
@@ -526,5 +531,7 @@ namespace FOnlineDatRipper
         /// Defines the convertToolStripMenuItem.
         /// </summary>
         private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
+        private System.Windows.Forms.Panel pnlInputFiles;
+        private System.Windows.Forms.ListBox listBoxInputFiles;
     }
 }

@@ -221,12 +221,12 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the MidBuffSize.
         /// </summary>
-        private const int MidBuffSize = 0x200;// 512 Bytes in size
+        private readonly int MidBuffSize = 0x400; // 1024 Bytes in size
 
         /// <summary>
         /// Defines the midBuff.
         /// </summary>
-        private readonly byte[] midBuff = new byte[MidBuffSize];
+        private readonly byte[] midBuff;
 
         /// <summary>
         /// Defines the mPtr.
@@ -302,6 +302,9 @@ namespace FOnlineDatRipper
         public ACMDecoder(byte[] acmData, ProgressUpdate delget)
         {
             this.srcBuff = acmData;
+            // find some auto adjust mid buff size
+            this.MidBuffSize = acmData.Length >> 2;
+            this.midBuff = new byte[MidBuffSize];
             this.OnProgressUpdate = delget;
             Init();
         }
@@ -368,8 +371,9 @@ namespace FOnlineDatRipper
             // while there's still values
             int initValsToGo = valsToGo; // purpose of this readonly var is for measuring the progress
             while (valsToGo != 0)
-            {
+            {                
                 MakeNewValues();
+                
                 progress = 100.0 * ((initValsToGo - valsToGo) / (double)initValsToGo);
                 if (OnProgressUpdate != null)
                 {
@@ -458,7 +462,7 @@ namespace FOnlineDatRipper
         {
             availBytes = Math.Min(MidBuffSize, srcBuff.Length - srcBuffPos);
 
-            if (availBytes > 0)
+            if (availBytes >= 0)
             {
                 mPtr = 0;
                 Array.Copy(srcBuff, srcBuffPos, midBuff, 0, availBytes);
@@ -476,8 +480,7 @@ namespace FOnlineDatRipper
         {
             while (bits > availBits)
             {
-                byte oneByte;
-                availBytes--;
+                byte oneByte;                
                 if (availBytes > 0)
                 {
                     oneByte = midBuff[mPtr++];
@@ -486,6 +489,7 @@ namespace FOnlineDatRipper
                 {
                     oneByte = ReadNextPortion();
                 }
+                availBytes--;
                 nextBits |= oneByte << availBits;
                 availBits += 8;
             }
@@ -604,6 +608,7 @@ namespace FOnlineDatRipper
             {
                 return false;
             }
+            
             UnpackValues();
 
             valCnt = Math.Min(valsToGo, someSize2);

@@ -437,5 +437,10 @@ namespace FOnlineDatRipper
         {
             return progress;
         }
+
+        public override FOType GetFOFileType()
+        {
+            return FOType.FRM;
+        }
     }
 }
