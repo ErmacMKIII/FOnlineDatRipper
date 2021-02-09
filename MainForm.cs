@@ -185,8 +185,7 @@ namespace FOnlineDatRipper
             // its in another thread so invoke back to UI thread
             base.Invoke((Action)delegate
             {
-                this.taskProgressBar.Value = (inputFiles.Length == 0 || currFOFile == null) ? 
-                    100 : (int)Math.Round(currFOFile.GetProgress() / (double)fOnlineFiles.Count);
+                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round(currFOFile.GetProgress());
             });
         }
 
@@ -199,8 +198,6 @@ namespace FOnlineDatRipper
             treeViewDat.BeginUpdate();
             // then call preorder
             List<Node<string>> datPreOrderList = dat.Tree.Preorder();
-
-            treeViewDat.Nodes.Clear();
 
             TreeNodeCollection selected = treeViewDat.Nodes;
             TreeNode selectedNode = null;
@@ -319,22 +316,11 @@ namespace FOnlineDatRipper
             // sub to the event (dat is fresh spawn so no stacking events)
             dat.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
-            // start measuring the time
-            stopwatch.Start();
-
+            // read the input dat file
             dat.ReadFile(inputFile);
 
             // call dat to buld tree structure
             dat.BuildTreeStruct();
-
-            // stop measuring the time
-            stopwatch.Stop();
-
-            // set displayed elapsed time (in the message), measured in seconds
-            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
-
-            // reset for another read or any op
-            stopwatch.Reset();
         }
 
         /// <summary>
@@ -347,20 +333,8 @@ namespace FOnlineDatRipper
             // sub to the event (frm is fresh spawn so no stacking events)
             frm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
-            // start measuring the time
-            stopwatch.Start();
-
             // read FRM
             frm.ReadFile(inputFile);
-
-            // stop measuring the time
-            stopwatch.Stop();
-
-            // set displayed elapsed time (in the message), measured in seconds
-            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
-
-            // reset for another read or any op
-            stopwatch.Reset();
         }
 
         /// <summary>
@@ -372,20 +346,8 @@ namespace FOnlineDatRipper
         {
             acm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
-            // start measuring the time
-            stopwatch.Start();
-
             // read acm
             acm.ReadFile(inputFile);
-
-            // stop measuring the time
-            stopwatch.Stop();
-
-            // set displayed elapsed time (in the message), measured in seconds
-            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
-
-            // reset for another read or any op
-            stopwatch.Reset();
         }
 
         /// <summary>
@@ -451,12 +413,12 @@ namespace FOnlineDatRipper
             {
                 openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|FRM files (*.frm)|*.frm|ACM files (*.acm)|*.acm|All files (*.*)|*.*";
                 openFileDialog.RestoreDirectory = true;
-                openFileDialog.Multiselect = true;
-
-                listBoxInputFiles.Items.Clear();
+                openFileDialog.Multiselect = true;                
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
                 {
+                    fOnlineFiles.Clear();
+                    listBoxInputFiles.Items.Clear();
                     inputFiles = openFileDialog.FileNames;
 
                     foreach (string inputFile in inputFiles)
@@ -520,6 +482,10 @@ namespace FOnlineDatRipper
         private void Reader_DoWork(object sender, DoWorkEventArgs e)
         {
             currInFileIndex = 0;
+
+            // start measuring the time
+            stopwatch.Start();
+
             foreach (string inputFile in inputFiles)
             {
                 // choose behaviour based on file extension
@@ -548,6 +514,15 @@ namespace FOnlineDatRipper
                 // inc current file index
                 currInFileIndex++;
             }
+
+            // stop measuring the time
+            stopwatch.Stop();
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
         }
 
         /// <summary>
@@ -657,7 +632,6 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void previewToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
             if (selectedFOFile != null) {
 
                 // create ACM list (sound files)
@@ -908,52 +882,55 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void convertToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
-
-            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            if (selectedFOFile != null)
             {
-                // make a cast
-                Dat dat = (Dat)selectedFOFile;
-
                 // create ACM list (sound files)
-                List<ACM> acms = new List<ACM>();
-                // create FRM list (image files)
-                List<FRM> fRMs = new List<FRM>();
+                List<ACM> acms = new List<ACM>();                
 
-                foreach (int selectedIndex in selectedIndices)
+                switch (selectedFOFile.GetFOFileType())
                 {
-                    ListViewItem selItem = datListViewItems[selectedIndex];
-                    Node<string> datNode = (Node<string>)selItem.Tag;
-                    DataBlock dataBlock = dat.GetDataBlock(datNode);
-                    byte[] bytes = dat.Data(dataBlock);
-                    string filename = dataBlock.Filename;
-                    if (filename.ToLower().EndsWith(".acm"))
-                    {
-                        ACM acm = new ACM(dataBlock.Filename);
-                        acm.ReadBytes(bytes);
-                        acms.Add(acm);
-                    }
-                    else if (filename.ToLower().EndsWith(".frm"))
-                    {
-                        FRM frm = new FRM(dataBlock.Filename);
-                        frm.ReadBytes(bytes);
-                        fRMs.Add(frm);
-                    }
+                    case FOnlineFile.FOType.DAT:
+                        // make a cast
+                        Dat dat = (Dat)selectedFOFile;
 
-                }
+                        ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                        foreach (int selectedIndex in selectedIndices)
+                        {
+                            ListViewItem selItem = datListViewItems[selectedIndex];
+                            Node<string> datNode = (Node<string>)selItem.Tag;
+                            DataBlock dataBlock = dat.GetDataBlock(datNode);
+                            byte[] bytes = dat.Data(dataBlock);
+                            string filename = dataBlock.Filename;
+                            if (filename.ToLower().EndsWith(".acm"))
+                            {
+                                ACM acm = new ACM(dataBlock.Filename);
+                                acm.ReadBytes(bytes);
+                                acms.Add(acm);
+                            }                            
 
-                if (fRMs.Count != 0)
-                {
+                        }                        
 
-                }
+                        if (acms.Count != 0)
+                        {
+                            // create and use the subform
+                            using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
+                            {
+                                cacmForm.ShowDialog();
+                            }
+                        }
+                        break;
 
-                if (acms.Count != 0)
-                {
-                    // create and use the subform
-                    using (ACMConversionForm acmConvForm = new ACMConversionForm(acms))
-                    {
-                        acmConvForm.ShowDialog();
-                    }
+                    case FOnlineFile.FOType.ACM:
+                        acms.Add((ACM)selectedFOFile);
+                        if (acms.Count != 0)
+                        {
+                            // create and use the subform
+                            using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
+                            {
+                                cacmForm.ShowDialog();
+                            }
+                        }
+                        break;                    
                 }
             }
         }

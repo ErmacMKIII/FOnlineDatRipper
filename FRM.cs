@@ -293,11 +293,14 @@ namespace FOnlineDatRipper
             }
             //----------------------------------------------------------------------
             frameSize = (uint)(((buffer[pos] & 0xFF) << 24) | ((buffer[pos + 1] & 0xFF) << 16) | ((buffer[pos + 2] & 0xFF) << 8) | (buffer[pos + 3] & 0xFF));
-            if (framesPerDirection != 0 && frameSize % framesPerDirection != 0)
+            foreach (int offs in offset)
             {
-                error = true;
-                errorMessage = "Error - FRM has invalid frames per direction or invalid frame size!";
-                return;
+                if (offs > frameSize)
+                {
+                    error = true;
+                    errorMessage = "Error - FRM has invalid frame offset array or invalid frame size!";
+                    return;
+                }
             }
             pos += 4;
             this.progress = 20.0;
