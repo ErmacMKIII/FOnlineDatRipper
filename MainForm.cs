@@ -185,7 +185,9 @@ namespace FOnlineDatRipper
             // its in another thread so invoke back to UI thread
             base.Invoke((Action)delegate
             {
-                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round(currFOFile.GetProgress());
+                // fonline file index
+                int index = fOnlineFiles.IndexOf(currFOFile);
+                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round((index + 1) * currFOFile.GetProgress() / (double) fOnlineFiles.Count);
             });
         }
 
@@ -771,10 +773,13 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Extractor_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
             {
-                DatDoExtractAll((Dat)(selectedFOFile));
-            }            
+                if (fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+                {
+                    DatDoExtractAll((Dat)(fOnlineFile));
+                }
+            }
         }
 
         /// <summary>
