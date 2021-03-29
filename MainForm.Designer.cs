@@ -127,6 +127,7 @@ namespace FOnlineDatRipper
             this.extractToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
             this.extractToolStripMenuItem.Name = "extractToolStripMenuItem";
             resources.ApplyResources(this.extractToolStripMenuItem, "extractToolStripMenuItem");
+            this.extractToolStripMenuItem.Click += new System.EventHandler(this.extractToolStripMenuItem_Click);
             // 
             // pnlTree
             // 

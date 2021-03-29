@@ -141,6 +141,16 @@ namespace FOnlineDatRipper
         /// </summary>
         private double seconds = 0.0;
 
+        /// <summary>
+        /// Extract specific files.
+        /// </summary>
+        private readonly BackgroundWorker miniExtractor = new BackgroundWorker();
+
+        /// <summary>
+        /// List of specific files for extraction.
+        /// </summary>
+        // for extranction from dat
+        private List<Node<string>> files4Extract = new List<Node<string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
@@ -155,11 +165,23 @@ namespace FOnlineDatRipper
             extractor.DoWork += Extractor_DoWork;
             extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
 
+            miniExtractor.DoWork += MiniExtractor_DoWork;
+            miniExtractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+
             InitDarkTheme(this);
 
             // dark renderer to the menu strip
             this.mainMenuStrip.Renderer = new DarkRenderer();
             this.cntxtMenuStrip.Renderer = new DarkRenderer();
+        }
+
+        private void MiniExtractor_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            {
+                Dat dat = (Dat)selectedFOFile;
+                DatDoExtract(dat);
+            }
         }
 
         /// <summary>
@@ -353,7 +375,7 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Extrall all from the dat.
+        /// Extract all from the dat.
         /// Called from Background worker.
         /// </summary>
         /// <param name="dat">The dat<see cref="Dat"/>.</param>
@@ -363,6 +385,31 @@ namespace FOnlineDatRipper
 
             // call dat to extract all
             dat.ExtractAll(outDir);
+
+            // stop measuring the time
+            stopwatch.Stop();
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
+        /// Extract all from the selected treeview/listview of dat archive.
+        /// Called from Background worker.
+        /// </summary>
+        /// <param name="dat">The dat<see cref="Dat"/>.</param>
+        private void DatDoExtract(Dat dat)
+        {
+            stopwatch.Start();
+
+            // call dat to extract all
+            foreach (Node<string> node in this.files4Extract)
+            {
+                dat.Extract(outDir, node);
+            }
 
             // stop measuring the time
             stopwatch.Stop();
@@ -775,6 +822,7 @@ namespace FOnlineDatRipper
         {
             foreach (FOnlineFile fOnlineFile in fOnlineFiles)
             {
+                // extract only archives
                 if (fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
                 {
                     DatDoExtractAll((Dat)(fOnlineFile));
@@ -789,7 +837,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
         private void Extractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show("Dat File sucessfully extracted in " + seconds + " seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Dat File(s) sucessfully extracted in " + seconds + " seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.taskProgressBar.Value = 0;
         }
 
@@ -801,7 +849,7 @@ namespace FOnlineDatRipper
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("VERSION v0.3 - CHROMIUM\n");
+            sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
             sb.Append("PUBLIC BUILD reviewed on 2021-02-04 at 07:15).\n");
             sb.Append("This software is free software.\n");
@@ -935,7 +983,11 @@ namespace FOnlineDatRipper
                                 cacmForm.ShowDialog();
                             }
                         }
-                        break;                    
+                        break;
+
+                    case FOnlineFile.FOType.FRM:
+                        MessageBox.Show("Conversion is not supported for FRM(s)!", "File(s) Conversion", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
                 }
             }
         }
@@ -957,5 +1009,36 @@ namespace FOnlineDatRipper
             }
         }
 
+        private void extractToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (outDir == null)
+            {
+                MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!miniExtractor.IsBusy)
+            {
+                // call dat to extract all
+                if (treeViewDat.SelectedNode != null)
+                {
+                    KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)treeViewDat.SelectedNode.Tag;
+                    Node<string> target = pair.Value;
+                    files4Extract.Add(target);
+                }
+                else
+                {
+                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                    foreach (int selectedIndex in selectedIndices)
+                    {
+                        ListViewItem selItem = datListViewItems[selectedIndex];
+                        files4Extract.Add((Node<string>)selItem.Tag); 
+                    }
+                }
+                miniExtractor.RunWorkerAsync();
+            }
+            else
+            {
+                MessageBox.Show("Extracting currently in progress, Please Wait!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }        
     }
 }

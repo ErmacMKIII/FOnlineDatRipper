@@ -180,6 +180,12 @@ namespace FOnlineDatRipper
             // choose output directory
             using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
             {
+                if (chkListBox.CheckedIndices.Count == 0)
+                {
+                    MessageBox.Show("There's no selected files for conversion. Make sure that at least one is selected!", "Converting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 // if user confirms dialog
                 if (openDirDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -221,7 +227,8 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            progress = 0.0;
+            progress = 0.0;                     
+
             // loop through selected ACM items
             foreach (int index in chkListBox.CheckedIndices)
             {
@@ -231,24 +238,33 @@ namespace FOnlineDatRipper
                 }
 
                 ACM acm = acms[index];
+                acm.WaveStream.Position = 0; // important! - always read stream from position 0.
+                
+                WaveFormat outWaveFormat = new WaveFormat(); // output format: 16bit, 44.1 kHz
+                // Input is 16bit, 22050 Hz
+                WaveFormatConversionStream waveFormatConversionStream = new WaveFormatConversionStream(outWaveFormat, acm.WaveStream);                
+
                 int li = acm.Tag.LastIndexOf('.'); // last index of dot; point is to remove extension to add the new one
                 string outFile = outDir + Path.DirectorySeparatorChar + acm.Tag.Substring(0, li + 1) + audioFormat.ToString().ToLower();
                 switch (audioFormat)
                 {
                     case AudioFormat.AAC:
-                        MediaFoundationApi.Startup();
-                        MediaFoundationEncoder.EncodeToAac(acm.WaveStream, outFile);
+                        MediaFoundationApi.Startup();                        
+                        MediaFoundationEncoder.EncodeToAac(waveFormatConversionStream, outFile);
                         MediaFoundationApi.Shutdown();
                         break;
                     case AudioFormat.MP3:
                         MediaFoundationApi.Startup();
-                        MediaFoundationEncoder.EncodeToMp3(acm.WaveStream, outFile);
+                        MediaFoundationEncoder.EncodeToMp3(waveFormatConversionStream, outFile);
                         MediaFoundationApi.Shutdown();
                         break;
                     case AudioFormat.WAV:
-                        WaveFileWriter.CreateWaveFile(outFile, acm.WaveStream);
+                        using (waveFormatConversionStream)
+                        {
+                            WaveFileWriter.CreateWaveFile(outFile, waveFormatConversionStream);
+                        }                            
                         break;
-                }
+                }                
                 progress += 100.0 / (double)chkListBox.CheckedItems.Count;
                 backgroundWorker.ReportProgress((int)progress);
             }

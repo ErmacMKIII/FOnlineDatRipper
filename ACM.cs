@@ -165,7 +165,7 @@ namespace FOnlineDatRipper
                 {
                     this.waveStream = new RawSourceWaveStream(
                         new MemoryStream(this.content, 0, this.length),
-                        new WaveFormat((int)(acmDecoder.Info.Bitrate), 16, 2)
+                        new WaveFormat((int)(acmDecoder.Info.Bitrate), 2) // 16 bit, 22050 bitrate, 2 channels
                     );
                     ok = true;
                 }

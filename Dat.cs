@@ -481,6 +481,62 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
+        /// Extract all children of this node if directory, otherwise extract only itself.
+        /// </summary>
+        /// <param name="outdir"></param>
+        /// <param name="target"></param>
+        public void Extract(string outdir, Node<string> target)
+        {
+            progress = 0.0;
+
+            int fileTotal = 0;
+            int fileExtract = 0;
+            Stack<Node<string>> ustack = new Stack<Node<string>>();
+            ustack.Push(target);            
+            
+            // while stack is not empty
+            while (ustack.Count != 0)
+            {
+                Node<string> node = ustack.Pop();
+
+                foreach (Node<string> item in node.Children)
+                {
+                    // if it's file
+                    if (item.Children.Count == 0)
+                    {
+                        // find the data block and extract it
+                        DataBlock dataBlock = GetDataBlock(item);
+                        if (dataBlock != null)
+                        {
+                            progress = 100.0 * fileExtract / (double)fileTotal;
+                            Extract(outdir, dataBlock);
+                            fileExtract++;
+                            if (OnProgressUpdate != null)
+                            {
+                                OnProgressUpdate(progress);
+                            }
+                        }
+                    }
+                    // otherwise if directory
+                    else
+                    {
+                        // puuush!
+                        ustack.Push(item);
+
+                        fileTotal += item.Children.Count;
+                        progress = 100.0 * fileExtract / (double)fileTotal;
+
+                        if (OnProgressUpdate != null)
+                        {
+                            OnProgressUpdate(progress);
+                        }
+                    }
+                }
+            }
+            progress = 100.0;
+        }
+
+        /// <summary>
         /// Gets the tag (filename).
         /// </summary>
         /// <returns>.</returns>
