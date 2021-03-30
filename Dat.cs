@@ -344,7 +344,7 @@ namespace FOnlineDatRipper
                 (
                     t =>
                     {
-                        return t.Data.Equals(part);
+                        return t.Data.Equals(part) && t.Parent.Equals(currNode);
                     }
                 );
 

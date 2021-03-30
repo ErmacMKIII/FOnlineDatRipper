@@ -44,12 +44,14 @@ namespace FOnlineDatRipper
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.imgLstDatStruct = new System.Windows.Forms.ImageList(this.components);
-            this.cntxtMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cntxtMenuStripLong = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.previewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.convertToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnlTree = new System.Windows.Forms.Panel();
             this.treeViewDat = new System.Windows.Forms.TreeView();
+            this.cntxtMenuStripShort = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.extractShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtBoxPathInfo = new System.Windows.Forms.TextBox();
             this.pnlView = new System.Windows.Forms.Panel();
             this.listViewDat = new System.Windows.Forms.ListView();
@@ -77,8 +79,9 @@ namespace FOnlineDatRipper
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.cntxtMenuStrip.SuspendLayout();
+            this.cntxtMenuStripLong.SuspendLayout();
             this.pnlTree.SuspendLayout();
+            this.cntxtMenuStripShort.SuspendLayout();
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
@@ -99,14 +102,14 @@ namespace FOnlineDatRipper
             this.imgLstDatStruct.Images.SetKeyName(5, "frm_icon.png");
             this.imgLstDatStruct.Images.SetKeyName(6, "file_icon.png");
             // 
-            // cntxtMenuStrip
+            // cntxtMenuStripLong
             // 
-            this.cntxtMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cntxtMenuStripLong.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.previewToolStripMenuItem,
             this.convertToolStripMenuItem,
             this.extractToolStripMenuItem});
-            this.cntxtMenuStrip.Name = "cntxtMenuStrip";
-            resources.ApplyResources(this.cntxtMenuStrip, "cntxtMenuStrip");
+            this.cntxtMenuStripLong.Name = "cntxtMenuStrip";
+            resources.ApplyResources(this.cntxtMenuStripLong, "cntxtMenuStripLong");
             // 
             // previewToolStripMenuItem
             // 
@@ -138,13 +141,27 @@ namespace FOnlineDatRipper
             // 
             // treeViewDat
             // 
-            this.treeViewDat.ContextMenuStrip = this.cntxtMenuStrip;
+            this.treeViewDat.ContextMenuStrip = this.cntxtMenuStripShort;
             resources.ApplyResources(this.treeViewDat, "treeViewDat");
             this.treeViewDat.ImageList = this.imgLstDatStruct;
             this.treeViewDat.Name = "treeViewDat";
             this.treeViewDat.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeViewDat_AfterCollapse);
             this.treeViewDat.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewDat_BeforeExpand);
             this.treeViewDat.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewDat_AfterSelect);
+            // 
+            // cntxtMenuStripShort
+            // 
+            this.cntxtMenuStripShort.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extractShortToolStripMenuItem});
+            this.cntxtMenuStripShort.Name = "cntxtMenuStrip";
+            resources.ApplyResources(this.cntxtMenuStripShort, "cntxtMenuStripShort");
+            // 
+            // extractShortToolStripMenuItem
+            // 
+            this.extractShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
+            this.extractShortToolStripMenuItem.Name = "extractShortToolStripMenuItem";
+            resources.ApplyResources(this.extractShortToolStripMenuItem, "extractShortToolStripMenuItem");
+            this.extractShortToolStripMenuItem.Click += new System.EventHandler(this.extractShortToolStripMenuItem_Click);
             // 
             // txtBoxPathInfo
             // 
@@ -161,7 +178,7 @@ namespace FOnlineDatRipper
             // 
             // listViewDat
             // 
-            this.listViewDat.ContextMenuStrip = this.cntxtMenuStrip;
+            this.listViewDat.ContextMenuStrip = this.cntxtMenuStripLong;
             resources.ApplyResources(this.listViewDat, "listViewDat");
             this.listViewDat.GridLines = true;
             this.listViewDat.HideSelection = false;
@@ -355,9 +372,10 @@ namespace FOnlineDatRipper
             this.Controls.Add(this.mainMenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "MainForm";
-            this.cntxtMenuStrip.ResumeLayout(false);
+            this.cntxtMenuStripLong.ResumeLayout(false);
             this.pnlTree.ResumeLayout(false);
             this.pnlTree.PerformLayout();
+            this.cntxtMenuStripShort.ResumeLayout(false);
             this.pnlView.ResumeLayout(false);
             this.pnlView.PerformLayout();
             this.groupBoxDatArchive.ResumeLayout(false);
@@ -381,7 +399,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the cntxtMenuStrip.
         /// </summary>
-        private System.Windows.Forms.ContextMenuStrip cntxtMenuStrip;
+        private System.Windows.Forms.ContextMenuStrip cntxtMenuStripLong;
 
         /// <summary>
         /// Defines the previewToolStripMenuItem.
@@ -534,5 +552,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
         private System.Windows.Forms.Panel pnlInputFiles;
         private System.Windows.Forms.ListBox listBoxInputFiles;
+        private System.Windows.Forms.ContextMenuStrip cntxtMenuStripShort;
+        private System.Windows.Forms.ToolStripMenuItem extractShortToolStripMenuItem;
     }
 }

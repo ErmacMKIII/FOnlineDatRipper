@@ -172,7 +172,8 @@ namespace FOnlineDatRipper
 
             // dark renderer to the menu strip
             this.mainMenuStrip.Renderer = new DarkRenderer();
-            this.cntxtMenuStrip.Renderer = new DarkRenderer();
+            this.cntxtMenuStripShort.Renderer = new DarkRenderer();
+            this.cntxtMenuStripLong.Renderer = new DarkRenderer();
         }
 
         private void MiniExtractor_DoWork(object sender, DoWorkEventArgs e)
@@ -243,27 +244,15 @@ namespace FOnlineDatRipper
                 if (datNode == dat.Tree.Root)
                 {
                     selectedNode = new TreeNode(datNode.Data, ClosedRootIndex, ClosedRootIndex);
+                    selectedNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, datNode);
+                    selected.Add(selectedNode);
                 }
                 else if (datNode.Children.Count != 0)
                 {
                     selectedNode = new TreeNode(datNode.Data, ClosedDirIndex, ClosedDirIndex);
-                }
-                else if (datNode.Data.ToLower().EndsWith(".acm"))
-                {
-                    selectedNode = new TreeNode(datNode.Data, ACMIndex, ACMIndex);
-                }
-                else if (datNode.Data.ToLower().EndsWith(".frm"))
-                {
-                    selectedNode = new TreeNode(datNode.Data, FRMIndex, FRMIndex);
-                }
-                else
-                {
-                    selectedNode = new TreeNode(datNode.Data, FileIndex, FileIndex);
-                }
-
-                // associate with the node dat tree
-                selectedNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, datNode);              
-                selected.Add(selectedNode);
+                    selectedNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, datNode);
+                    selected.Add(selectedNode);
+                }                  
             }
 
             treeViewDat.CollapseAll();
@@ -851,11 +840,11 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-02-04 at 07:15).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-03-30 at 10:15).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
-            sb.Append("Changelog for v0.3 CHROMIUM:\n");
+            sb.Append("Changelog for v0.4 DEUTERIUM:\n");
             sb.Append("\t- Initial pre-release.\n");
             sb.Append("\n");
             sb.Append("\n");
@@ -1039,6 +1028,38 @@ namespace FOnlineDatRipper
             {
                 MessageBox.Show("Extracting currently in progress, Please Wait!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }        
+        }
+
+        private void extractShortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (outDir == null)
+            {
+                MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else if (!miniExtractor.IsBusy)
+            {
+                // call dat to extract all
+                if (treeViewDat.SelectedNode != null)
+                {
+                    KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)treeViewDat.SelectedNode.Tag;
+                    Node<string> target = pair.Value;
+                    files4Extract.Add(target);
+                }
+                else
+                {
+                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                    foreach (int selectedIndex in selectedIndices)
+                    {
+                        ListViewItem selItem = datListViewItems[selectedIndex];
+                        files4Extract.Add((Node<string>)selItem.Tag);
+                    }
+                }
+                miniExtractor.RunWorkerAsync();
+            }
+            else
+            {
+                MessageBox.Show("Extracting currently in progress, Please Wait!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
