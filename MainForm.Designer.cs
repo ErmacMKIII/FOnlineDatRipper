@@ -18,7 +18,7 @@ namespace FOnlineDatRipper
     internal partial class MainForm
     {
         /// <summary>
-        /// Required designer variable...................
+        /// Required designer variable....................
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
@@ -69,16 +69,13 @@ namespace FOnlineDatRipper
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator = new System.Windows.Forms.ToolStripSeparator();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cntxtMenuStripLong.SuspendLayout();
             this.pnlTree.SuspendLayout();
             this.cntxtMenuStripShort.SuspendLayout();
@@ -294,54 +291,6 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.mainMenuStrip, "mainMenuStrip");
             this.mainMenuStrip.Name = "mainMenuStrip";
             // 
-            // fileToolStripMenuItem
-            // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem,
-            this.toolStripSeparator,
-            this.saveToolStripMenuItem,
-            this.saveAsToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
-            // 
-            // openToolStripMenuItem
-            // 
-            this.openToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.dir_icon_opened;
-            resources.ApplyResources(this.openToolStripMenuItem, "openToolStripMenuItem");
-            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
-            // 
-            // toolStripSeparator
-            // 
-            this.toolStripSeparator.Name = "toolStripSeparator";
-            resources.ApplyResources(this.toolStripSeparator, "toolStripSeparator");
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
-            resources.ApplyResources(this.saveToolStripMenuItem, "saveToolStripMenuItem");
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            // 
-            // saveAsToolStripMenuItem
-            // 
-            this.saveAsToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_all_icon;
-            this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            resources.ApplyResources(this.saveAsToolStripMenuItem, "saveAsToolStripMenuItem");
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            resources.ApplyResources(this.toolStripSeparator1, "toolStripSeparator1");
-            // 
-            // exitToolStripMenuItem
-            // 
-            this.exitToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.exit_icon;
-            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
-            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
-            // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -361,6 +310,34 @@ namespace FOnlineDatRipper
             this.HowToToolStripMenuItem.Name = "HowToToolStripMenuItem";
             resources.ApplyResources(this.HowToToolStripMenuItem, "HowToToolStripMenuItem");
             this.HowToToolStripMenuItem.Click += new System.EventHandler(this.HowToToolStripMenuItem_Click);
+            // 
+            // openToolStripMenuItem
+            // 
+            this.openToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.dir_icon_opened;
+            resources.ApplyResources(this.openToolStripMenuItem, "openToolStripMenuItem");
+            this.openToolStripMenuItem.Name = "openToolStripMenuItem";
+            this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            resources.ApplyResources(this.toolStripSeparator1, "toolStripSeparator1");
+            // 
+            // exitToolStripMenuItem
+            // 
+            this.exitToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.exit_icon;
+            this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
+            resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
             // 
             // MainForm
             // 
@@ -397,7 +374,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ImageList imgLstDatStruct;
 
         /// <summary>
-        /// Defines the cntxtMenuStrip.
+        /// Defines the cntxtMenuStripLong.
         /// </summary>
         private System.Windows.Forms.ContextMenuStrip cntxtMenuStripLong;
 
@@ -497,41 +474,6 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.MenuStrip mainMenuStrip;
 
         /// <summary>
-        /// Defines the fileToolStripMenuItem.
-        /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
-
-        /// <summary>
-        /// Defines the openToolStripMenuItem.
-        /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
-
-        /// <summary>
-        /// Defines the toolStripSeparator.
-        /// </summary>
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator;
-
-        /// <summary>
-        /// Defines the saveToolStripMenuItem.
-        /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
-
-        /// <summary>
-        /// Defines the saveAsToolStripMenuItem.
-        /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-
-        /// <summary>
-        /// Defines the toolStripSeparator1.
-        /// </summary>
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-
-        /// <summary>
-        /// Defines the exitToolStripMenuItem.
-        /// </summary>
-        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-
-        /// <summary>
         /// Defines the helpToolStripMenuItem.
         /// </summary>
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
@@ -550,9 +492,29 @@ namespace FOnlineDatRipper
         /// Defines the convertToolStripMenuItem.
         /// </summary>
         private System.Windows.Forms.ToolStripMenuItem convertToolStripMenuItem;
+
+        /// <summary>
+        /// Defines the pnlInputFiles.
+        /// </summary>
         private System.Windows.Forms.Panel pnlInputFiles;
+
+        /// <summary>
+        /// Defines the listBoxInputFiles.
+        /// </summary>
         private System.Windows.Forms.ListBox listBoxInputFiles;
+
+        /// <summary>
+        /// Defines the cntxtMenuStripShort.
+        /// </summary>
         private System.Windows.Forms.ContextMenuStrip cntxtMenuStripShort;
+
+        /// <summary>
+        /// Defines the extractShortToolStripMenuItem.
+        /// </summary>
         private System.Windows.Forms.ToolStripMenuItem extractShortToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
     }
 }

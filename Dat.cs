@@ -65,7 +65,7 @@ namespace FOnlineDatRipper
         private readonly Tree<string> tree = new Tree<string>(new Node<string>("root"));
 
         /// <summary>
-        /// Defines the scope for nodes................
+        /// Defines the scope for nodes.................
         /// </summary>
         private readonly List<List<Node<string>>> scope = new List<List<Node<string>>>();
 
@@ -86,17 +86,17 @@ namespace FOnlineDatRipper
 
         /// <summary>
         /// Gets the Progress
-        /// Gets or sets the Progress......
+        /// Gets or sets the Progress.......
         /// </summary>
         public double Progress { get => progress; }
 
         /// <summary>
-        /// Is error occurred?............
+        /// Is error occurred?.............
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message to display............
+        /// Error message to display.............
         /// </summary>
         private string errorMessage = "";
 
@@ -111,13 +111,13 @@ namespace FOnlineDatRipper
         public string ErrorMessage { get => errorMessage; }
 
         /// <summary>
-        /// Tag used to associtate this (e.g. filename).....
+        /// Tag used to associtate this (e.g. filename)......
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// Gets the Tag
-        /// Tag used to associtate this (e.g. filename).....
+        /// Tag used to associtate this (e.g. filename)......
         /// </summary>
         public string Tag { get => tag; }
 
@@ -483,17 +483,43 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Extract all children of this node if directory, otherwise extract only itself.
         /// </summary>
-        /// <param name="outdir"></param>
-        /// <param name="target"></param>
+        /// <param name="outdir">.</param>
+        /// <param name="target">.</param>
         public void Extract(string outdir, Node<string> target)
         {
             progress = 0.0;
 
-            int fileTotal = 0;
-            int fileExtract = 0;
+            int fileTotal = 0; // total counted files for extracting
+            int fileExtract = 0; // extracted (processed) files
             Stack<Node<string>> ustack = new Stack<Node<string>>();
-            ustack.Push(target);            
-            
+
+            if (target.Children.Count == 0)
+            {
+                DataBlock dataBlock = GetDataBlock(target);
+                if (dataBlock != null)
+                {
+                    progress = 100.0;
+                    Extract(outdir, dataBlock);
+                    fileExtract++;
+                    if (OnProgressUpdate != null)
+                    {
+                        OnProgressUpdate(progress);
+                    }
+                }
+            }
+            else
+            {
+                fileTotal += target.Children.Count;
+                ustack.Push(target);
+
+                progress = 100.0 * fileExtract / (double)fileTotal;
+
+                if (OnProgressUpdate != null)
+                {
+                    OnProgressUpdate(progress);
+                }
+            }
+
             // while stack is not empty
             while (ustack.Count != 0)
             {
@@ -532,7 +558,9 @@ namespace FOnlineDatRipper
                         }
                     }
                 }
+
             }
+
             progress = 100.0;
         }
 
@@ -572,6 +600,10 @@ namespace FOnlineDatRipper
             return progress;
         }
 
+        /// <summary>
+        /// The GetFOFileType.
+        /// </summary>
+        /// <returns>The <see cref="FOType"/>.</returns>
         public override FOType GetFOFileType()
         {
             return FOType.DAT;

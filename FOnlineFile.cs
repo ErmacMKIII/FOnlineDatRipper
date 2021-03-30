@@ -17,15 +17,29 @@ namespace FOnlineDatRipper
     /// </summary>
     internal abstract class FOnlineFile
     {
+        /// <summary>
+        /// Defines the FOType.
+        /// </summary>
         public enum FOType
         {
-            ACM, FRM, DAT
+            /// <summary>
+            /// Defines the ACM.
+            /// </summary>
+            ACM,
+            /// <summary>
+            /// Defines the FRM.
+            /// </summary>
+            FRM,
+            /// <summary>
+            /// Defines the DAT.
+            /// </summary>
+            DAT
         }
 
         /// <summary>
         /// Get type. It's one of the following {ACM, FRM, DAT}.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>.</returns>
         public abstract FOType GetFOFileType();
 
         /// <summary>

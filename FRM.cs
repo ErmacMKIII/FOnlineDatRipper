@@ -120,7 +120,7 @@ namespace FOnlineDatRipper
         private readonly byte[] buffer = new byte[BufferSize];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example)...........
+        /// Read only tag as a display name (on the tab for example)............
         /// </summary>
         private readonly string tag;
 
@@ -165,24 +165,24 @@ namespace FOnlineDatRipper
         public string Tag => tag;
 
         /// <summary>
-        /// Did error occurred?....
+        /// Did error occurred?.....
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message for display....
+        /// Error message for display.....
         /// </summary>
         private string errorMessage = "";
 
         /// <summary>
         /// Gets a value indicating whether Error
-        /// Did error occurred?....
+        /// Did error occurred?.....
         /// </summary>
         public bool Error { get => error; }
 
         /// <summary>
         /// Gets the ErrorMessage
-        /// Error message for display....
+        /// Error message for display.....
         /// </summary>
         public string ErrorMessage { get => errorMessage; }
 
@@ -441,6 +441,10 @@ namespace FOnlineDatRipper
             return progress;
         }
 
+        /// <summary>
+        /// The GetFOFileType.
+        /// </summary>
+        /// <returns>The <see cref="FOType"/>.</returns>
         public override FOType GetFOFileType()
         {
             return FOType.FRM;

@@ -26,29 +26,29 @@ namespace FOnlineDatRipper
         public event ACMDecoder.ProgressUpdate OnProgressUpdate;
 
         /// <summary>
-        /// Represents decoded data (64 MB buffer)...........
+        /// Represents decoded data (64 MB buffer)............
         /// </summary>
         private readonly byte[] content = new byte[0x4000000];
 
         /// <summary>
-        /// Read only tag as a display name (on the tab for example)............
+        /// Read only tag as a display name (on the tab for example).............
         /// </summary>
         private readonly string tag;
 
         /// <summary>
         /// Gets the Tag
-        /// Tag for this acm (for display)...........
+        /// Tag for this acm (for display)............
         /// </summary>
         public string Tag => tag;
 
         /// <summary>
         /// Gets the Content
-        /// Decoded bytes...........
+        /// Decoded bytes............
         /// </summary>
         public byte[] Content => content;
 
         /// <summary>
-        /// Content as Wave Stream...........
+        /// Content as Wave Stream............
         /// </summary>
         private RawSourceWaveStream waveStream;
 
@@ -58,13 +58,13 @@ namespace FOnlineDatRipper
         public RawSourceWaveStream WaveStream { get => waveStream; }
 
         /// <summary>
-        /// Length of Content Buffer...........
+        /// Length of Content Buffer............
         /// </summary>
         private int length = 0;
 
         /// <summary>
         /// Gets the Length
-        /// Length of Content Buffer...........
+        /// Length of Content Buffer............
         /// </summary>
         public int Length { get => length; }
 
@@ -79,17 +79,17 @@ namespace FOnlineDatRipper
         public string ErrorMessage { get => errorMessage; }
 
         /// <summary>
-        /// Did error occurred?.....
+        /// Did error occurred?......
         /// </summary>
         private bool error = false;
 
         /// <summary>
-        /// Error message for display.....
+        /// Error message for display......
         /// </summary>
         private string errorMessage = "";
 
         /// <summary>
-        /// ACM Decoder, each ACM has one!.
+        /// ACM Decoder, each ACM has one!..
         /// </summary>
         private ACMDecoder acmDecoder;
 
@@ -214,6 +214,10 @@ namespace FOnlineDatRipper
             return (this.acmDecoder == null) ? 0 : acmDecoder.Progress;
         }
 
+        /// <summary>
+        /// The GetFOFileType.
+        /// </summary>
+        /// <returns>The <see cref="FOType"/>.</returns>
         public override FOType GetFOFileType()
         {
             return FOType.ACM;

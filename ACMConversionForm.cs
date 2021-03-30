@@ -76,9 +76,9 @@ namespace FOnlineDatRipper
         private readonly ComboBox cmbBoxOutputFormat = new ComboBox();
 
         /// <summary>
-        /// Defines the btnGo.
+        /// Defines the btnConvert.
         /// </summary>
-        private readonly Button btnGo = new Button();
+        private readonly Button btnConvert = new Button();
 
         /// <summary>
         /// Defines the progBar.
@@ -160,10 +160,10 @@ namespace FOnlineDatRipper
             this.Controls.Add(cmbBoxOutputFormat);
 
             // button GO
-            btnGo.Dock = DockStyle.Bottom;
-            btnGo.Text = "GO";
-            btnGo.Click += BtnGo_Click;
-            this.Controls.Add(btnGo);
+            btnConvert.Dock = DockStyle.Bottom;
+            btnConvert.Text = "CONVERT...";
+            btnConvert.Click += BtnGo_Click;
+            this.Controls.Add(btnConvert);
 
             // progress bar
             this.progBar.Dock = DockStyle.Bottom;
@@ -227,7 +227,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            progress = 0.0;                     
+            progress = 0.0;
 
             // loop through selected ACM items
             foreach (int index in chkListBox.CheckedIndices)
@@ -239,17 +239,17 @@ namespace FOnlineDatRipper
 
                 ACM acm = acms[index];
                 acm.WaveStream.Position = 0; // important! - always read stream from position 0.
-                
+
                 WaveFormat outWaveFormat = new WaveFormat(); // output format: 16bit, 44.1 kHz
                 // Input is 16bit, 22050 Hz
-                WaveFormatConversionStream waveFormatConversionStream = new WaveFormatConversionStream(outWaveFormat, acm.WaveStream);                
+                WaveFormatConversionStream waveFormatConversionStream = new WaveFormatConversionStream(outWaveFormat, acm.WaveStream);
 
                 int li = acm.Tag.LastIndexOf('.'); // last index of dot; point is to remove extension to add the new one
                 string outFile = outDir + Path.DirectorySeparatorChar + acm.Tag.Substring(0, li + 1) + audioFormat.ToString().ToLower();
                 switch (audioFormat)
                 {
                     case AudioFormat.AAC:
-                        MediaFoundationApi.Startup();                        
+                        MediaFoundationApi.Startup();
                         MediaFoundationEncoder.EncodeToAac(waveFormatConversionStream, outFile);
                         MediaFoundationApi.Shutdown();
                         break;
@@ -262,9 +262,9 @@ namespace FOnlineDatRipper
                         using (waveFormatConversionStream)
                         {
                             WaveFileWriter.CreateWaveFile(outFile, waveFormatConversionStream);
-                        }                            
+                        }
                         break;
-                }                
+                }
                 progress += 100.0 / (double)chkListBox.CheckedItems.Count;
                 backgroundWorker.ReportProgress((int)progress);
             }
