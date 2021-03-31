@@ -51,6 +51,7 @@ namespace FOnlineDatRipper
         /// </summary>
         public static readonly Color DarkForeground = Color.FromArgb(0xFF, 0x7F, 0x50);
 
+
         /// <summary>
         /// Defines the ClosedRootIndex.
         /// </summary>
@@ -62,29 +63,39 @@ namespace FOnlineDatRipper
         internal const int OpenedRootIndex = 1;
 
         /// <summary>
+        /// Defines the ClosedRootIndex.
+        /// </summary>
+        internal const int ClosedArchiveIndex = 2;
+
+        /// <summary>
+        /// Defines the OpenedRootIndex.
+        /// </summary>
+        internal const int OpenedArchiveIndex = 3;
+
+        /// <summary>
         /// Defines the ClosedDirIndex.
         /// </summary>
-        internal const int ClosedDirIndex = 2;
+        internal const int ClosedDirIndex = 4;
 
         /// <summary>
         /// Defines the OpenedDirIndex.
         /// </summary>
-        internal const int OpenedDirIndex = 3;
+        internal const int OpenedDirIndex = 5;
 
         /// <summary>
         /// Defines the ACMIndex.
         /// </summary>
-        internal const int ACMIndex = 4;
+        internal const int ACMIndex = 6;
 
         /// <summary>
         /// Defines the FRMIndex.
         /// </summary>
-        internal const int FRMIndex = 5;
+        internal const int FRMIndex = 7;
 
         /// <summary>
         /// Defines the FileIndex.
         /// </summary>
-        internal const int FileIndex = 6;
+        internal const int FileIndex = 8;
 
         /// <summary>
         /// Defines the input file......
@@ -247,7 +258,7 @@ namespace FOnlineDatRipper
                 // these elifs are for choosing corresponding image
                 if (datNode == dat.Tree.Root)
                 {
-                    selectedNode = new TreeNode(datNode.Data, ClosedRootIndex, ClosedRootIndex);
+                    selectedNode = new TreeNode(datNode.Data, ClosedArchiveIndex, ClosedArchiveIndex);
                     selectedNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, datNode);
                     selected.Add(selectedNode);
                 }
@@ -287,7 +298,7 @@ namespace FOnlineDatRipper
                 int imageIndex;
                 if (child == dat.Tree.Root)
                 {
-                    imageIndex = ClosedRootIndex;
+                    imageIndex = ClosedArchiveIndex;
                 }
                 else if (child.Children.Count != 0)
                 {
@@ -586,7 +597,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="TreeViewCancelEventArgs"/>.</param>
         private void treeViewDat_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
-            e.Node.ImageIndex = (e.Node.Level == 0) ? OpenedRootIndex : OpenedDirIndex;
+            e.Node.ImageIndex = (e.Node.Level == 0) ? OpenedArchiveIndex : OpenedDirIndex;
         }
 
         /// <summary>
@@ -596,7 +607,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="TreeViewEventArgs"/>.</param>
         private void treeViewDat_AfterCollapse(object sender, TreeViewEventArgs e)
         {
-            e.Node.ImageIndex = (e.Node.Level == 0) ? ClosedRootIndex : ClosedDirIndex;
+            e.Node.ImageIndex = (e.Node.Level == 0) ? ClosedArchiveIndex : ClosedDirIndex;
         }
 
         /// <summary>

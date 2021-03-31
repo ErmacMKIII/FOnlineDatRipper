@@ -202,5 +202,11 @@
   <ItemGroup>
     <None Include="res\convert_icon.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\archive_icon_closed.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\archive_icon_opened.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

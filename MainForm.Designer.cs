@@ -69,13 +69,13 @@ namespace FOnlineDatRipper
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cntxtMenuStripLong.SuspendLayout();
             this.pnlTree.SuspendLayout();
             this.cntxtMenuStripShort.SuspendLayout();
@@ -93,11 +93,13 @@ namespace FOnlineDatRipper
             this.imgLstDatStruct.TransparentColor = System.Drawing.Color.Transparent;
             this.imgLstDatStruct.Images.SetKeyName(0, "root_icon_closed.png");
             this.imgLstDatStruct.Images.SetKeyName(1, "root_icon_opened.png");
-            this.imgLstDatStruct.Images.SetKeyName(2, "dir_icon_closed.png");
-            this.imgLstDatStruct.Images.SetKeyName(3, "dir_icon_opened.png");
-            this.imgLstDatStruct.Images.SetKeyName(4, "acm_icon.png");
-            this.imgLstDatStruct.Images.SetKeyName(5, "frm_icon.png");
-            this.imgLstDatStruct.Images.SetKeyName(6, "file_icon.png");
+            this.imgLstDatStruct.Images.SetKeyName(2, "archive_icon_closed.png");
+            this.imgLstDatStruct.Images.SetKeyName(3, "archive_icon_opened.png");
+            this.imgLstDatStruct.Images.SetKeyName(4, "dir_icon_closed.png");
+            this.imgLstDatStruct.Images.SetKeyName(5, "dir_icon_opened.png");
+            this.imgLstDatStruct.Images.SetKeyName(6, "acm_icon.png");
+            this.imgLstDatStruct.Images.SetKeyName(7, "frm_icon.png");
+            this.imgLstDatStruct.Images.SetKeyName(8, "file_icon.png");
             // 
             // cntxtMenuStripLong
             // 
@@ -291,25 +293,14 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.mainMenuStrip, "mainMenuStrip");
             this.mainMenuStrip.Name = "mainMenuStrip";
             // 
-            // helpToolStripMenuItem
+            // fileToolStripMenuItem
             // 
-            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aboutToolStripMenuItem,
-            this.HowToToolStripMenuItem});
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
-            // 
-            // aboutToolStripMenuItem
-            // 
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // HowToToolStripMenuItem
-            // 
-            this.HowToToolStripMenuItem.Name = "HowToToolStripMenuItem";
-            resources.ApplyResources(this.HowToToolStripMenuItem, "HowToToolStripMenuItem");
-            this.HowToToolStripMenuItem.Click += new System.EventHandler(this.HowToToolStripMenuItem_Click);
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.openToolStripMenuItem,
+            this.toolStripSeparator1,
+            this.exitToolStripMenuItem});
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
             // 
             // openToolStripMenuItem
             // 
@@ -330,14 +321,25 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.exitToolStripMenuItem, "exitToolStripMenuItem");
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
-            // fileToolStripMenuItem
+            // helpToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem,
-            this.toolStripSeparator1,
-            this.exitToolStripMenuItem});
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            resources.ApplyResources(this.fileToolStripMenuItem, "fileToolStripMenuItem");
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem,
+            this.HowToToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            resources.ApplyResources(this.helpToolStripMenuItem, "helpToolStripMenuItem");
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            resources.ApplyResources(this.aboutToolStripMenuItem, "aboutToolStripMenuItem");
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // HowToToolStripMenuItem
+            // 
+            this.HowToToolStripMenuItem.Name = "HowToToolStripMenuItem";
+            resources.ApplyResources(this.HowToToolStripMenuItem, "HowToToolStripMenuItem");
+            this.HowToToolStripMenuItem.Click += new System.EventHandler(this.HowToToolStripMenuItem_Click);
             // 
             // MainForm
             // 
