@@ -289,6 +289,12 @@ namespace FOnlineDatRipper
         /// <param name="node"> dat node to start building from .</param>
         private void BuildListView(FOnlineFile fOnlineFile, Node<string> node)
         {
+            // if no children (like files) make it no effect
+            if (node.Children.Count == 0)
+            {
+                return;
+            }
+
             datListViewItems.Clear();
             listViewDat.Items.Clear();
 
@@ -780,12 +786,7 @@ namespace FOnlineDatRipper
             }
         }
 
-        /// <summary>
-        /// The previewToolStripMenuItem_Click.
-        /// </summary>
-        /// <param name="sender">The sender<see cref="object"/>.</param>
-        /// <param name="e">The e<see cref="EventArgs"/>.</param>
-        private void previewToolStripMenuItem_Click(object sender, EventArgs e)
+        private void BuildPreview()
         {
             ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
             // create ACM list (sound files)
@@ -801,20 +802,25 @@ namespace FOnlineDatRipper
                     ListViewItem selItem = datListViewItems[selectedIndex];
                     KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
                     Node<string> datNode = kvp.Value;
-                    DataBlock dataBlock = dat.GetDataBlock(datNode);
-                    byte[] bytes = dat.Data(dataBlock);
-                    string filename = dataBlock.Filename;
-                    if (filename.ToLower().EndsWith(".acm"))
+
+                    // protection of dat node
+                    if (datNode != null)
                     {
-                        ACM acm = new ACM(dataBlock.Filename);
-                        acm.ReadBytes(bytes);
-                        acms.Add(acm);
-                    }
-                    else if (filename.ToLower().EndsWith(".frm"))
-                    {
-                        FRM frm = new FRM(dataBlock.Filename);
-                        frm.ReadBytes(bytes);
-                        fRMs.Add(frm);
+                        DataBlock dataBlock = dat.GetDataBlock(datNode);
+                        byte[] bytes = dat.Data(dataBlock);
+                        string filename = dataBlock.Filename;
+                        if (filename.ToLower().EndsWith(".acm"))
+                        {
+                            ACM acm = new ACM(dataBlock.Filename);
+                            acm.ReadBytes(bytes);
+                            acms.Add(acm);
+                        }
+                        else if (filename.ToLower().EndsWith(".frm"))
+                        {
+                            FRM frm = new FRM(dataBlock.Filename);
+                            frm.ReadBytes(bytes);
+                            fRMs.Add(frm);
+                        }
                     }
 
                 }
@@ -838,7 +844,7 @@ namespace FOnlineDatRipper
                 }
 
             }
-            else
+            else if (selectedFOFile == null)
             {
                 foreach (int selectedIndex in selectedIndices)
                 {
@@ -879,6 +885,16 @@ namespace FOnlineDatRipper
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// The previewToolStripMenuItem_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void previewToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BuildPreview();
         }
 
         /// <summary>
@@ -1146,6 +1162,7 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void listViewDat_DoubleClick(object sender, EventArgs e)
         {
+            // if choosing internal directory from archive
             if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
                 IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
@@ -1156,6 +1173,25 @@ namespace FOnlineDatRipper
                         ListViewItem selItem = datListViewItems[selectedIndex];
                         KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
                         BuildListView((Dat)selectedFOFile, kvp.Value);
+                        // build preview if double click the files
+                        if (kvp.Value != null && kvp.Value.Children.Count == 0)
+                        {
+                            BuildPreview();
+                        }
+                    }
+                }));
+                listViewDat.EndInvoke(asyncResult);
+            } 
+            // if choosing file from the root
+            else if (selectedFOFile == null)
+            {
+                IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
+                {
+                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                    foreach (int selectedIndex in selectedIndices)
+                    {
+                        ListViewItem selItem = datListViewItems[selectedIndex];
+                        BuildPreview();
                     }
                 }));
                 listViewDat.EndInvoke(asyncResult);
