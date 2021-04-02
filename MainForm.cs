@@ -300,6 +300,9 @@ namespace FOnlineDatRipper
 
             if (node.Data.Equals("/"))
             {
+                txtBoxPathInfo.Text = "/";
+
+                int fileCount = 0;
                 foreach (Node<string> child in node.Children)
                 {
                     // image index is chosen on these circumstances
@@ -320,6 +323,8 @@ namespace FOnlineDatRipper
                     {
                         imageIndex = FileIndex;
                     }
+                    fileCount++;
+                    
 
                     // create new list view item and add it to the big list
                     ListViewItem item = new ListViewItem(child.Data, imageIndex);
@@ -327,6 +332,8 @@ namespace FOnlineDatRipper
                     item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(fOnlineFile, child);
                     datListViewItems.Add(item);
                 }
+                txtBoxFileCount.Text = String.Format("0 directories and {0} files", fileCount);
+
                 // enable virtual (for better performance)
                 listViewDat.VirtualMode = true;
                 listViewDat.VirtualListSize = datListViewItems.Count;
@@ -336,7 +343,7 @@ namespace FOnlineDatRipper
                 Dat dat = (Dat)fOnlineFile;
                 datCacheMiss = true;
                 // set path info to the full file name generated from datnode
-                txtBoxPathInfo.Text = Dat.GetFileName(node);
+                txtBoxPathInfo.Text = "/" + Dat.GetFileName(node);
 
                 int dirCount = 0;
                 int fileCount = 0;
@@ -985,7 +992,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-04-01 at 22:00).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-04-02 at 03:00).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
