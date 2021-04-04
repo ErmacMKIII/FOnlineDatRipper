@@ -169,7 +169,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// List of specific files for extraction..
         /// </summary>
-        private List<Node<string>> files4Extract = new List<Node<string>>();
+        private List<Node<string>> files2Extract = new List<Node<string>>();
 
         /// <summary>
         /// Root of Tree View.
@@ -498,7 +498,7 @@ namespace FOnlineDatRipper
             stopwatch.Start();
 
             // call dat to extract all
-            foreach (Node<string> node in this.files4Extract)
+            foreach (Node<string> node in this.files2Extract)
             {
                 dat.Extract(outDir, node);
             }
@@ -1035,7 +1035,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 07:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 22:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1093,9 +1093,9 @@ namespace FOnlineDatRipper
             sb.Append("\t   FRM image file (*.frm) or ACM sound file (*.acm).\n");
             sb.Append("\t2. Wait for task to complete\n");
             sb.Append("\tand you will be prompted with message.\n");
-            sb.Append("\t3. View the file, enjoy.\n");
+            sb.Append("\t3. View the file(s), enjoy.\n");
             sb.Append("\n");
-            sb.Append("- Extracting file(s):\n");
+            sb.Append("- Extracting archive file(s):\n");
             sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
             sb.Append("\t2. Perform step \"Opening file\".\n");
             sb.Append("\t3. Choose \"Output...\" by clicking on the button.\n");
@@ -1104,7 +1104,7 @@ namespace FOnlineDatRipper
             sb.Append("\t5. Right click to extract them.\n");
             sb.Append("\t6. Wait for extraction to complete.\n");
             sb.Append("\n");
-            sb.Append("- Extracting all files:\n");
+            sb.Append("- Extracting all archive files:\n");
             sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
             sb.Append("\t2. Perform step \"Opening file\".\n");
             sb.Append("\t3. Choose \"Output...\" by clicking on the button.\n");
@@ -1247,6 +1247,7 @@ namespace FOnlineDatRipper
             }
             else if (!miniExtractor.IsBusy)
             {
+                files2Extract.Clear();
                 ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
                 foreach (int selectedIndex in selectedIndices)
                 {
@@ -1254,10 +1255,14 @@ namespace FOnlineDatRipper
                     KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
                     if (pair.Key != null && pair.Key.GetFOFileType() == FOnlineFile.FOType.DAT)
                     {
-                        files4Extract.Add(pair.Value);
+                        files2Extract.Add(pair.Value);
                     }
                 }
-                miniExtractor.RunWorkerAsync();
+
+                if (files2Extract.Count != 0)
+                {
+                    miniExtractor.RunWorkerAsync();
+                }
             }
             else
             {
@@ -1278,15 +1283,20 @@ namespace FOnlineDatRipper
             }
             else if (!miniExtractor.IsBusy)
             {
+                files2Extract.Clear();
                 // call dat to extract all
                 if (treeViewDat.SelectedNode != null)
                 {
                     KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)treeViewDat.SelectedNode.Tag;
                     leftSelectedFOFile = pair.Key;
                     Node<string> target = pair.Value;
-                    files4Extract.Add(target);
+                    files2Extract.Add(target);
                 }
-                miniExtractor.RunWorkerAsync();
+
+                if (files2Extract.Count != 0)
+                {
+                    miniExtractor.RunWorkerAsync();
+                }
             }
             else
             {
@@ -1308,6 +1318,7 @@ namespace FOnlineDatRipper
                 FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
+                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT;
             }
         }
 
@@ -1325,6 +1336,7 @@ namespace FOnlineDatRipper
                 FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
+                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT;
             }
         }
     }
