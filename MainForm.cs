@@ -220,11 +220,13 @@ namespace FOnlineDatRipper
             if (leftSelectedFOFile != null && leftSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
                 Dat dat = (Dat)leftSelectedFOFile;
+                currFOFile = dat;
                 DatDoExtract(dat);
             } 
             else if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
                 Dat dat = (Dat)rightSelectedFOFile;
+                currFOFile = dat;
                 DatDoExtract(dat);
             }
 
@@ -254,8 +256,7 @@ namespace FOnlineDatRipper
             base.Invoke((Action)delegate
             {
                 // fonline file index
-                int index = fOnlineFiles.IndexOf(currFOFile);
-                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round((index + 1) * currFOFile.GetProgress() / (double)fOnlineFiles.Count);
+                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round(currFOFile.GetProgress());
             });
         }
 
@@ -513,15 +514,17 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Do something with FOnline File.
+        /// Do something with FOnline File(s).
         /// </summary>
         private void DoWith()
-        {
+        {           
             treeViewDat.Nodes.Clear();
             datListViewItems.Clear();
 
-            treeViewDat.Nodes.Add(rootNode);
+            treeViewDat.Nodes.Add(rootNode);          
 
+            myRoot.Children.Clear();
+            rootNode.Nodes.Clear();
             rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myRoot);            
 
             ListViewItem item;
@@ -581,6 +584,8 @@ namespace FOnlineDatRipper
                     this.txtBoxOutDir.Text = "";
                     this.txtBoxPathInfo.Text = "";
                     this.txtBoxFileCount.Text = "";
+
+                    this.cmbBoxFOFiles.Items.Clear();
 
                     foreach (string inputFile in inputFiles)
                     {
@@ -1003,7 +1008,8 @@ namespace FOnlineDatRipper
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Extractor_DoWork(object sender, DoWorkEventArgs e)
-        {           
+        {
+            currFOFile = extrTargDat;
             // extract only archives                        
             DatDoExtractAll(extrTargDat);
         }
