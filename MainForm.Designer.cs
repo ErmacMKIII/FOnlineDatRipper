@@ -188,6 +188,7 @@ namespace FOnlineDatRipper
             this.listViewDat.VirtualMode = true;
             this.listViewDat.CacheVirtualItems += new System.Windows.Forms.CacheVirtualItemsEventHandler(this.listViewDat_CacheVirtualItems);
             this.listViewDat.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.listViewDat_RetrieveVirtualItem);
+            this.listViewDat.SelectedIndexChanged += new System.EventHandler(this.listViewDat_SelectedIndexChanged);
             this.listViewDat.DoubleClick += new System.EventHandler(this.listViewDat_DoubleClick);
             // 
             // txtBoxFileCount

@@ -424,7 +424,7 @@ namespace FOnlineDatRipper
             // create path list in reverse order
             Node<string> inode = datNode;
             List<string> pathList = new List<string>();
-            while (inode != null)
+            while (!inode.Data.Equals("/"))
             {
                 pathList.Add(inode.Data);
                 inode = inode.Parent;

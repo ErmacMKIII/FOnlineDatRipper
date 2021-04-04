@@ -35,7 +35,15 @@ namespace FOnlineDatRipper
         /// Currently SELECTED FOnlineFile from left side in tree view..
         /// It's a must have cuz we need to call corresponding FOnline methods.
         /// </summary>
-        private FOnlineFile selectedFOFile;
+        private FOnlineFile leftSelectedFOFile;
+
+
+        /// <summary>
+        /// Currently SELECTED FOnlineFile from right side in list view..
+        /// It's a must have cuz we need to call corresponding FOnline methods.
+        /// </summary>
+        private FOnlineFile rightSelectedFOFile;
+
 
         /// <summary>
         /// Currently PROCESSED FOnlineFile.
@@ -169,6 +177,11 @@ namespace FOnlineDatRipper
         private TreeNode rootNode = new TreeNode("/", ClosedRootIndex, ClosedRootIndex);
 
         /// <summary>
+        /// My root of the virtual system. In the root are all loaded files.
+        /// </summary>
+        private Node<string> myRoot = new Node<string>("/");
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
         /// </summary>
         public MainForm()
@@ -199,11 +212,17 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void MiniExtractor_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            if (leftSelectedFOFile != null && leftSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
-                Dat dat = (Dat)selectedFOFile;
+                Dat dat = (Dat)leftSelectedFOFile;
+                DatDoExtract(dat);
+            } 
+            else if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            {
+                Dat dat = (Dat)rightSelectedFOFile;
                 DatDoExtract(dat);
             }
+
         }
 
         /// <summary>
@@ -295,27 +314,29 @@ namespace FOnlineDatRipper
                 return;
             }
 
+            txtBoxPathInfo.Text = "";
+
             datListViewItems.Clear();
             listViewDat.Items.Clear();
 
-            if (node.Data.Equals("/"))
+            if (fOnlineFile == null && node.Data.Equals("/"))
             {
                 txtBoxPathInfo.Text = "/";
 
                 int fileCount = 0;
-                foreach (Node<string> child in node.Children)
+                foreach (FOnlineFile inFoFile in fOnlineFiles)
                 {
                     // image index is chosen on these circumstances
                     int imageIndex;
-                    if (child.Data.ToLower().EndsWith(".dat"))
+                    if (inFoFile.GetFOFileType() == FOnlineFile.FOType.DAT)
                     {
                         imageIndex = ClosedArchiveIndex;
                     }
-                    else if (child.Data.ToLower().EndsWith(".acm"))
+                    else if (inFoFile.GetFOFileType() == FOnlineFile.FOType.ACM)
                     {
                         imageIndex = ACMIndex;
                     }
-                    else if (child.Data.ToLower().EndsWith(".frm"))
+                    else if (inFoFile.GetFOFileType() == FOnlineFile.FOType.FRM)
                     {
                         imageIndex = FRMIndex;
                     }
@@ -327,9 +348,9 @@ namespace FOnlineDatRipper
                     
 
                     // create new list view item and add it to the big list
-                    ListViewItem item = new ListViewItem(child.Data, imageIndex);
+                    ListViewItem item = new ListViewItem(inFoFile.GetTag(), imageIndex);
                     // tag tree node from the dat instance
-                    item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(fOnlineFile, child);
+                    item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, node.Children[fileCount - 1]);
                     datListViewItems.Add(item);
                 }
                 txtBoxFileCount.Text = String.Format("0 directories and {0} files", fileCount);
@@ -496,8 +517,7 @@ namespace FOnlineDatRipper
 
             treeViewDat.Nodes.Add(rootNode);
 
-            Node<string> root = new Node<string>("/");
-            rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, root);            
+            rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myRoot);            
 
             ListViewItem item;
             Node<string> node;
@@ -509,8 +529,9 @@ namespace FOnlineDatRipper
                         Dat dat = (Dat)fOnlineFile;
                         BuildTreeView(dat); // build left side, tree view
                         item = new ListViewItem(dat.Tag, ClosedArchiveIndex);
-                        node = new Node<string>(dat.Tag);
-                        root.Children.Add(node);
+                        node = dat.Tree.Root;
+                        node.Parent = myRoot;
+                        myRoot.Children.Add(node);
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, node);
                         datListViewItems.Add(item);
                         break;
@@ -518,7 +539,8 @@ namespace FOnlineDatRipper
                         ACM acm = (ACM)fOnlineFile;
                         item = new ListViewItem(acm.Tag, ACMIndex);
                         node = new Node<string>(acm.Tag);
-                        root.Children.Add(node);
+                        node.Parent = myRoot;
+                        myRoot.Children.Add(node);
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(acm, node);
                         datListViewItems.Add(item);
                         break;
@@ -526,7 +548,8 @@ namespace FOnlineDatRipper
                         FRM frm = (FRM)fOnlineFile;
                         item = new ListViewItem(frm.Tag, FRMIndex);
                         node = new Node<string>(frm.Tag);
-                        root.Children.Add(node);
+                        node.Parent = myRoot;
+                        myRoot.Children.Add(node);
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(frm, node);
                         datListViewItems.Add(item);
                         break;
@@ -605,6 +628,9 @@ namespace FOnlineDatRipper
 
             // do something with FOnline File(s)!
             DoWith();
+
+            // build list view items from the root "/"
+            BuildListView(null, myRoot);
         }
 
         /// <summary>
@@ -614,7 +640,8 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Reader_DoWork(object sender, DoWorkEventArgs e)
         {
-            selectedFOFile = null;
+            leftSelectedFOFile = null;
+            rightSelectedFOFile = null;
             currFOFile = null;
             currInFileIndex = 0;
 
@@ -718,7 +745,9 @@ namespace FOnlineDatRipper
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="TreeViewEventArgs"/>.</param>
         private void treeViewDat_AfterSelect(object sender, TreeViewEventArgs e)
-        {            
+        {
+            leftSelectedFOFile = null;
+            rightSelectedFOFile = null;
             IAsyncResult asyncResult = treeViewDat.BeginInvoke(new Action(() =>
             {
                 if (e.Node.IsExpanded)
@@ -732,12 +761,12 @@ namespace FOnlineDatRipper
                 if (e.Node.Tag != null)
                 {
                     KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)e.Node.Tag;
-                    selectedFOFile = pair.Key;
+                    leftSelectedFOFile = pair.Key;
                     Node<string> node = pair.Value;
-                    BuildListView(selectedFOFile, node);
+                    BuildListView(leftSelectedFOFile, node);
                 }
             }));
-            treeViewDat.EndInvoke(asyncResult);            
+            treeViewDat.EndInvoke(asyncResult);
         }
 
         /// <summary>
@@ -801,9 +830,9 @@ namespace FOnlineDatRipper
             // create FRM list (image files)
             List<FRM> fRMs = new List<FRM>();
 
-            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
-                Dat dat = (Dat)selectedFOFile;
+                Dat dat = (Dat)rightSelectedFOFile;
                 foreach (int selectedIndex in selectedIndices)
                 {
                     ListViewItem selItem = datListViewItems[selectedIndex];
@@ -851,7 +880,7 @@ namespace FOnlineDatRipper
                 }
 
             }
-            else if (selectedFOFile == null)
+            else if (rightSelectedFOFile == null)
             {
                 foreach (int selectedIndex in selectedIndices)
                 {
@@ -936,11 +965,11 @@ namespace FOnlineDatRipper
             {
                 MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if (selectedFOFile == null)
+            else if (rightSelectedFOFile == null)
             {
                 MessageBox.Show("There is no selected files for extraction! Please select one.", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if (selectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
+            else if (rightSelectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
             {
                 MessageBox.Show("Selected file is not dat archive!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -992,7 +1021,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-04-02 at 03:00).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 05:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1105,9 +1134,9 @@ namespace FOnlineDatRipper
             // create ACM list (sound files)
             List<ACM> acms = new List<ACM>();
 
-            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+            if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
-                Dat dat = (Dat)selectedFOFile;
+                Dat dat = (Dat)rightSelectedFOFile;
                 foreach (int selectedIndex in selectedIndices)
                 {
                     ListViewItem selItem = datListViewItems[selectedIndex];
@@ -1168,41 +1197,27 @@ namespace FOnlineDatRipper
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void listViewDat_DoubleClick(object sender, EventArgs e)
-        {
-            // if choosing internal directory from archive
-            if (selectedFOFile != null && selectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
+        {            
+            IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
             {
-                IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
+                ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+                foreach (int selectedIndex in selectedIndices)
                 {
-                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
-                    foreach (int selectedIndex in selectedIndices)
+                    ListViewItem selItem = datListViewItems[selectedIndex];
+                    KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
+                    // build list view of children files for right selected fofile (if it has children)
+                    if (rightSelectedFOFile != null)
                     {
-                        ListViewItem selItem = datListViewItems[selectedIndex];
-                        KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
-                        BuildListView((Dat)selectedFOFile, kvp.Value);
-                        // build preview if double click the files
-                        if (kvp.Value != null && kvp.Value.Children.Count == 0)
-                        {
-                            BuildPreview();
-                        }
+                        BuildListView(rightSelectedFOFile, kvp.Value);
                     }
-                }));
-                listViewDat.EndInvoke(asyncResult);
-            } 
-            // if choosing file from the root
-            else if (selectedFOFile == null)
-            {
-                IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
-                {
-                    ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
-                    foreach (int selectedIndex in selectedIndices)
+                    // build preview if double click the files
+                    if (kvp.Value != null && kvp.Value.Children.Count == 0)
                     {
-                        ListViewItem selItem = datListViewItems[selectedIndex];
                         BuildPreview();
                     }
-                }));
-                listViewDat.EndInvoke(asyncResult);
-            }
+                }
+            }));
+            listViewDat.EndInvoke(asyncResult);
         }
 
         /// <summary>
@@ -1223,7 +1238,10 @@ namespace FOnlineDatRipper
                 {
                     ListViewItem selItem = listViewDat.Items[selectedIndex];
                     KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
-                    files4Extract.Add(pair.Value);
+                    if (pair.Key != null && pair.Key.GetFOFileType() == FOnlineFile.FOType.DAT)
+                    {
+                        files4Extract.Add(pair.Value);
+                    }
                 }
                 miniExtractor.RunWorkerAsync();
             }
@@ -1250,6 +1268,7 @@ namespace FOnlineDatRipper
                 if (treeViewDat.SelectedNode != null)
                 {
                     KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)treeViewDat.SelectedNode.Tag;
+                    leftSelectedFOFile = pair.Key;
                     Node<string> target = pair.Value;
                     files4Extract.Add(target);
                 }
@@ -1258,6 +1277,19 @@ namespace FOnlineDatRipper
             else
             {
                 MessageBox.Show("Extracting currently in progress, Please Wait!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void listViewDat_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            leftSelectedFOFile = null;
+            rightSelectedFOFile = null;
+            ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+            if (selectedIndices.Count != 0)
+            {
+                ListViewItem selItem = listViewDat.Items[selectedIndices[0]];
+                KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
+                rightSelectedFOFile = pair.Key;
             }
         }
     }
