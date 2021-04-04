@@ -180,6 +180,11 @@ namespace FOnlineDatRipper
         /// My root of the virtual system. In the root are all loaded files.
         /// </summary>
         private Node<string> myRoot = new Node<string>("/");
+                        
+        /// <summary>
+        /// Target for operation Extract All
+        /// </summary>
+        private Dat extrTargDat;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
@@ -580,7 +585,11 @@ namespace FOnlineDatRipper
                     foreach (string inputFile in inputFiles)
                     {
                         listBoxInputFiles.Items.Add(inputFile);
-                    }
+                        if (inputFile.ToLower().EndsWith(".dat"))
+                        {
+                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
+                        }
+                    }                    
 
                     reader.RunWorkerAsync();
                 }
@@ -880,7 +889,7 @@ namespace FOnlineDatRipper
                 }
 
             }
-            else if (rightSelectedFOFile == null)
+            else if (rightSelectedFOFile != null)
             {
                 foreach (int selectedIndex in selectedIndices)
                 {
@@ -965,20 +974,25 @@ namespace FOnlineDatRipper
             {
                 MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if (rightSelectedFOFile == null)
+            else if (cmbBoxFOFiles.SelectedItem == null)
             {
                 MessageBox.Show("There is no selected files for extraction! Please select one.", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            else if (rightSelectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
+            /*else if (rightSelectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
             {
                 MessageBox.Show("Selected file is not dat archive!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }*/
             else
             {
-                DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                if (dialogResult == DialogResult.Yes)
+                Predicate<FOnlineFile> predicate = new Predicate<FOnlineFile>(t => t.GetTag().Equals(cmbBoxFOFiles.SelectedItem));
+                this.extrTargDat = (Dat)fOnlineFiles.Find(predicate);
+                if (extrTargDat != null)
                 {
-                    extractor.RunWorkerAsync();
+                    DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                    if (dialogResult == DialogResult.Yes)
+                    {
+                        extractor.RunWorkerAsync();
+                    }
                 }
             }
         }
@@ -989,15 +1003,9 @@ namespace FOnlineDatRipper
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
         private void Extractor_DoWork(object sender, DoWorkEventArgs e)
-        {
-            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
-            {
-                // extract only archives
-                if (fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
-                {
-                    DatDoExtractAll((Dat)(fOnlineFile));
-                }
-            }
+        {           
+            // extract only archives                        
+            DatDoExtractAll(extrTargDat);
         }
 
         /// <summary>
@@ -1021,7 +1029,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v0.4 - DEUTERIUM\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 05:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 07:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1290,6 +1298,27 @@ namespace FOnlineDatRipper
                 ListViewItem selItem = listViewDat.Items[selectedIndices[0]];
                 KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
                 rightSelectedFOFile = pair.Key;
+                Node<string> value = pair.Value;
+                FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
+                cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
+                cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
+            }
+        }
+
+        private void listViewDat_MouseClick(object sender, MouseEventArgs e)
+        {
+            leftSelectedFOFile = null;
+            rightSelectedFOFile = null;
+            ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
+            if (selectedIndices.Count != 0)
+            {
+                ListViewItem selItem = listViewDat.Items[selectedIndices[0]];
+                KeyValuePair<FOnlineFile, Node<string>> pair = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
+                rightSelectedFOFile = pair.Key;
+                Node<string> value = pair.Value;
+                FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
+                cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
+                cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
             }
         }
     }

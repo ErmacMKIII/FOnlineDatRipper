@@ -64,6 +64,8 @@ namespace FOnlineDatRipper
             this.lblInArchive = new System.Windows.Forms.Label();
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
+            this.cmbBoxFOFiles = new System.Windows.Forms.ComboBox();
+            this.lblDatTargExtr = new System.Windows.Forms.Label();
             this.pnlInputFiles = new System.Windows.Forms.Panel();
             this.listBoxInputFiles = new System.Windows.Forms.ListBox();
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
@@ -190,6 +192,7 @@ namespace FOnlineDatRipper
             this.listViewDat.RetrieveVirtualItem += new System.Windows.Forms.RetrieveVirtualItemEventHandler(this.listViewDat_RetrieveVirtualItem);
             this.listViewDat.SelectedIndexChanged += new System.EventHandler(this.listViewDat_SelectedIndexChanged);
             this.listViewDat.DoubleClick += new System.EventHandler(this.listViewDat_DoubleClick);
+            this.listViewDat.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listViewDat_MouseClick);
             // 
             // txtBoxFileCount
             // 
@@ -249,6 +252,8 @@ namespace FOnlineDatRipper
             // groupBoxPaths
             // 
             resources.ApplyResources(this.groupBoxPaths, "groupBoxPaths");
+            this.groupBoxPaths.Controls.Add(this.cmbBoxFOFiles);
+            this.groupBoxPaths.Controls.Add(this.lblDatTargExtr);
             this.groupBoxPaths.Controls.Add(this.pnlInputFiles);
             this.groupBoxPaths.Controls.Add(this.btnInArch);
             this.groupBoxPaths.Controls.Add(this.lblInArchive);
@@ -259,6 +264,18 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
+            // 
+            // cmbBoxFOFiles
+            // 
+            resources.ApplyResources(this.cmbBoxFOFiles, "cmbBoxFOFiles");
+            this.cmbBoxFOFiles.FormattingEnabled = true;
+            this.cmbBoxFOFiles.Name = "cmbBoxFOFiles";
+            // 
+            // lblDatTargExtr
+            // 
+            resources.ApplyResources(this.lblDatTargExtr, "lblDatTargExtr");
+            this.lblDatTargExtr.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.lblDatTargExtr.Name = "lblDatTargExtr";
             // 
             // pnlInputFiles
             // 
@@ -519,5 +536,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
+        private System.Windows.Forms.Label lblDatTargExtr;
+        private System.Windows.Forms.ComboBox cmbBoxFOFiles;
     }
 }
