@@ -48,7 +48,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationIcon>
+    </ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib, Version=1.3.1.9, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
@@ -86,42 +87,42 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ACMForm.cs">
+    <Compile Include="Forms\ACMForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ACM.cs" />
-    <Compile Include="ACMDecoder.cs" />
-    <Compile Include="AmplitudeBuffer.cs" />
-    <Compile Include="ACMConversionForm.cs">
+    <Compile Include="FOnlineFiles\ACM.cs" />
+    <Compile Include="FOnlineFiles\ACMDecoder.cs" />
+    <Compile Include="FOnlineFiles\AmplitudeBuffer.cs" />
+    <Compile Include="Forms\ACMConversionForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="FRMForm.cs">
+    <Compile Include="Forms\FRMForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dat.cs" />
-    <Compile Include="DataBlock.cs" />
-    <Compile Include="Frame.cs" />
-    <Compile Include="FRM.cs" />
-    <Compile Include="FOnlineFile.cs" />
-    <Compile Include="MainForm.cs">
+    <Compile Include="FOnlineFiles\Dat.cs" />
+    <Compile Include="FOnlineFiles\DataBlock.cs" />
+    <Compile Include="FOnlineFiles\Frame.cs" />
+    <Compile Include="FOnlineFiles\FRM.cs" />
+    <Compile Include="FOnlineFiles\FOnlineFile.cs" />
+    <Compile Include="Forms\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="MainForm.Designer.cs">
+    <Compile Include="Forms\MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="DarkRenderer.cs" />
-    <Compile Include="Node.cs" />
-    <Compile Include="Palette.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Forms\DarkRenderer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tables.cs" />
-    <Compile Include="Tree.cs" />
-    <EmbeddedResource Include="MainForm.resx">
+    <Compile Include="Util\Node.cs" />
+    <Compile Include="FOnlineFiles\Palette.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="FOnlineFiles\Tables.cs" />
+    <Compile Include="Util\Tree.cs" />
+    <EmbeddedResource Include="Forms\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -140,6 +141,24 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resources\acm_icon.png" />
+    <None Include="Resources\archive_icon_closed.png" />
+    <None Include="Resources\archive_icon_opened.png" />
+    <None Include="Resources\convert_icon.png" />
+    <None Include="Resources\dir_icon_closed.png" />
+    <None Include="Resources\dir_icon_opened.png" />
+    <None Include="Resources\dir_out_icon.png" />
+    <None Include="Resources\exit_icon.png" />
+    <None Include="Resources\extract_all_icon.png" />
+    <None Include="Resources\extract_icon.png" />
+    <None Include="Resources\eye_icon.png" />
+    <None Include="Resources\Fallout Palette.act" />
+    <None Include="Resources\file_icon.png" />
+    <None Include="Resources\frm_icon.png" />
+    <None Include="Resources\gplv3_logo.png" />
+    <None Include="Resources\load_icon.png" />
+    <None Include="Resources\root_icon_closed.png" />
+    <None Include="Resources\root_icon_opened.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -157,58 +176,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\gplv3_logo.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\acm_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\dir_icon_closed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\dir_icon_opened.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\extract_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\eye_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\file_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\frm_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\load_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\root_icon_closed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\root_icon_opened.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\dir_out_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\extract_all_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\exit_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\convert_icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\archive_icon_closed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="res\archive_icon_opened.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="app.ico" />
+    <None Include="Resources\app.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
