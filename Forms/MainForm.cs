@@ -112,11 +112,6 @@ namespace FOnlineDatRipper
         private string[] inputFiles;
 
         /// <summary>
-        /// Current input file in process.
-        /// </summary>
-        private int currInFileIndex = 0;
-
-        /// <summary>
         /// Defines the output directory to extract the data............
         /// </summary>
         private string outDir;
@@ -169,26 +164,29 @@ namespace FOnlineDatRipper
         /// <summary>
         /// List of specific files for extraction..
         /// </summary>
-        private List<Node<string>> files2Extract = new List<Node<string>>();
+        private readonly List<Node<string>> files2Extract = new List<Node<string>>();
 
         /// <summary>
         /// Root of Tree View.
         /// </summary>
-        private TreeNode rootNode = new TreeNode("/", ClosedRootIndex, ClosedRootIndex);
+        private readonly TreeNode rootNode = new TreeNode("/", ClosedRootIndex, ClosedRootIndex);
 
         /// <summary>
         /// My root of the virtual system. In the root are all loaded files.
         /// </summary>
-        private Node<string> myRoot = new Node<string>("/");
+        private readonly Node<string> myRoot = new Node<string>("/");
                         
         /// <summary>
         /// Target for operation Extract All
         /// </summary>
         private Dat extrTargDat;
 
+        private readonly StringBuilder glblErrMsg = new StringBuilder();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
         /// </summary>
+        /// 
         public MainForm()
         {
             InitializeComponent();
@@ -313,17 +311,17 @@ namespace FOnlineDatRipper
         /// <param name="dat">dat archive.</param>
         /// <param name="node"> dat node to start building from .</param>
         private void BuildListView(FOnlineFile fOnlineFile, Node<string> node)
-        {
+        { 
+            txtBoxPathInfo.Text = "";
+
+            datListViewItems.Clear();
+            listViewDat.Items.Clear();
+
             // if no children (like files) make it no effect
             if (node.Children.Count == 0)
             {
                 return;
             }
-
-            txtBoxPathInfo.Text = "";
-
-            datListViewItems.Clear();
-            listViewDat.Items.Clear();
 
             if (fOnlineFile == null && node.Data.Equals("/"))
             {
@@ -359,11 +357,7 @@ namespace FOnlineDatRipper
                     item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, node.Children[fileCount - 1]);
                     datListViewItems.Add(item);
                 }
-                txtBoxFileCount.Text = String.Format("0 directories and {0} files", fileCount);
-
-                // enable virtual (for better performance)
-                listViewDat.VirtualMode = true;
-                listViewDat.VirtualListSize = datListViewItems.Count;
+                txtBoxFileCount.Text = String.Format("0 directories and {0} files", fileCount);                
             }
             else if (fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
@@ -411,10 +405,199 @@ namespace FOnlineDatRipper
                 }
                 txtBoxFileCount.Text = String.Format("{0} directories and {1} files", dirCount, fileCount);
 
-                // enable virtual (for better performance)
-                listViewDat.VirtualMode = true;
-                listViewDat.VirtualListSize = datListViewItems.Count;
-            }             
+                
+            }
+            
+            // enable virtual (for better performance)
+            listViewDat.VirtualMode = true;
+            listViewDat.VirtualListSize = datListViewItems.Count;
+        }        
+
+        /// <summary>
+        /// Extract all from the dat.
+        /// Called from Background worker.
+        /// </summary>
+        /// <param name="dat">The dat<see cref="Dat"/>.</param>
+        private void DatDoExtractAll(Dat dat)
+        {
+            stopwatch.Start();
+
+            // call dat to extract all
+            dat.ExtractAll(outDir);
+
+            // stop measuring the time
+            stopwatch.Stop();
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
+        /// Extract all from the selected treeview/listview of dat archive.
+        /// Called from Background worker.
+        /// </summary>
+        /// <param name="dat">The dat<see cref="Dat"/>.</param>
+        private void DatDoExtract(Dat dat)
+        {
+            stopwatch.Start();
+
+            // call dat to extract all
+            foreach (Node<string> node in this.files2Extract)
+            {
+                dat.Extract(outDir, node);
+            }
+
+            // stop measuring the time
+            stopwatch.Stop();
+
+            // set displayed elapsed time (in the message), measured in seconds
+            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
+
+            // reset for another read or any op
+            stopwatch.Reset();
+        }
+
+        /// <summary>
+        /// Do something with FOnline File(s).
+        /// </summary>
+        private void ProcessFOnlineFiles()
+        {           
+            treeViewDat.Nodes.Clear();
+            datListViewItems.Clear();
+            myRoot.Children.Clear();
+            rootNode.Nodes.Clear();
+
+            if (fOnlineFiles.Count != 0)
+            {
+                treeViewDat.Nodes.Add(rootNode);
+                
+                rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myRoot);            
+
+                ListViewItem item;
+                Node<string> node;
+                foreach (FOnlineFile fOnlineFile in fOnlineFiles)
+                {
+                    // add to the tree and to the list view only the files without error
+                    if (!fOnlineFile.IsError())
+                    {
+                        switch (fOnlineFile.GetFOFileType())
+                        {
+                            case FOnlineFile.FOType.DAT:
+                                Dat dat = (Dat)fOnlineFile;
+                                BuildTreeView(dat); // build left side, tree view
+                                item = new ListViewItem(dat.Tag, ClosedArchiveIndex);
+                                node = dat.Tree.Root;
+                                node.Parent = myRoot;
+                                myRoot.Children.Add(node);
+                                item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, node);
+                                datListViewItems.Add(item);
+                                break;
+                            case FOnlineFile.FOType.ACM:
+                                ACM acm = (ACM)fOnlineFile;
+                                item = new ListViewItem(acm.Tag, ACMIndex);
+                                node = new Node<string>(acm.Tag);
+                                node.Parent = myRoot;
+                                myRoot.Children.Add(node);
+                                item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(acm, node);
+                                datListViewItems.Add(item);
+                                break;
+                            case FOnlineFile.FOType.FRM:
+                                FRM frm = (FRM)fOnlineFile;
+                                item = new ListViewItem(frm.Tag, FRMIndex);
+                                node = new Node<string>(frm.Tag);
+                                node.Parent = myRoot;
+                                myRoot.Children.Add(node);
+                                item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(frm, node);
+                                datListViewItems.Add(item);
+                                break;
+                        }
+                    }
+                }
+
+            }
+            
+        }
+
+        /// <summary>
+        /// The FileOpen.
+        /// </summary>
+        private void FileOpen()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|FRM files (*.frm)|*.frm|ACM files (*.acm)|*.acm|All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.Multiselect = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    fOnlineFiles.Clear();
+                    listBoxInputFiles.Items.Clear();
+                    inputFiles = openFileDialog.FileNames;
+                    
+                    this.txtBoxPathInfo.Text = "";
+                    this.txtBoxFileCount.Text = "";
+
+                    this.cmbBoxFOFiles.Items.Clear();
+
+                    foreach (string inputFile in inputFiles)
+                    {
+                        listBoxInputFiles.Items.Add(inputFile);
+                        if (inputFile.ToLower().EndsWith(".dat"))
+                        {
+                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
+                        }
+                    }                    
+
+                    reader.RunWorkerAsync();
+                }
+            }
+        }
+
+        /// <summary>
+        /// The btnInDir_Click.
+        /// </summary>
+        /// <param name="sender">The sender<see cref="object"/>.</param>
+        /// <param name="e">The e<see cref="EventArgs"/>.</param>
+        private void btnInArch_Click(object sender, EventArgs e)
+        {
+            FileOpen();
+        }
+
+        /// <summary>
+        /// Executes after Reader complete it's work.
+        /// </summary>
+        /// <param name="sender">.</param>
+        /// <param name="e">.</param>
+        private void Reader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            // Detect errors!            
+            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
+            {
+                if (fOnlineFile.IsError())
+                {
+                    glblErrMsg.Append("@" + fOnlineFile.GetTag() + " : " + fOnlineFile.GetErrorMessage() + "\n");
+                }
+            }
+
+            if (glblErrMsg.Length == 0)
+            {
+                MessageBox.Show("File(s) sucessfully loaded in " + seconds + " seconds!", "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("File(s) loaded in (" + seconds + " seconds) with errors." + "\n" + glblErrMsg.ToString(), "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            this.taskProgressBar.Value = 0;
+
+            // do something with FOnline File(s)!
+            ProcessFOnlineFiles();
+
+            // build list view items from the root "/"
+            BuildListView(null, myRoot);
         }
 
         /// <summary>
@@ -467,187 +650,6 @@ namespace FOnlineDatRipper
         }
 
         /// <summary>
-        /// Extract all from the dat.
-        /// Called from Background worker.
-        /// </summary>
-        /// <param name="dat">The dat<see cref="Dat"/>.</param>
-        private void DatDoExtractAll(Dat dat)
-        {
-            stopwatch.Start();
-
-            // call dat to extract all
-            dat.ExtractAll(outDir);
-
-            // stop measuring the time
-            stopwatch.Stop();
-
-            // set displayed elapsed time (in the message), measured in seconds
-            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
-
-            // reset for another read or any op
-            stopwatch.Reset();
-        }
-
-        /// <summary>
-        /// Extract all from the selected treeview/listview of dat archive.
-        /// Called from Background worker.
-        /// </summary>
-        /// <param name="dat">The dat<see cref="Dat"/>.</param>
-        private void DatDoExtract(Dat dat)
-        {
-            stopwatch.Start();
-
-            // call dat to extract all
-            foreach (Node<string> node in this.files2Extract)
-            {
-                dat.Extract(outDir, node);
-            }
-
-            // stop measuring the time
-            stopwatch.Stop();
-
-            // set displayed elapsed time (in the message), measured in seconds
-            seconds = stopwatch.ElapsedMilliseconds / 1000.0;
-
-            // reset for another read or any op
-            stopwatch.Reset();
-        }
-
-        /// <summary>
-        /// Do something with FOnline File(s).
-        /// </summary>
-        private void DoWith()
-        {           
-            treeViewDat.Nodes.Clear();
-            datListViewItems.Clear();
-
-            treeViewDat.Nodes.Add(rootNode);          
-
-            myRoot.Children.Clear();
-            rootNode.Nodes.Clear();
-            rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myRoot);            
-
-            ListViewItem item;
-            Node<string> node;
-            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
-            {
-                switch (fOnlineFile.GetFOFileType())
-                {
-                    case FOnlineFile.FOType.DAT:
-                        Dat dat = (Dat)fOnlineFile;
-                        BuildTreeView(dat); // build left side, tree view
-                        item = new ListViewItem(dat.Tag, ClosedArchiveIndex);
-                        node = dat.Tree.Root;
-                        node.Parent = myRoot;
-                        myRoot.Children.Add(node);
-                        item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(dat, node);
-                        datListViewItems.Add(item);
-                        break;
-                    case FOnlineFile.FOType.ACM:
-                        ACM acm = (ACM)fOnlineFile;
-                        item = new ListViewItem(acm.Tag, ACMIndex);
-                        node = new Node<string>(acm.Tag);
-                        node.Parent = myRoot;
-                        myRoot.Children.Add(node);
-                        item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(acm, node);
-                        datListViewItems.Add(item);
-                        break;
-                    case FOnlineFile.FOType.FRM:
-                        FRM frm = (FRM)fOnlineFile;
-                        item = new ListViewItem(frm.Tag, FRMIndex);
-                        node = new Node<string>(frm.Tag);
-                        node.Parent = myRoot;
-                        myRoot.Children.Add(node);
-                        item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(frm, node);
-                        datListViewItems.Add(item);
-                        break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The FileOpen.
-        /// </summary>
-        private void FileOpen()
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|FRM files (*.frm)|*.frm|ACM files (*.acm)|*.acm|All files (*.*)|*.*";
-                openFileDialog.RestoreDirectory = true;
-                openFileDialog.Multiselect = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
-                {
-                    fOnlineFiles.Clear();
-                    listBoxInputFiles.Items.Clear();
-                    inputFiles = openFileDialog.FileNames;
-                    this.txtBoxOutDir.Text = "";
-                    this.txtBoxPathInfo.Text = "";
-                    this.txtBoxFileCount.Text = "";
-
-                    this.cmbBoxFOFiles.Items.Clear();
-
-                    foreach (string inputFile in inputFiles)
-                    {
-                        listBoxInputFiles.Items.Add(inputFile);
-                        if (inputFile.ToLower().EndsWith(".dat"))
-                        {
-                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
-                        }
-                    }                    
-
-                    reader.RunWorkerAsync();
-                }
-            }
-        }
-
-        /// <summary>
-        /// The btnInDir_Click.
-        /// </summary>
-        /// <param name="sender">The sender<see cref="object"/>.</param>
-        /// <param name="e">The e<see cref="EventArgs"/>.</param>
-        private void btnInArch_Click(object sender, EventArgs e)
-        {
-            FileOpen();
-        }
-
-        /// <summary>
-        /// Executes after Reader complete it's work.
-        /// </summary>
-        /// <param name="sender">.</param>
-        /// <param name="e">.</param>
-        private void Reader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            // Detect errors!
-            int errNum = 0;
-            StringBuilder errMsg = new StringBuilder();
-            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
-            {
-                if (fOnlineFile.IsError())
-                {
-                    errMsg.Append("@" + fOnlineFile.GetTag() + " : " + fOnlineFile.GetErrorMessage() + "\n");
-                    errNum++;
-                }
-            }
-
-            if (errNum == 0)
-            {
-                MessageBox.Show("File(s) sucessfully loaded in " + seconds + " seconds!", "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show("File(s) loaded in (" + seconds + " seconds) with errors." + "\n" + errMsg.ToString(), "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            this.taskProgressBar.Value = 0;
-
-            // do something with FOnline File(s)!
-            DoWith();
-
-            // build list view items from the root "/"
-            BuildListView(null, myRoot);
-        }
-
-        /// <summary>
         /// The Worker_DoWork.
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
@@ -657,7 +659,9 @@ namespace FOnlineDatRipper
             leftSelectedFOFile = null;
             rightSelectedFOFile = null;
             currFOFile = null;
-            currInFileIndex = 0;
+
+            // reset global error message
+            glblErrMsg.Length = 0;
 
             // start measuring the time
             stopwatch.Start();
@@ -685,10 +689,11 @@ namespace FOnlineDatRipper
                         fOnlineFiles.Add(currFOFile);
                         DatDoAll((Dat)currFOFile, inputFile); // read dat file, build dat tree  
                         break;
+                    default:
+                        glblErrMsg.Append("@" + inputFile + " : Unknown extension \"" + extension + "\"!\n");
+                        break;
                 }
 
-                // inc current file index
-                currInFileIndex++;
             }
 
             // stop measuring the time
@@ -1033,9 +1038,9 @@ namespace FOnlineDatRipper
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("VERSION v0.4 - DEUTERIUM\n");
+            sb.Append("VERSION v1.0 - ETERNAL\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-04-04 at 22:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-06-22 at 14:00).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
