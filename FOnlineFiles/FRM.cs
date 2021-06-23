@@ -112,7 +112,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the BufferSize.
         /// </summary>
-        internal const int BufferSize = 0x1000000;// 16 MB Buffer Size
+        public const int BufferSize = 0x1000000;// 16 MB Buffer Size
 
         /// <summary>
         /// Defines the buffer.

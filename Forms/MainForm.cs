@@ -26,6 +26,8 @@ namespace FOnlineDatRipper
     /// </summary>
     internal partial class MainForm : Form
     {
+        public const int MemSize = 0x20000000; // 512 MB allowed to take
+
         /// <summary>
         /// FOnline file list.
         /// </summary>
@@ -137,17 +139,17 @@ namespace FOnlineDatRipper
         private ListViewItem[] datCache;
 
         /// <summary>
-        /// Tells if cache miss has occurred..............
+        /// Tells if cache miss has occurred
         /// </summary>
         private bool datCacheMiss = true;
 
         /// <summary>
-        /// Defines the begin index of the item block and it's always 1000 in length..............
+        /// Defines the begin index of the item block and it's always 1000 in length
         /// </summary>
         private int datCacheIndex = 0;
 
         /// <summary>
-        /// Defines the the dat list view items..............
+        /// Defines the the dat list view items
         /// </summary>
         private readonly List<ListViewItem> datListViewItems = new List<ListViewItem>(2000);
 
@@ -849,6 +851,8 @@ namespace FOnlineDatRipper
             // create FRM list (image files)
             List<FRM> fRMs = new List<FRM>();
 
+            int totalMem = 0;
+
             if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
                 Dat dat = (Dat)rightSelectedFOFile;
@@ -866,21 +870,29 @@ namespace FOnlineDatRipper
                         string filename = dataBlock.Filename;
                         if (filename.ToLower().EndsWith(".acm"))
                         {
+                            totalMem += ACM.BufferSize;
                             ACM acm = new ACM(dataBlock.Filename);
                             acm.ReadBytes(bytes);
                             acms.Add(acm);
                         }
                         else if (filename.ToLower().EndsWith(".frm"))
                         {
+                            totalMem += FRM.BufferSize;
                             FRM frm = new FRM(dataBlock.Filename);
                             frm.ReadBytes(bytes);
                             fRMs.Add(frm);
                         }
                     }
 
+                    if (totalMem > MemSize)
+                    {
+                        MessageBox.Show("Memory maxed out due to large amount of files!", "Memory Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+
                 }
 
-                if (fRMs.Count != 0)
+                if (fRMs.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (FRMForm frmForm = new FRMForm(fRMs))
@@ -889,7 +901,7 @@ namespace FOnlineDatRipper
                     }
                 }
 
-                if (acms.Count != 0)
+                if (acms.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (ACMForm acmForm = new ACMForm(acms))
@@ -909,20 +921,28 @@ namespace FOnlineDatRipper
                     string filename = itemNode.Data;
                     if (filename.ToLower().EndsWith(".acm"))
                     {
+                        totalMem += ACM.BufferSize;
                         ACM acm = new ACM(inputFiles[selectedIndex]);
                         acm.ReadFile(inputFiles[selectedIndex]);
                         acms.Add(acm);
                     }
                     else if (filename.ToLower().EndsWith(".frm"))
                     {
+                        totalMem += FRM.BufferSize;
                         FRM frm = new FRM(inputFiles[selectedIndex]);
                         frm.ReadFile(inputFiles[selectedIndex]);
                         fRMs.Add(frm);
                     }
 
+                    if (totalMem > MemSize)
+                    {
+                        MessageBox.Show("Memory maxed out due to large amount of files!", "Memory Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+
                 }
 
-                if (fRMs.Count != 0)
+                if (fRMs.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (FRMForm frmForm = new FRMForm(fRMs))
@@ -931,7 +951,7 @@ namespace FOnlineDatRipper
                     }
                 }
 
-                if (acms.Count != 0)
+                if (acms.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (ACMForm acmForm = new ACMForm(acms))
@@ -1038,11 +1058,15 @@ namespace FOnlineDatRipper
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("VERSION v1.0 - ETERNAL\n");
+            sb.Append("VERSION v1.0 - ETERNAL - BETA1\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-06-22 at 14:00).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2021-06-23 at 15:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
+            sb.Append("\n");
+            sb.Append("Changelog for v1.0 ETERNAL:\n");
+            sb.Append("\t- Fixed Out of Memory error by disallowing too many files to be opened.\n");
+            sb.Append("\t- Fixed permitting unknown extensions with file open.\n");
             sb.Append("\n");
             sb.Append("Changelog for v0.4 DEUTERIUM:\n");
             sb.Append("\t- Initial pre-release.\n");
@@ -1153,6 +1177,8 @@ namespace FOnlineDatRipper
             // create ACM list (sound files)
             List<ACM> acms = new List<ACM>();
 
+            int totalMem = 0;
+
             if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
                 Dat dat = (Dat)rightSelectedFOFile;
@@ -1166,14 +1192,21 @@ namespace FOnlineDatRipper
                     string filename = dataBlock.Filename;
                     if (filename.ToLower().EndsWith(".acm"))
                     {
-                        ACM acm = new ACM(dataBlock.Filename);
+                        totalMem += ACM.BufferSize;
+                        ACM acm = new ACM(dataBlock.Filename);                        
                         acm.ReadBytes(bytes);
                         acms.Add(acm);
                     }
 
+                    if (totalMem > MemSize)
+                    {
+                        MessageBox.Show("Memory maxed out due to large amount of files!", "Memory Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+
                 }
 
-                if (acms.Count != 0)
+                if (acms.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
@@ -1193,13 +1226,21 @@ namespace FOnlineDatRipper
                     string filename = itemNode.Data;
                     if (filename.ToLower().EndsWith(".acm"))
                     {
+                        totalMem += ACM.BufferSize;
                         ACM acm = new ACM(inputFiles[selectedIndex]);
                         acm.ReadFile(inputFiles[selectedIndex]);
                         acms.Add(acm);
                     }
+
+                    if (totalMem > MemSize)
+                    {
+                        MessageBox.Show("Memory maxed out due to large amount of files!", "Memory Problem", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        break;
+                    }
+
                 }
 
-                if (acms.Count != 0)
+                if (acms.Count != 0 && totalMem <= MemSize)
                 {
                     // create and use the subform
                     using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
