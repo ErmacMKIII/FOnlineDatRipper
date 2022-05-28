@@ -51,6 +51,8 @@ namespace FOnlineDatRipper
             this.pnlTree = new System.Windows.Forms.Panel();
             this.treeViewDat = new System.Windows.Forms.TreeView();
             this.cntxtMenuStripShort = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.removeShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtBoxPathInfo = new System.Windows.Forms.TextBox();
             this.pnlView = new System.Windows.Forms.Panel();
@@ -114,23 +116,23 @@ namespace FOnlineDatRipper
             // 
             // previewToolStripMenuItem
             // 
+            resources.ApplyResources(this.previewToolStripMenuItem, "previewToolStripMenuItem");
             this.previewToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.eye_icon;
             this.previewToolStripMenuItem.Name = "previewToolStripMenuItem";
-            resources.ApplyResources(this.previewToolStripMenuItem, "previewToolStripMenuItem");
             this.previewToolStripMenuItem.Click += new System.EventHandler(this.previewToolStripMenuItem_Click);
             // 
             // convertToolStripMenuItem
             // 
+            resources.ApplyResources(this.convertToolStripMenuItem, "convertToolStripMenuItem");
             this.convertToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.convert_icon;
             this.convertToolStripMenuItem.Name = "convertToolStripMenuItem";
-            resources.ApplyResources(this.convertToolStripMenuItem, "convertToolStripMenuItem");
             this.convertToolStripMenuItem.Click += new System.EventHandler(this.convertToolStripMenuItem_Click);
             // 
             // extractToolStripMenuItem
             // 
+            resources.ApplyResources(this.extractToolStripMenuItem, "extractToolStripMenuItem");
             this.extractToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
             this.extractToolStripMenuItem.Name = "extractToolStripMenuItem";
-            resources.ApplyResources(this.extractToolStripMenuItem, "extractToolStripMenuItem");
             this.extractToolStripMenuItem.Click += new System.EventHandler(this.extractToolStripMenuItem_Click);
             // 
             // pnlTree
@@ -148,20 +150,37 @@ namespace FOnlineDatRipper
             this.treeViewDat.Name = "treeViewDat";
             this.treeViewDat.AfterCollapse += new System.Windows.Forms.TreeViewEventHandler(this.treeViewDat_AfterCollapse);
             this.treeViewDat.BeforeExpand += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewDat_BeforeExpand);
+            this.treeViewDat.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewDat_BeforeSelect);
             this.treeViewDat.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewDat_AfterSelect);
             // 
             // cntxtMenuStripShort
             // 
             this.cntxtMenuStripShort.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addShortToolStripMenuItem,
+            this.removeShortToolStripMenuItem,
             this.extractShortToolStripMenuItem});
             this.cntxtMenuStripShort.Name = "cntxtMenuStrip";
             resources.ApplyResources(this.cntxtMenuStripShort, "cntxtMenuStripShort");
             // 
+            // addShortToolStripMenuItem
+            // 
+            resources.ApplyResources(this.addShortToolStripMenuItem, "addShortToolStripMenuItem");
+            this.addShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.plus_file_icon;
+            this.addShortToolStripMenuItem.Name = "addShortToolStripMenuItem";
+            this.addShortToolStripMenuItem.Click += new System.EventHandler(this.addShortToolStripMenuItem_Click);
+            // 
+            // removeShortToolStripMenuItem
+            // 
+            resources.ApplyResources(this.removeShortToolStripMenuItem, "removeShortToolStripMenuItem");
+            this.removeShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.minus_file_icon;
+            this.removeShortToolStripMenuItem.Name = "removeShortToolStripMenuItem";
+            this.removeShortToolStripMenuItem.Click += new System.EventHandler(this.removeShortToolStripMenuItem_Click);
+            // 
             // extractShortToolStripMenuItem
             // 
+            resources.ApplyResources(this.extractShortToolStripMenuItem, "extractShortToolStripMenuItem");
             this.extractShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.extract_icon;
             this.extractShortToolStripMenuItem.Name = "extractShortToolStripMenuItem";
-            resources.ApplyResources(this.extractShortToolStripMenuItem, "extractShortToolStripMenuItem");
             this.extractShortToolStripMenuItem.Click += new System.EventHandler(this.extractShortToolStripMenuItem_Click);
             // 
             // txtBoxPathInfo
@@ -538,5 +557,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
         private System.Windows.Forms.Label lblDatTargExtr;
         private System.Windows.Forms.ComboBox cmbBoxFOFiles;
+        private System.Windows.Forms.ToolStripMenuItem addShortToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem removeShortToolStripMenuItem;
     }
 }

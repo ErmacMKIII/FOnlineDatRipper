@@ -109,12 +109,12 @@ namespace FOnlineDatRipper
         internal const int FileIndex = 8;
 
         /// <summary>
-        /// Defines the input file......
+        /// Input files from the filesystem {FRM, ACM or DAT}
         /// </summary>
         private string[] inputFiles;
 
         /// <summary>
-        /// Defines the output directory to extract the data............
+        /// Defines the output directory to extract the data.
         /// </summary>
         private string outDir;
 
@@ -277,13 +277,20 @@ namespace FOnlineDatRipper
             {
                 // position yourself always to be the parent of the datNode
                 if (datNode.Parent != null)
-                {
-                    int level = datNode.Level() + 1; // +1 comes from pre-existing root
-                    while (selectedNode.Level >= level)
+                {                    
+                    if (selectedNode == null)
                     {
-                        selectedNode = selectedNode.Parent;
-                    }
-                    selected = selectedNode.Nodes;
+                        selectedNode = this.rootNode;
+                    } 
+                    else
+                    {
+                        int level = datNode.Level() + 1; // +1 comes from pre-existing root
+                        while (selectedNode.Level >= level)
+                        {
+                            selectedNode = selectedNode.Parent;
+                        }
+                        selected = selectedNode.Nodes;
+                    }                    
                 }
 
                 // these elifs are for choosing corresponding image
@@ -322,14 +329,14 @@ namespace FOnlineDatRipper
             // if no children (like files) make it no effect
             if (node.Children.Count == 0)
             {
+                listViewDat.VirtualListSize = 0;
                 return;
             }
 
-            if (fOnlineFile == null && node.Data.Equals("/"))
+            if (fOnlineFile == null && node == myRoot)
             {
                 txtBoxPathInfo.Text = "/";
 
-                int fileCount = 0;
                 foreach (FOnlineFile inFoFile in fOnlineFiles)
                 {
                     // image index is chosen on these circumstances
@@ -350,16 +357,20 @@ namespace FOnlineDatRipper
                     {
                         imageIndex = FileIndex;
                     }
-                    fileCount++;
                     
 
                     // create new list view item and add it to the big list
                     ListViewItem item = new ListViewItem(inFoFile.GetTag(), imageIndex);
-                    // tag tree node from the dat instance
-                    item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, node.Children[fileCount - 1]);
-                    datListViewItems.Add(item);
+                    // tag tree node from the dat instance                    
+
+                    Node<string> child = node.Children.Find(m => m.Data.Equals(inFoFile.GetTag()));
+                    if (child != null)
+                    {
+                        item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, child);
+                        datListViewItems.Add(item);
+                    }                    
                 }
-                txtBoxFileCount.Text = String.Format("0 directories and {0} files", fileCount);                
+                txtBoxFileCount.Text = String.Format("0 directories and {0} files", node.Children.Count);                
             }
             else if (fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
@@ -410,8 +421,6 @@ namespace FOnlineDatRipper
                 
             }
             
-            // enable virtual (for better performance)
-            listViewDat.VirtualMode = true;
             listViewDat.VirtualListSize = datListViewItems.Count;
         }        
 
@@ -538,7 +547,7 @@ namespace FOnlineDatRipper
                 {
                     fOnlineFiles.Clear();
                     listBoxInputFiles.Items.Clear();
-                    inputFiles = openFileDialog.FileNames;
+                    string[] inputFiles = openFileDialog.FileNames;
                     
                     this.txtBoxPathInfo.Text = "";
                     this.txtBoxFileCount.Text = "";
@@ -554,9 +563,61 @@ namespace FOnlineDatRipper
                         }
                     }                    
 
-                    reader.RunWorkerAsync();
+                    reader.RunWorkerAsync(inputFiles);
                 }
             }
+        }
+
+        /// <summary>
+        /// File Add (Include File)
+        /// </summary>
+        private void FileAdd()
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Fallout 2 dat files (*.dat)|*.dat|FRM files (*.frm)|*.frm|ACM files (*.acm)|*.acm|All files (*.*)|*.*";
+                openFileDialog.RestoreDirectory = true;
+                openFileDialog.Multiselect = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string[] inputFiles = openFileDialog.FileNames;
+
+                    this.txtBoxPathInfo.Text = "";
+                    this.txtBoxFileCount.Text = "";
+
+                    this.cmbBoxFOFiles.Items.Clear();
+
+                    foreach (string inputFile in inputFiles)
+                    {
+                        listBoxInputFiles.Items.Add(inputFile);
+                        if (inputFile.ToLower().EndsWith(".dat"))
+                        {
+                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
+                        }
+                    }
+
+                    reader.RunWorkerAsync(inputFiles);
+                }
+            }
+        }
+
+        private void FileRemove()
+        {            
+            var selectedItems = listBoxInputFiles.SelectedItems;
+
+            foreach (var selItem in selectedItems)
+            {
+                listBoxInputFiles.Items.Remove(selItem);                
+            }
+            var selectedNode = treeViewDat.SelectedNode;
+            this.fOnlineFiles.RemoveAll(foFile => foFile.GetTag().Equals(selectedNode.Text));
+            myRoot.Children.RemoveAll(node => node.Data.Equals(selectedNode.Text));   
+
+            this.rootNode.Nodes.Remove(selectedNode);
+            this.cmbBoxFOFiles.Items.Remove(selectedNode.Text);
+            this.BuildListView(null, myRoot);        
+                        
         }
 
         /// <summary>
@@ -576,15 +637,7 @@ namespace FOnlineDatRipper
         /// <param name="e">.</param>
         private void Reader_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            // Detect errors!            
-            foreach (FOnlineFile fOnlineFile in fOnlineFiles)
-            {
-                if (fOnlineFile.IsError())
-                {
-                    glblErrMsg.Append("@" + fOnlineFile.GetTag() + " : " + fOnlineFile.GetErrorMessage() + "\n");
-                }
-            }
-
+            // Display Error Message
             if (glblErrMsg.Length == 0)
             {
                 MessageBox.Show("File(s) sucessfully loaded in " + seconds + " seconds!", "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -610,7 +663,8 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="dat">The dat<see cref="Dat"/>.</param>
         /// <param name="inputFile">The inputFile<see cref="string"/>.</param>
-        private void DatDoAll(Dat dat, string inputFile)
+        /// <returns> Is the operation OK </returns>
+        private bool DatDoAll(Dat dat, string inputFile)
         {
             // sub to the event (dat is fresh spawn so no stacking events)
             dat.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
@@ -620,6 +674,9 @@ namespace FOnlineDatRipper
 
             // call dat to buld tree structure
             dat.BuildTreeStruct();
+
+            // return negation of error flag - OK
+            return !dat.Error;
         }
 
         /// <summary>
@@ -628,13 +685,16 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="frm">.</param>
         /// <param name="inputFile">The inputFile<see cref="string"/>.</param>
-        private void FRMDoAll(FRM frm, string inputFile)
+        private bool FRMDoAll(FRM frm, string inputFile)
         {
             // sub to the event (frm is fresh spawn so no stacking events)
             frm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
             // read FRM
             frm.ReadFile(inputFile);
+
+            // return negation of error flag - OK
+            return !frm.Error;
         }
 
         /// <summary>
@@ -643,12 +703,15 @@ namespace FOnlineDatRipper
         /// </summary>
         /// <param name="acm">.</param>
         /// <param name="inputFile">The inputFile<see cref="string"/>.</param>
-        private void ACMDoAll(ACM acm, string inputFile)
+        private bool ACMDoAll(ACM acm, string inputFile)
         {
             acm.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
             // read acm
             acm.ReadFile(inputFile);
+
+            // return negation of error flag - OK
+            return !acm.Error;
         }
 
         /// <summary>
@@ -662,34 +725,57 @@ namespace FOnlineDatRipper
             rightSelectedFOFile = null;
             currFOFile = null;
 
+            inputFiles = (string[])e.Argument;
+
             // reset global error message
             glblErrMsg.Length = 0;
 
             // start measuring the time
-            stopwatch.Start();
+            stopwatch.Start();            
 
             foreach (string inputFile in inputFiles)
             {
                 // choose behaviour based on file extension
                 string extension = Path.GetExtension(inputFile);
-
+                bool ok = false;
                 // fonlinefile in the switch scope
                 switch (extension.ToLower())
                 {
                     case ".acm":
                         currFOFile = new ACM(inputFile);
-                        fOnlineFiles.Add(currFOFile);
-                        ACMDoAll((ACM)currFOFile, inputFile);
+                        ok = ACMDoAll((ACM)currFOFile, inputFile);
+                        if (ok)
+                        {
+                            fOnlineFiles.Add(currFOFile);
+                        } 
+                        else
+                        {
+                            glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
+                        }
                         break;
                     case ".frm":
                         currFOFile = new FRM(inputFile);
-                        fOnlineFiles.Add(currFOFile);
-                        FRMDoAll((FRM)currFOFile, inputFile);
+                        ok = FRMDoAll((FRM)currFOFile, inputFile);
+                        if (ok)
+                        {
+                            fOnlineFiles.Add(currFOFile);
+                        } 
+                        else
+                        {
+                            glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
+                        }
                         break;
                     case ".dat":
-                        currFOFile = new Dat(inputFile);
-                        fOnlineFiles.Add(currFOFile);
-                        DatDoAll((Dat)currFOFile, inputFile); // read dat file, build dat tree  
+                        currFOFile = new Dat(inputFile);                        
+                        ok = DatDoAll((Dat)currFOFile, inputFile); // read dat file, build dat tree  
+                        if (ok)
+                        {
+                            fOnlineFiles.Add(currFOFile);
+                        } 
+                        else
+                        {
+                            glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
+                        }
                         break;
                     default:
                         glblErrMsg.Append("@" + inputFile + " : Unknown extension \"" + extension + "\"!\n");
@@ -788,6 +874,14 @@ namespace FOnlineDatRipper
                 }
             }));
             treeViewDat.EndInvoke(asyncResult);
+
+            var selectedNode = this.treeViewDat.SelectedNode;
+            if (selectedNode != null)
+            {
+                cntxtMenuStripShort.Items[0].Enabled = (this.treeViewDat.SelectedNode == rootNode);
+                cntxtMenuStripShort.Items[1].Enabled = (this.treeViewDat.SelectedNode != null && this.treeViewDat.SelectedNode.Level == 1);
+                cntxtMenuStripShort.Items[2].Enabled = (this.treeViewDat.SelectedNode != null && this.treeViewDat.SelectedNode.Level >= 1);
+            }
         }
 
         /// <summary>
@@ -812,7 +906,7 @@ namespace FOnlineDatRipper
                 datCacheMiss = true;
                 // fetch new one, wait to see what happens   
                 // add guards against index break
-                e.Item = (e.ItemIndex >= 0 && e.ItemIndex < datListViewItems.Count) ? this.datListViewItems[e.ItemIndex] : null;
+                e.Item = (e.ItemIndex >= 0 && e.ItemIndex < datListViewItems.Count) ? this.datListViewItems[e.ItemIndex] : new ListViewItem();
             }
         }
 
@@ -1364,7 +1458,13 @@ namespace FOnlineDatRipper
                 FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
-                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT;
+                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT || value.Data.ToLower().EndsWith(".dat");
+            } 
+            else
+            {
+                cntxtMenuStripLong.Items[0].Enabled = false;
+                cntxtMenuStripLong.Items[1].Enabled = false;
+                cntxtMenuStripLong.Items[2].Enabled = false;
             }
         }
 
@@ -1382,8 +1482,29 @@ namespace FOnlineDatRipper
                 FOnlineFile.FOType fOType = pair.Key.GetFOFileType();
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
-                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT;
+                cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT || value.Data.ToLower().EndsWith(".dat");
+            } 
+            else
+            {
+                cntxtMenuStripLong.Items[0].Enabled = false;
+                cntxtMenuStripLong.Items[1].Enabled = false;
+                cntxtMenuStripLong.Items[2].Enabled = false;
             }
+        }       
+
+        private void addShortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileAdd();
+        }
+
+        private void removeShortToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileRemove();
+        }
+
+        private void treeViewDat_BeforeSelect(object sender, TreeViewCancelEventArgs e)
+        {
+            
         }
     }
 }

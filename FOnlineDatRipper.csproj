@@ -178,5 +178,9 @@
   <ItemGroup>
     <None Include="Resources\app.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\minus_file_icon.png" />
+    <Content Include="Resources\plus_file_icon.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

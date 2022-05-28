@@ -114,17 +114,19 @@ namespace FOnlineDatRipper
         /// <param name="acmFile">The acmFile<see cref="string"/>.</param>
         public override void ReadFile(string acmFile)
         {
-            bool ok = false;
+            error = false;
             byte[] acmBytes = File.ReadAllBytes(acmFile);
 
             this.acmDecoder = new ACMDecoder(acmBytes, OnProgressUpdate);
             if (acmDecoder.Info.Id != 0x32897)
             {
-                errorMessage = "Error - ACM file does not have valid Id!";
+                error = true;
+                errorMessage = "Error - ACM file does not have valid Id!";                
             }
             else if (acmDecoder.Info.Version != 0x01)
             {
-                errorMessage = "Error - ACM file is not of correct version!";
+                error = true;
+                errorMessage = "Error - ACM file is not of correct version!";                
             }
             else
             {
@@ -135,15 +137,14 @@ namespace FOnlineDatRipper
                         new MemoryStream(this.content, 0, this.length),
                         new WaveFormat((int)(acmDecoder.Info.Bitrate), 16, 2)
                     );
-                    ok = true;
                 }
                 else
                 {
-                    errorMessage = "Error - ACM file is not valid (Decoding error)!";
+                    error = true;
+                    errorMessage = "Error - ACM file is not valid (Decoding error)!";                    
                 }
             }
 
-            this.error = !ok;
         }
 
         /// <summary>
