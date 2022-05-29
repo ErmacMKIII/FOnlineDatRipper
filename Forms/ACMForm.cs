@@ -13,9 +13,14 @@
 namespace FOnlineDatRipper
 {
     using FOnlineDatRipper.Properties;
+    using NAudio.Gui;
     using NAudio.Wave;
+    using NAudio.WaveFormRenderer;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Drawing;
+    using System.Drawing.Imaging;
     using System.Windows.Forms;
 
     /// <summary>
@@ -54,6 +59,16 @@ namespace FOnlineDatRipper
         private readonly WaveOutEvent wo = new WaveOutEvent();
 
         /// <summary>
+        /// Visualizer
+        /// </summary>
+        private readonly WaveFormRenderer waveFormRenderer = new WaveFormRenderer();
+         
+        /// <summary>
+        /// Picture Box containing the waveform
+        /// </summary>
+        private readonly PictureBox picBox = new PictureBox();        
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ACMForm"/> class.
         /// </summary>
         /// <param name="acms">The acms<see cref="List{ACM}"/>.</param>
@@ -61,23 +76,8 @@ namespace FOnlineDatRipper
         {
             this.acms = acms;
             Init();
-            InitDarkTheme(this);
-        }
-
-        /// <summary>
-        /// The InitDarkTheme.
-        /// </summary>
-        /// <param name="root">The root<see cref="Control"/>.</param>
-        private void InitDarkTheme(Control root)
-        {
-            root.BackColor = MainForm.DarkBackground;
-            root.ForeColor = MainForm.DarkForeground;
-
-            foreach (Control ctrl in root.Controls)
-            {
-                InitDarkTheme(ctrl);
-            }
-        }
+            MainForm.InitDarkTheme(this);
+        }       
 
         /// <summary>
         /// Defines initalization of this subform.
@@ -92,7 +92,7 @@ namespace FOnlineDatRipper
             this.MaximizeBox = false;
             this.FormBorderStyle = FormBorderStyle.Fixed3D;
 
-            listBox.Dock = DockStyle.Fill;
+            listBox.Dock = DockStyle.Top;
             this.listBox.SelectedIndexChanged += ListBox_SelectedIndexChanged;
 
             // add each ACM to the list box
@@ -101,6 +101,11 @@ namespace FOnlineDatRipper
                 listBox.Items.Add(acm.Tag);
             }
             this.Controls.Add(listBox);
+
+            // add pic box to display waveform
+            this.picBox.Dock = DockStyle.Fill;
+            this.picBox.Paint += PicBox_Paint;
+            this.Controls.Add(picBox);
 
             // next frame button
             btnPlay.FlatStyle = FlatStyle.Flat;
@@ -124,6 +129,31 @@ namespace FOnlineDatRipper
             this.Controls.Add(btnStop);
         }
 
+        private void PicBox_Paint(object sender, PaintEventArgs e)
+        {
+            var g = e.Graphics;
+            g.Clear(Color.Transparent);
+
+            var settings = new SoundCloudBlockWaveFormSettings(Color.Orange, Color.DarkOrange, Color.Magenta, Color.DarkMagenta);
+            
+            settings.BackgroundColor = MainForm.DefaultBackColor;
+            settings.Width = picBox.Width >> 1;
+            settings.TopHeight = picBox.Height >> 2;
+            settings.BottomHeight = picBox.Height >> 2;
+
+            // render the wave form the field image
+            int index = listBox.SelectedIndex;
+            if (index != -1)
+            {
+                ACM acm = acms[index];
+                var waveFormImg = waveFormRenderer.Render(
+                    acm.WaveStream, settings
+                );
+                
+                g.DrawImage(waveFormImg, Rectangle.FromLTRB(0, picBox.Height / 2, picBox.Width, picBox.Height));
+            }                       
+        }
+
         /// <summary>
         /// The ListBox_SelectedIndexChanged.
         /// </summary>
@@ -138,14 +168,17 @@ namespace FOnlineDatRipper
                 {
                     wo.Stop();
                 }
-
                 ACM acm = acms[index];
                 if (acm.WaveStream != null && wo.PlaybackState == PlaybackState.Stopped)
                 {
+                    // invalidate so the sound wave form is being displayed
+                    picBox.Invalidate();
+
+                    // initialize the stream for playing
                     acm.WaveStream.Position = 0;
-                    wo.Init(acm.WaveStream);
+                    wo.Init(acm.WaveStream); 
                 }
-            }
+            } 
         }
 
         /// <summary>
@@ -189,7 +222,7 @@ namespace FOnlineDatRipper
             int index = listBox.SelectedIndex;
             if (index != -1)
             {
-                ACM acm = acms[index];
+                ACM acm = acms[index];                
                 if (acm.WaveStream != null
                     && acm.WaveStream.Position == acm.WaveStream.Length)
                 {
@@ -197,12 +230,11 @@ namespace FOnlineDatRipper
                 }
 
                 if (wo.PlaybackState != PlaybackState.Playing)
-                {
+                {                                       
                     wo.Play();
                 }
-
             }
-        }
+        }       
 
         /// <summary>
         /// The Dispose.

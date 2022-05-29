@@ -109,23 +109,8 @@ namespace FOnlineDatRipper
             backgroundWorker.ProgressChanged += BackgroundWorker_ProgressChanged;
             backgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
 
-            InitDarkTheme(this);
-        }
-
-        /// <summary>
-        /// The InitDarkTheme.
-        /// </summary>
-        /// <param name="root">The root<see cref="Control"/>.</param>
-        private void InitDarkTheme(Control root)
-        {
-            root.BackColor = MainForm.DarkBackground;
-            root.ForeColor = MainForm.DarkForeground;
-
-            foreach (Control ctrl in root.Controls)
-            {
-                InitDarkTheme(ctrl);
-            }
-        }
+            MainForm.InitDarkTheme(this);
+        }        
 
         /// <summary>
         /// The Init.

@@ -236,7 +236,7 @@ namespace FOnlineDatRipper
         /// The InitDarkTheme.
         /// </summary>
         /// <param name="root">The root<see cref="Control"/>.</param>
-        private void InitDarkTheme(Control root)
+        public static void InitDarkTheme(Control root)
         {
             root.BackColor = DarkBackground;
             root.ForeColor = DarkForeground;
@@ -1090,35 +1090,43 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void btnExtractAll_Click(object sender, EventArgs e)
         {
-            if (inputFiles == null)
+            var subList = this.fOnlineFiles.FindAll(f => f.GetFOFileType() == FOnlineFile.FOType.DAT);
+            var datList = subList.ConvertAll<Dat>(f => new Dat(f.GetTag()));
+            // create and use the subform
+            using (ExtractorForm extForm = new ExtractorForm(datList))
             {
-                MessageBox.Show("There's no input file. Make sure it's loaded first!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                extForm.ShowDialog();
             }
-            else if (outDir == null)
-            {
-                MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            else if (cmbBoxFOFiles.SelectedItem == null)
-            {
-                MessageBox.Show("There is no selected files for extraction! Please select one.", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            /*else if (rightSelectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
-            {
-                MessageBox.Show("Selected file is not dat archive!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }*/
-            else
-            {
-                Predicate<FOnlineFile> predicate = new Predicate<FOnlineFile>(t => t.GetTag().Equals(cmbBoxFOFiles.SelectedItem));
-                this.extrTargDat = (Dat)fOnlineFiles.Find(predicate);
-                if (extrTargDat != null)
-                {
-                    DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-                    if (dialogResult == DialogResult.Yes)
-                    {
-                        extractor.RunWorkerAsync();
-                    }
-                }
-            }
+
+            //if (inputFiles == null)
+            //{
+            //    MessageBox.Show("There's no input file. Make sure it's loaded first!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+            //else if (outDir == null)
+            //{
+            //    MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+            //else if (cmbBoxFOFiles.SelectedItem == null)
+            //{
+            //    MessageBox.Show("There is no selected files for extraction! Please select one.", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}
+            ///*else if (rightSelectedFOFile.GetFOFileType() != FOnlineFile.FOType.DAT)
+            //{
+            //    MessageBox.Show("Selected file is not dat archive!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //}*/
+            //else
+            //{
+            //    Predicate<FOnlineFile> predicate = new Predicate<FOnlineFile>(t => t.GetTag().Equals(cmbBoxFOFiles.SelectedItem));
+            //    this.extrTargDat = (Dat)fOnlineFiles.Find(predicate);
+            //    if (extrTargDat != null)
+            //    {
+            //        DialogResult dialogResult = MessageBox.Show("This is time consuming operation, are you sure you want to continue?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            //        if (dialogResult == DialogResult.Yes)
+            //        {
+            //            extractor.RunWorkerAsync();
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
