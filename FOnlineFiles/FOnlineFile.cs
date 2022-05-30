@@ -55,6 +55,12 @@ namespace FOnlineDatRipper
         public abstract string GetTag();
 
         /// <summary>
+        /// Get Absoulte File Path (including filename with extension)
+        /// </summary>
+        /// <returns></returns>
+        public abstract string GetFilePath();
+
+        /// <summary>
         /// Tells if error occurred during reading this FOnline File.
         /// </summary>
         /// <returns>Did error occur?.</returns>

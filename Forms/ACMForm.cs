@@ -84,6 +84,9 @@ namespace FOnlineDatRipper
         /// </summary>
         private void Init()
         {
+            this.Width = 400;
+            this.Height = 300;
+
             this.Text = "ACM File(s) Preview";
             this.Icon = Resources.app;
             this.StartPosition = FormStartPosition.CenterScreen;

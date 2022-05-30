@@ -109,11 +109,6 @@ namespace FOnlineDatRipper
         internal const int FileIndex = 8;
 
         /// <summary>
-        /// Input files from the filesystem {FRM, ACM or DAT}
-        /// </summary>
-        private string[] inputFiles;
-
-        /// <summary>
         /// Defines the output directory to extract the data.
         /// </summary>
         private string outDir;
@@ -178,12 +173,12 @@ namespace FOnlineDatRipper
         /// </summary>
         private readonly Node<string> myRoot = new Node<string>("/");
                         
-        /// <summary>
-        /// Target for operation Extract All
-        /// </summary>
-        private Dat extrTargDat;
+        ///// <summary>
+        ///// Target for operation Extract All
+        ///// </summary>
+        ////private Dat extrTargDat;
 
-        private readonly StringBuilder glblErrMsg = new StringBuilder();
+        private readonly StringBuilder glblErrMsg = new StringBuilder();        
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainForm"/> class.
@@ -196,11 +191,11 @@ namespace FOnlineDatRipper
             reader.DoWork += Reader_DoWork;
             reader.RunWorkerCompleted += Reader_RunWorkerCompleted;
 
-            extractor.DoWork += Extractor_DoWork;
-            extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+            //extractor.DoWork += Extractor_DoWork;
+            //extractor.RunWorkerCompleted += MiniExtractor_RunWorkerCompleted;
 
             miniExtractor.DoWork += MiniExtractor_DoWork;
-            miniExtractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+            miniExtractor.RunWorkerCompleted += MiniExtractor_RunWorkerCompleted;
 
             InitDarkTheme(this);
 
@@ -366,6 +361,7 @@ namespace FOnlineDatRipper
                     Node<string> child = node.Children.Find(m => m.Data.Equals(inFoFile.GetTag()));
                     if (child != null)
                     {
+                        item.Text = child.Data;
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, child);
                         datListViewItems.Add(item);
                     }                    
@@ -725,7 +721,7 @@ namespace FOnlineDatRipper
             rightSelectedFOFile = null;
             currFOFile = null;
 
-            inputFiles = (string[])e.Argument;
+            var inputFiles = (string[])e.Argument;
 
             // reset global error message
             glblErrMsg.Length = 0;
@@ -1011,20 +1007,22 @@ namespace FOnlineDatRipper
                 {
                     ListViewItem selItem = listViewDat.Items[selectedIndex];
                     KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
+                    var foFile = kvp.Key;
+                    var filePath = kvp.Key.GetFilePath();
                     Node<string> itemNode = kvp.Value;
                     string filename = itemNode.Data;
                     if (filename.ToLower().EndsWith(".acm"))
                     {
                         totalMem += ACM.BufferSize;
-                        ACM acm = new ACM(inputFiles[selectedIndex]);
-                        acm.ReadFile(inputFiles[selectedIndex]);
+                        ACM acm = new ACM(filePath);
+                        acm.ReadFile(filePath);
                         acms.Add(acm);
                     }
                     else if (filename.ToLower().EndsWith(".frm"))
                     {
                         totalMem += FRM.BufferSize;
-                        FRM frm = new FRM(inputFiles[selectedIndex]);
-                        frm.ReadFile(inputFiles[selectedIndex]);
+                        FRM frm = new FRM(filePath);
+                        frm.ReadFile(filePath);
                         fRMs.Add(frm);
                     }
 
@@ -1091,7 +1089,7 @@ namespace FOnlineDatRipper
         private void btnExtractAll_Click(object sender, EventArgs e)
         {
             var subList = this.fOnlineFiles.FindAll(f => f.GetFOFileType() == FOnlineFile.FOType.DAT);
-            var datList = subList.ConvertAll<Dat>(f => new Dat(f.GetTag()));
+            var datList = subList.ConvertAll<Dat>(f => (Dat)f);
             // create and use the subform
             using (ExtractorForm extForm = new ExtractorForm(datList))
             {
@@ -1129,24 +1127,24 @@ namespace FOnlineDatRipper
             //}
         }
 
-        /// <summary>
-        /// The Extractor_DoWork.
-        /// </summary>
-        /// <param name="sender">The sender<see cref="object"/>.</param>
-        /// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
-        private void Extractor_DoWork(object sender, DoWorkEventArgs e)
-        {
-            currFOFile = extrTargDat;
-            // extract only archives                        
-            DatDoExtractAll(extrTargDat);
-        }
+        ///// <summary>
+        ///// The Extractor_DoWork.
+        ///// </summary>
+        ///// <param name="sender">The sender<see cref="object"/>.</param>
+        ///// <param name="e">The e<see cref="DoWorkEventArgs"/>.</param>
+        //private void Extractor_DoWork(object sender, DoWorkEventArgs e)
+        //{
+        //    currFOFile = extrTargDat;
+        //    // extract only archives                        
+        //    DatDoExtractAll(extrTargDat);
+        //}
 
         /// <summary>
-        /// The Extractor_RunWorkerCompleted.
+        /// The MiniExtractor_RunWorkerCompleted.
         /// </summary>
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
-        private void Extractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        private void MiniExtractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             MessageBox.Show("Dat File(s) sucessfully extracted in " + seconds + " seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.taskProgressBar.Value = 0;
@@ -1167,11 +1165,12 @@ namespace FOnlineDatRipper
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
             sb.Append("Changelog for v1.0 ETERNAL:\n");
-            sb.Append("\t- Fixed Out of Memory error by disallowing too many files to be opened.\n");
-            sb.Append("\t- Fixed permitting unknown extensions with file open.\n");
+            sb.Append("- Fixed Out of Memory error by disallowing\n");
+            sb.Append("  too many files to be opened.\n");
+            sb.Append("- Fixed permitting unknown extensions with file open.\n");
             sb.Append("\n");
             sb.Append("Changelog for v0.4 DEUTERIUM:\n");
-            sb.Append("\t- Initial pre-release.\n");
+            sb.Append("- Initial pre-release.\n");
             sb.Append("\n");
             sb.Append("Purpose:\n");
             sb.Append("FOnlineRipper combines archiver/viewer/converter\n");
@@ -1324,13 +1323,16 @@ namespace FOnlineDatRipper
                 {
                     ListViewItem selItem = listViewDat.Items[selectedIndex];
                     KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)selItem.Tag;
+                    var foFile = kvp.Key;
+                    var filePath = kvp.Key.GetFilePath();
+
                     Node<string> itemNode = (Node<string>)kvp.Value;
                     string filename = itemNode.Data;
                     if (filename.ToLower().EndsWith(".acm"))
                     {
                         totalMem += ACM.BufferSize;
-                        ACM acm = new ACM(inputFiles[selectedIndex]);
-                        acm.ReadFile(inputFiles[selectedIndex]);
+                        ACM acm = new ACM(filePath);
+                        acm.ReadFile(filePath);
                         acms.Add(acm);
                     }
 

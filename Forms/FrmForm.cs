@@ -68,6 +68,9 @@ namespace FOnlineDatRipper
         /// </summary>
         private void Init()
         {
+            this.Width = 400;
+            this.Height = 300;
+
             frmDisplayIndex = 0;
             this.Text = "FRM File(s) Preview";
             this.Icon = Resources.app;

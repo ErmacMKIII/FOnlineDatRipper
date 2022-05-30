@@ -98,12 +98,17 @@ namespace FOnlineDatRipper
         /// </summary>
         private ACMDecoder acmDecoder;
 
+        private readonly string filePath;
+
+        public string FilePath { get => filePath; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ACM"/> class.
         /// </summary>
         /// <param name="acmFile">.</param>
         public ACM(string acmFile)
         {
+            this.filePath = acmFile;
             int lastIndex = acmFile.LastIndexOf('\\');
             this.tag = acmFile.Substring(lastIndex + 1);
         }
@@ -227,6 +232,15 @@ namespace FOnlineDatRipper
         public override FOType GetFOFileType()
         {
             return FOType.ACM;
+        }
+
+        /// <summary>
+        /// Get Absolute FilePath (included filename with extension)
+        /// </summary>
+        /// <returns>absolute filepath</returns>
+        public override string GetFilePath()
+        {
+            return filePath;
         }
     }
 }

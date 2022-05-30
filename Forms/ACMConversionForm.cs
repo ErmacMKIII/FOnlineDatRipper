@@ -117,6 +117,9 @@ namespace FOnlineDatRipper
         /// </summary>
         private void Init()
         {
+            this.Width = 400;
+            this.Height = 300;
+
             this.Text = "ACM File(s) Conversion";
             this.Icon = Resources.app;
             this.StartPosition = FormStartPosition.CenterScreen;
@@ -134,6 +137,7 @@ namespace FOnlineDatRipper
             this.Controls.Add(chkListBox);
 
             // label output format and combobox for output format
+            this.lblOutputFormat.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.lblOutputFormat.Text = "Output format:";
             this.lblOutputFormat.Dock = DockStyle.Bottom;
             this.Controls.Add(lblOutputFormat);
@@ -144,7 +148,7 @@ namespace FOnlineDatRipper
             this.cmbBoxOutputFormat.SelectedIndex = 0;
             this.Controls.Add(cmbBoxOutputFormat);
 
-            // button GO
+            // button Convert            
             btnConvert.Dock = DockStyle.Bottom;
             btnConvert.Text = "CONVERT...";
             btnConvert.Click += BtnGo_Click;

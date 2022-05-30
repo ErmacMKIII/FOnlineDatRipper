@@ -35,6 +35,17 @@ namespace FOnlineDatRipper
         public event ProgressUpdate OnProgressUpdate;
 
         /// <summary>
+        /// The FileNameProcessing.
+        /// </summary>
+        /// <param name="fileName">The value<see cref="string"/>.</param>
+        public delegate void FileNameProcessing(string fileName);
+
+        /// <summary>
+        /// Defines the OnFileNameProcessing.
+        /// </summary>
+        public event FileNameProcessing OnFileNameProcessing;
+
+        /// <summary>
         /// Defines the BufferSize.
         /// </summary>
         public const int BufferSize = 0x10000000;// 256 MB Buffer
@@ -121,12 +132,18 @@ namespace FOnlineDatRipper
         /// </summary>
         public string Tag { get => tag; }
 
+
+        private readonly string filePath;
+
+        public string FilePath { get => filePath; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Dat"/> class.
         /// </summary>
         /// <param name="filepath">The filepath<see cref="string"/>.</param>
         public Dat(string filepath)
         {
+            this.filePath = filepath;
             int lastIndex = filepath.LastIndexOf('\\');
             this.tag = filepath.Substring(lastIndex + 1);
         }
@@ -231,6 +248,11 @@ namespace FOnlineDatRipper
                     DataBlock dataBlock = new DataBlock(filename, compressed, realSize, packedSize, offset);
                     dataBlocks.Add(dataBlock);
 
+                    if (OnFileNameProcessing != null)
+                    {
+                        OnFileNameProcessing(filename);
+                    }
+
                     progress += 95.0 / (double)fileCount;
                     if (OnProgressUpdate != null)
                     {
@@ -320,6 +342,10 @@ namespace FOnlineDatRipper
             foreach (DataBlock dataBlock in dataBlocks)
             {
                 Extract(outdir, dataBlock);
+                if (OnFileNameProcessing != null)
+                {
+                    OnFileNameProcessing(dataBlock.Filename);
+                }
                 progress += 100.0 / (double)dataBlocks.Count;
                 if (OnProgressUpdate != null)
                 {
@@ -505,6 +531,10 @@ namespace FOnlineDatRipper
                     {
                         OnProgressUpdate(progress);
                     }
+                    if (OnFileNameProcessing != null)
+                    {
+                        OnFileNameProcessing(dataBlock.Filename);
+                    }
                 }
             }
             else
@@ -537,6 +567,10 @@ namespace FOnlineDatRipper
                             progress = 100.0 * fileExtract / (double)fileTotal;
                             Extract(outdir, dataBlock);
                             fileExtract++;
+                            if (OnFileNameProcessing != null)
+                            {
+                                OnFileNameProcessing(dataBlock.Filename);
+                            }
                             if (OnProgressUpdate != null)
                             {
                                 OnProgressUpdate(progress);
@@ -550,8 +584,7 @@ namespace FOnlineDatRipper
                         ustack.Push(item);
 
                         fileTotal += item.Children.Count;
-                        progress = 100.0 * fileExtract / (double)fileTotal;
-
+                        progress = 100.0 * fileExtract / (double)fileTotal;                        
                         if (OnProgressUpdate != null)
                         {
                             OnProgressUpdate(progress);
@@ -607,6 +640,15 @@ namespace FOnlineDatRipper
         public override FOType GetFOFileType()
         {
             return FOType.DAT;
+        }
+
+        /// <summary>
+        /// Get Absolute FilePath (included filename with extension)
+        /// </summary>
+        /// <returns>absolute filepath</returns>
+        public override string GetFilePath()
+        {
+            return filePath;
         }
     }
 }

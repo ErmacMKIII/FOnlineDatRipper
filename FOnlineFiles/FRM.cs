@@ -164,6 +164,10 @@ namespace FOnlineDatRipper
         /// </summary>
         public string Tag => tag;
 
+        private readonly string filePath;
+
+        public string FilePath { get => filePath; }
+
         /// <summary>
         /// Did error occurred?.....
         /// </summary>
@@ -202,6 +206,7 @@ namespace FOnlineDatRipper
         /// <param name="frmFile"> frm binary file.</param>
         public FRM(string frmFile)
         {
+            this.filePath = frmFile;
             int lastIndex = frmFile.LastIndexOf('\\');
             this.tag = frmFile.Substring(lastIndex + 1);
             ReadFile(frmFile);
@@ -448,6 +453,15 @@ namespace FOnlineDatRipper
         public override FOType GetFOFileType()
         {
             return FOType.FRM;
+        }
+
+        /// <summary>
+        /// Get Absolute FilePath (included filename with extension)
+        /// </summary>
+        /// <returns>absolute filepath</returns>
+        public override string GetFilePath()
+        {
+            return filePath;
         }
     }
 }
