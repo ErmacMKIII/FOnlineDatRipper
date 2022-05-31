@@ -56,24 +56,28 @@ namespace FOnlineDatRipper
             this.extractShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtBoxPathInfo = new System.Windows.Forms.TextBox();
             this.pnlView = new System.Windows.Forms.Panel();
-            this.listViewDat = new System.Windows.Forms.ListView();
             this.txtBoxFileCount = new System.Windows.Forms.TextBox();
+            this.listViewDat = new System.Windows.Forms.ListView();
             this.groupBoxDatArchive = new System.Windows.Forms.GroupBox();
-            this.btnOutDir = new System.Windows.Forms.Button();
             this.txtBoxOutDir = new System.Windows.Forms.TextBox();
             this.btnExtractAll = new System.Windows.Forms.Button();
             this.lblOutDir = new System.Windows.Forms.Label();
             this.lblInArchive = new System.Windows.Forms.Label();
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
+            this.tblLayOutBtnPnl = new System.Windows.Forms.TableLayoutPanel();
+            this.btnFilter = new System.Windows.Forms.Button();
+            this.listBoxInputFiles = new System.Windows.Forms.ListBox();
             this.lblFilter = new System.Windows.Forms.Label();
             this.txtBoxFilter = new System.Windows.Forms.TextBox();
-            this.cmbBoxFOFiles = new System.Windows.Forms.ComboBox();
-            this.lblDatTargExtr = new System.Windows.Forms.Label();
             this.pnlInputFiles = new System.Windows.Forms.Panel();
-            this.listBoxInputFiles = new System.Windows.Forms.ListBox();
-            this.taskProgressBar = new System.Windows.Forms.ProgressBar();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.groupBoxOutput = new System.Windows.Forms.GroupBox();
+            this.tblLayOutPnl = new System.Windows.Forms.TableLayoutPanel();
+            this.lblCurrExtrFile = new System.Windows.Forms.Label();
+            this.txtBoxCurrExtrFile = new System.Windows.Forms.TextBox();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
+            this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -82,15 +86,19 @@ namespace FOnlineDatRipper
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HowToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tblLayOutPnlBig = new System.Windows.Forms.TableLayoutPanel();
             this.cntxtMenuStripLong.SuspendLayout();
             this.pnlTree.SuspendLayout();
             this.cntxtMenuStripShort.SuspendLayout();
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
-            this.pnlInputFiles.SuspendLayout();
+            this.tblLayOutBtnPnl.SuspendLayout();
+            this.groupBoxOutput.SuspendLayout();
+            this.tblLayOutPnl.SuspendLayout();
             this.groupBoxWorkProgress.SuspendLayout();
             this.mainMenuStrip.SuspendLayout();
+            this.tblLayOutPnlBig.SuspendLayout();
             this.SuspendLayout();
             // 
             // imgLstDatStruct
@@ -194,9 +202,14 @@ namespace FOnlineDatRipper
             // pnlView
             // 
             resources.ApplyResources(this.pnlView, "pnlView");
-            this.pnlView.Controls.Add(this.listViewDat);
             this.pnlView.Controls.Add(this.txtBoxFileCount);
             this.pnlView.Name = "pnlView";
+            // 
+            // txtBoxFileCount
+            // 
+            resources.ApplyResources(this.txtBoxFileCount, "txtBoxFileCount");
+            this.txtBoxFileCount.Name = "txtBoxFileCount";
+            this.txtBoxFileCount.ReadOnly = true;
             // 
             // listViewDat
             // 
@@ -215,28 +228,15 @@ namespace FOnlineDatRipper
             this.listViewDat.DoubleClick += new System.EventHandler(this.listViewDat_DoubleClick);
             this.listViewDat.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listViewDat_MouseClick);
             // 
-            // txtBoxFileCount
-            // 
-            resources.ApplyResources(this.txtBoxFileCount, "txtBoxFileCount");
-            this.txtBoxFileCount.Name = "txtBoxFileCount";
-            this.txtBoxFileCount.ReadOnly = true;
-            // 
             // groupBoxDatArchive
             // 
             resources.ApplyResources(this.groupBoxDatArchive, "groupBoxDatArchive");
+            this.groupBoxDatArchive.Controls.Add(this.listViewDat);
             this.groupBoxDatArchive.Controls.Add(this.pnlView);
             this.groupBoxDatArchive.Controls.Add(this.pnlTree);
             this.groupBoxDatArchive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxDatArchive.Name = "groupBoxDatArchive";
             this.groupBoxDatArchive.TabStop = false;
-            // 
-            // btnOutDir
-            // 
-            resources.ApplyResources(this.btnOutDir, "btnOutDir");
-            this.btnOutDir.Image = global::FOnlineDatRipper.Properties.Resources.dir_out_icon;
-            this.btnOutDir.Name = "btnOutDir";
-            this.btnOutDir.UseVisualStyleBackColor = true;
-            this.btnOutDir.Click += new System.EventHandler(this.btnOutDir_Click);
             // 
             // txtBoxOutDir
             // 
@@ -273,20 +273,37 @@ namespace FOnlineDatRipper
             // groupBoxPaths
             // 
             resources.ApplyResources(this.groupBoxPaths, "groupBoxPaths");
+            this.groupBoxPaths.Controls.Add(this.listBoxInputFiles);
+            this.groupBoxPaths.Controls.Add(this.lblInArchive);
+            this.groupBoxPaths.Controls.Add(this.tblLayOutBtnPnl);
             this.groupBoxPaths.Controls.Add(this.lblFilter);
             this.groupBoxPaths.Controls.Add(this.txtBoxFilter);
-            this.groupBoxPaths.Controls.Add(this.cmbBoxFOFiles);
-            this.groupBoxPaths.Controls.Add(this.lblDatTargExtr);
             this.groupBoxPaths.Controls.Add(this.pnlInputFiles);
-            this.groupBoxPaths.Controls.Add(this.btnInArch);
-            this.groupBoxPaths.Controls.Add(this.lblInArchive);
-            this.groupBoxPaths.Controls.Add(this.lblOutDir);
-            this.groupBoxPaths.Controls.Add(this.btnExtractAll);
-            this.groupBoxPaths.Controls.Add(this.txtBoxOutDir);
-            this.groupBoxPaths.Controls.Add(this.btnOutDir);
             this.groupBoxPaths.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
+            // 
+            // tblLayOutBtnPnl
+            // 
+            resources.ApplyResources(this.tblLayOutBtnPnl, "tblLayOutBtnPnl");
+            this.tblLayOutBtnPnl.Controls.Add(this.btnInArch, 0, 0);
+            this.tblLayOutBtnPnl.Controls.Add(this.btnExtractAll, 0, 1);
+            this.tblLayOutBtnPnl.Controls.Add(this.btnFilter, 0, 2);
+            this.tblLayOutBtnPnl.Name = "tblLayOutBtnPnl";
+            // 
+            // btnFilter
+            // 
+            resources.ApplyResources(this.btnFilter, "btnFilter");
+            this.btnFilter.Image = global::FOnlineDatRipper.Properties.Resources.file_filter_icon;
+            this.btnFilter.Name = "btnFilter";
+            this.btnFilter.UseVisualStyleBackColor = true;
+            this.btnFilter.Click += new System.EventHandler(this.btnFilter_Click);
+            // 
+            // listBoxInputFiles
+            // 
+            resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
+            this.listBoxInputFiles.FormattingEnabled = true;
+            this.listBoxInputFiles.Name = "listBoxInputFiles";
             // 
             // lblFilter
             // 
@@ -301,35 +318,42 @@ namespace FOnlineDatRipper
             this.txtBoxFilter.Name = "txtBoxFilter";
             this.txtBoxFilter.TextChanged += new System.EventHandler(this.txtBoxFilter_TextChanged);
             // 
-            // cmbBoxFOFiles
-            // 
-            resources.ApplyResources(this.cmbBoxFOFiles, "cmbBoxFOFiles");
-            this.cmbBoxFOFiles.FormattingEnabled = true;
-            this.cmbBoxFOFiles.Name = "cmbBoxFOFiles";
-            // 
-            // lblDatTargExtr
-            // 
-            resources.ApplyResources(this.lblDatTargExtr, "lblDatTargExtr");
-            this.lblDatTargExtr.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.lblDatTargExtr.Name = "lblDatTargExtr";
-            // 
             // pnlInputFiles
             // 
             resources.ApplyResources(this.pnlInputFiles, "pnlInputFiles");
-            this.pnlInputFiles.Controls.Add(this.listBoxInputFiles);
             this.pnlInputFiles.Name = "pnlInputFiles";
             // 
-            // listBoxInputFiles
+            // panel1
             // 
-            resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
-            this.listBoxInputFiles.FormattingEnabled = true;
-            this.listBoxInputFiles.Name = "listBoxInputFiles";
+            resources.ApplyResources(this.panel1, "panel1");
+            this.panel1.Name = "panel1";
             // 
-            // taskProgressBar
+            // groupBoxOutput
             // 
-            resources.ApplyResources(this.taskProgressBar, "taskProgressBar");
-            this.taskProgressBar.Name = "taskProgressBar";
-            this.taskProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            resources.ApplyResources(this.groupBoxOutput, "groupBoxOutput");
+            this.groupBoxOutput.Controls.Add(this.tblLayOutPnl);
+            this.groupBoxOutput.Name = "groupBoxOutput";
+            this.groupBoxOutput.TabStop = false;
+            // 
+            // tblLayOutPnl
+            // 
+            resources.ApplyResources(this.tblLayOutPnl, "tblLayOutPnl");
+            this.tblLayOutPnl.Controls.Add(this.lblCurrExtrFile, 0, 1);
+            this.tblLayOutPnl.Controls.Add(this.txtBoxOutDir, 1, 0);
+            this.tblLayOutPnl.Controls.Add(this.txtBoxCurrExtrFile, 1, 1);
+            this.tblLayOutPnl.Controls.Add(this.lblOutDir, 0, 0);
+            this.tblLayOutPnl.Name = "tblLayOutPnl";
+            // 
+            // lblCurrExtrFile
+            // 
+            resources.ApplyResources(this.lblCurrExtrFile, "lblCurrExtrFile");
+            this.lblCurrExtrFile.Name = "lblCurrExtrFile";
+            // 
+            // txtBoxCurrExtrFile
+            // 
+            resources.ApplyResources(this.txtBoxCurrExtrFile, "txtBoxCurrExtrFile");
+            this.txtBoxCurrExtrFile.Name = "txtBoxCurrExtrFile";
+            this.txtBoxCurrExtrFile.ReadOnly = true;
             // 
             // groupBoxWorkProgress
             // 
@@ -338,6 +362,12 @@ namespace FOnlineDatRipper
             this.groupBoxWorkProgress.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxWorkProgress.Name = "groupBoxWorkProgress";
             this.groupBoxWorkProgress.TabStop = false;
+            // 
+            // taskProgressBar
+            // 
+            resources.ApplyResources(this.taskProgressBar, "taskProgressBar");
+            this.taskProgressBar.Name = "taskProgressBar";
+            this.taskProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             // 
             // mainMenuStrip
             // 
@@ -395,16 +425,25 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.HowToToolStripMenuItem, "HowToToolStripMenuItem");
             this.HowToToolStripMenuItem.Click += new System.EventHandler(this.HowToToolStripMenuItem_Click);
             // 
+            // tblLayOutPnlBig
+            // 
+            resources.ApplyResources(this.tblLayOutPnlBig, "tblLayOutPnlBig");
+            this.tblLayOutPnlBig.Controls.Add(this.groupBoxWorkProgress, 0, 3);
+            this.tblLayOutPnlBig.Controls.Add(this.groupBoxDatArchive, 0, 1);
+            this.tblLayOutPnlBig.Controls.Add(this.groupBoxOutput, 0, 2);
+            this.tblLayOutPnlBig.Controls.Add(this.groupBoxPaths, 0, 0);
+            this.tblLayOutPnlBig.Name = "tblLayOutPnlBig";
+            // 
             // MainForm
             // 
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.groupBoxDatArchive);
-            this.Controls.Add(this.groupBoxPaths);
-            this.Controls.Add(this.groupBoxWorkProgress);
+            this.Controls.Add(this.tblLayOutPnlBig);
+            this.Controls.Add(this.panel1);
             this.Controls.Add(this.mainMenuStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Name = "MainForm";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.cntxtMenuStripLong.ResumeLayout(false);
             this.pnlTree.ResumeLayout(false);
             this.pnlTree.PerformLayout();
@@ -415,10 +454,17 @@ namespace FOnlineDatRipper
             this.groupBoxDatArchive.PerformLayout();
             this.groupBoxPaths.ResumeLayout(false);
             this.groupBoxPaths.PerformLayout();
-            this.pnlInputFiles.ResumeLayout(false);
+            this.tblLayOutBtnPnl.ResumeLayout(false);
+            this.tblLayOutBtnPnl.PerformLayout();
+            this.groupBoxOutput.ResumeLayout(false);
+            this.groupBoxOutput.PerformLayout();
+            this.tblLayOutPnl.ResumeLayout(false);
+            this.tblLayOutPnl.PerformLayout();
             this.groupBoxWorkProgress.ResumeLayout(false);
             this.mainMenuStrip.ResumeLayout(false);
             this.mainMenuStrip.PerformLayout();
+            this.tblLayOutPnlBig.ResumeLayout(false);
+            this.tblLayOutPnlBig.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -478,11 +524,6 @@ namespace FOnlineDatRipper
         /// Defines the groupBoxDatArchive.
         /// </summary>
         private System.Windows.Forms.GroupBox groupBoxDatArchive;
-
-        /// <summary>
-        /// Defines the btnOutDir.
-        /// </summary>
-        private System.Windows.Forms.Button btnOutDir;
 
         /// <summary>
         /// Defines the txtBoxOutDir.
@@ -572,11 +613,17 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.Label lblDatTargExtr;
-        private System.Windows.Forms.ComboBox cmbBoxFOFiles;
         private System.Windows.Forms.ToolStripMenuItem addShortToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeShortToolStripMenuItem;
         private System.Windows.Forms.Label lblFilter;
         private System.Windows.Forms.TextBox txtBoxFilter;
+        private System.Windows.Forms.TableLayoutPanel tblLayOutPnl;
+        private System.Windows.Forms.Label lblCurrExtrFile;
+        private System.Windows.Forms.TextBox txtBoxCurrExtrFile;
+        private System.Windows.Forms.GroupBox groupBoxOutput;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TableLayoutPanel tblLayOutPnlBig;
+        private System.Windows.Forms.Button btnFilter;
+        private System.Windows.Forms.TableLayoutPanel tblLayOutBtnPnl;
     }
 }

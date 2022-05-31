@@ -109,10 +109,10 @@ namespace FOnlineDatRipper
         /// </summary>
         internal const int FileIndex = 8;
 
-        /// <summary>
-        /// Defines the output directory to extract the data.
-        /// </summary>
-        private string outDir;
+        ///// <summary>
+        ///// Defines the output directory to extract the data.
+        ///// </summary>
+        //private string outDir;
 
         /// <summary>
         /// Defines the stopwatch.
@@ -173,7 +173,7 @@ namespace FOnlineDatRipper
         /// My root of the virtual system. In the root are all loaded files.
         /// </summary>
         private readonly Tree<string> myTree = new Tree<string>(new Node<string>("/"));
-                        
+
         ///// <summary>
         ///// Target for operation Extract All
         ///// </summary>
@@ -220,15 +220,17 @@ namespace FOnlineDatRipper
         {
             if (leftSelectedFOFile != null && leftSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
+                string outDir = (string)e.Argument;
                 Dat dat = (Dat)leftSelectedFOFile;
                 currFOFile = dat;
-                DatDoExtract(dat);
-            } 
+                DatDoExtract(outDir, dat);
+            }
             else if (rightSelectedFOFile != null && rightSelectedFOFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
+                string outDir = (string)e.Argument;
                 Dat dat = (Dat)rightSelectedFOFile;
                 currFOFile = dat;
-                DatDoExtract(dat);
+                DatDoExtract(outDir, dat);
             }
 
         }
@@ -270,7 +272,7 @@ namespace FOnlineDatRipper
             treeViewDat.BeginUpdate();
             // then call preorder
             List<Node<string>> datPreOrderList = dat.Tree.Preorder();
-           
+
             TreeNodeCollection selected = rootNode.Nodes;
             TreeNode selectedNode = null;
 
@@ -278,11 +280,11 @@ namespace FOnlineDatRipper
             {
                 // position yourself always to be the parent of the datNode
                 if (datNode.Parent != null)
-                {                    
+                {
                     if (selectedNode == null)
                     {
                         selectedNode = this.rootNode;
-                    } 
+                    }
                     else
                     {
                         int level = datNode.Level() + 1; // +1 comes from pre-existing root
@@ -291,7 +293,7 @@ namespace FOnlineDatRipper
                             selectedNode = selectedNode.Parent;
                         }
                         selected = selectedNode.Nodes;
-                    }                    
+                    }
                 }
 
                 // these elifs are for choosing corresponding image
@@ -321,7 +323,7 @@ namespace FOnlineDatRipper
         /// <param name="dat">dat archive.</param>
         /// <param name="node"> dat node to start building from .</param>
         private void BuildListView(FOnlineFile fOnlineFile, Node<string> node)
-        { 
+        {
             txtBoxPathInfo.Text = "";
 
             datListViewItems.Clear();
@@ -358,7 +360,7 @@ namespace FOnlineDatRipper
                     {
                         imageIndex = FileIndex;
                     }
-                    
+
 
                     // create new list view item and add it to the big list
                     ListViewItem item = new ListViewItem(inFoFile.GetTag(), imageIndex);
@@ -370,9 +372,9 @@ namespace FOnlineDatRipper
                         item.Text = child.Data;
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(inFoFile, child);
                         datListViewItems.Add(item);
-                    }                    
+                    }
                 }
-                txtBoxFileCount.Text = String.Format("0 directories and {0} files", node.Children.Count);                
+                txtBoxFileCount.Text = String.Format("0 directories and {0} files", node.Children.Count);
             }
             else if (fOnlineFile != null && fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT)
             {
@@ -421,7 +423,7 @@ namespace FOnlineDatRipper
                         Console.WriteLine("Match!");
                     }
 
-                    if (string.IsNullOrEmpty(txtBoxFilter.Text) || txtBoxFilter.Text.Equals(child.Data)) 
+                    if (string.IsNullOrEmpty(txtBoxFilter.Text) || txtBoxFilter.Text.Equals(child.Data))
                     {
                         item.Text = child.Data;
                         item.Tag = new KeyValuePair<FOnlineFile, Node<string>>(fOnlineFile, child);
@@ -430,11 +432,11 @@ namespace FOnlineDatRipper
                 }
                 txtBoxFileCount.Text = string.Format("{0} directories and {1} files", dirCount, fileCount);
 
-                
+
             }
-            
+
             listViewDat.VirtualListSize = datListViewItems.Count;
-        }        
+        }
 
         /// <summary>
         /// Extract all from the dat.
@@ -462,8 +464,9 @@ namespace FOnlineDatRipper
         /// Extract all from the selected treeview/listview of dat archive.
         /// Called from Background worker.
         /// </summary>
-        /// <param name="dat">The dat<see cref="Dat"/>.</param>
-        private void DatDoExtract(Dat dat)
+        /// <param name="outDir">Output Archive<see cref="Dat"/>.</param>
+        /// <param name="dat">The dat fonline archive<see cref="Dat"/>.</param>
+        private void DatDoExtract(string outDir, Dat dat)
         {
             stopwatch.Start();
 
@@ -487,7 +490,7 @@ namespace FOnlineDatRipper
         /// Do something with FOnline File(s).
         /// </summary>
         private void ProcessFOnlineFiles()
-        {               
+        {
             treeViewDat.Nodes.Clear();
             datListViewItems.Clear();
             myTree.Root.Children.Clear();
@@ -498,8 +501,8 @@ namespace FOnlineDatRipper
             if (fOnlineFiles.Count != 0)
             {
                 treeViewDat.Nodes.Add(rootNode);
-                
-                rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myTree.Root);            
+
+                rootNode.Tag = new KeyValuePair<FOnlineFile, Node<string>>(null, myTree.Root);
 
                 ListViewItem item;
                 Node<string> node;
@@ -546,11 +549,11 @@ namespace FOnlineDatRipper
 
             // Preorder the myTree & fill Trie to get Auto-completes
             List<Node<string>> preorderOfMyTree = myTree.Preorder();
-            foreach (Node<string> node in preorderOfMyTree) 
+            foreach (Node<string> node in preorderOfMyTree)
             {
                 trie.Insert(node.Data);
             }
-            
+
         }
 
         /// <summary>
@@ -569,20 +572,20 @@ namespace FOnlineDatRipper
                     fOnlineFiles.Clear();
                     listBoxInputFiles.Items.Clear();
                     string[] inputFiles = openFileDialog.FileNames;
-                    
+
                     this.txtBoxPathInfo.Text = "";
                     this.txtBoxFileCount.Text = "";
 
-                    this.cmbBoxFOFiles.Items.Clear();
+                    //this.cmbBoxFOFiles.Items.Clear();
 
                     foreach (string inputFile in inputFiles)
                     {
                         listBoxInputFiles.Items.Add(inputFile);
-                        if (inputFile.ToLower().EndsWith(".dat"))
-                        {
-                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
-                        }
-                    }                    
+                        //if (inputFile.ToLower().EndsWith(".dat"))
+                        //{
+                        //    cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
+                        //}
+                    }
 
                     reader.RunWorkerAsync(inputFiles);
                 }
@@ -607,15 +610,15 @@ namespace FOnlineDatRipper
                     this.txtBoxPathInfo.Text = "";
                     this.txtBoxFileCount.Text = "";
 
-                    this.cmbBoxFOFiles.Items.Clear();
+                    //this.cmbBoxFOFiles.Items.Clear();
 
                     foreach (string inputFile in inputFiles)
                     {
                         listBoxInputFiles.Items.Add(inputFile);
-                        if (inputFile.ToLower().EndsWith(".dat"))
-                        {
-                            cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
-                        }
+                        //if (inputFile.ToLower().EndsWith(".dat"))
+                        //{
+                        //    cmbBoxFOFiles.Items.Add(Path.GetFileName(inputFile));
+                        //}
                     }
 
                     reader.RunWorkerAsync(inputFiles);
@@ -624,21 +627,21 @@ namespace FOnlineDatRipper
         }
 
         private void FileRemove()
-        {            
+        {
             var selectedItems = listBoxInputFiles.SelectedItems;
 
             foreach (var selItem in selectedItems)
             {
-                listBoxInputFiles.Items.Remove(selItem);                
+                listBoxInputFiles.Items.Remove(selItem);
             }
             var selectedNode = treeViewDat.SelectedNode;
             this.fOnlineFiles.RemoveAll(foFile => foFile.GetTag().Equals(selectedNode.Text));
-            myTree.Root.Children.RemoveAll(node => node.Data.Equals(selectedNode.Text));   
+            myTree.Root.Children.RemoveAll(node => node.Data.Equals(selectedNode.Text));
 
             this.rootNode.Nodes.Remove(selectedNode);
-            this.cmbBoxFOFiles.Items.Remove(selectedNode.Text);
-            this.BuildListView(null, myTree.Root);        
-                        
+            //this.cmbBoxFOFiles.Items.Remove(selectedNode.Text);
+            this.BuildListView(null, myTree.Root);
+
         }
 
         /// <summary>
@@ -752,7 +755,7 @@ namespace FOnlineDatRipper
             glblErrMsg.Length = 0;
 
             // start measuring the time
-            stopwatch.Start();            
+            stopwatch.Start();
 
             foreach (string inputFile in inputFiles)
             {
@@ -768,7 +771,7 @@ namespace FOnlineDatRipper
                         if (ok)
                         {
                             fOnlineFiles.Add(currFOFile);
-                        } 
+                        }
                         else
                         {
                             glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
@@ -780,19 +783,19 @@ namespace FOnlineDatRipper
                         if (ok)
                         {
                             fOnlineFiles.Add(currFOFile);
-                        } 
+                        }
                         else
                         {
                             glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
                         }
                         break;
                     case ".dat":
-                        currFOFile = new Dat(inputFile);                        
+                        currFOFile = new Dat(inputFile);
                         ok = DatDoAll((Dat)currFOFile, inputFile); // read dat file, build dat tree  
                         if (ok)
                         {
                             fOnlineFiles.Add(currFOFile);
-                        } 
+                        }
                         else
                         {
                             glblErrMsg.Append("@" + currFOFile.GetTag() + " : " + currFOFile.GetErrorMessage() + "\n");
@@ -825,20 +828,20 @@ namespace FOnlineDatRipper
             if (e.Node.Level == 0)
             {
                 e.Node.ImageIndex = OpenedRootIndex;
-            } 
-            else 
+            }
+            else
             {
                 KeyValuePair<FOnlineFile, Node<string>> kvp = (KeyValuePair<FOnlineFile, Node<string>>)e.Node.Tag;
                 Node<string> node = kvp.Value;
                 if (node.Data.ToLower().Contains(".dat"))
                 {
                     e.Node.ImageIndex = OpenedArchiveIndex;
-                } 
+                }
                 else
                 {
                     e.Node.ImageIndex = OpenedDirIndex;
                 }
-            }           
+            }
         }
 
         /// <summary>
@@ -1096,14 +1099,14 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void btnOutDir_Click(object sender, EventArgs e)
         {
-            using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
-            {
-                if (openDirDialog.ShowDialog() == DialogResult.OK)
-                {
-                    outDir = openDirDialog.SelectedPath;
-                    this.txtBoxOutDir.Text = outDir;
-                }
-            }
+            //using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
+            //{
+            //    if (openDirDialog.ShowDialog() == DialogResult.OK)
+            //    {
+            //        outDir = openDirDialog.SelectedPath;
+            //        this.txtBoxOutDir.Text = outDir;
+            //    }
+            //}
         }
 
         /// <summary>
@@ -1319,7 +1322,7 @@ namespace FOnlineDatRipper
                     if (filename.ToLower().EndsWith(".acm"))
                     {
                         totalMem += ACM.BufferSize;
-                        ACM acm = new ACM(dataBlock.Filename);                        
+                        ACM acm = new ACM(dataBlock.Filename);
                         acm.ReadBytes(bytes);
                         acms.Add(acm);
                     }
@@ -1386,7 +1389,7 @@ namespace FOnlineDatRipper
         /// <param name="sender">The sender<see cref="object"/>.</param>
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void listViewDat_DoubleClick(object sender, EventArgs e)
-        {            
+        {
             IAsyncResult asyncResult = listViewDat.BeginInvoke(new Action(() =>
             {
                 ListView.SelectedIndexCollection selectedIndices = listViewDat.SelectedIndices;
@@ -1416,6 +1419,16 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void extractToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string outDir = null;
+            using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
+            {
+                if (openDirDialog.ShowDialog() == DialogResult.OK)
+                {
+                    outDir = openDirDialog.SelectedPath;
+                    this.txtBoxOutDir.Text = outDir;
+                }
+            }
+
             if (outDir == null)
             {
                 MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1436,7 +1449,7 @@ namespace FOnlineDatRipper
 
                 if (files2Extract.Count != 0)
                 {
-                    miniExtractor.RunWorkerAsync();
+                    miniExtractor.RunWorkerAsync(outDir);
                 }
             }
             else
@@ -1452,6 +1465,16 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="EventArgs"/>.</param>
         private void extractShortToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            string outDir = null;
+            using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
+            {
+                if (openDirDialog.ShowDialog() == DialogResult.OK)
+                {
+                    outDir = openDirDialog.SelectedPath;
+                    this.txtBoxOutDir.Text = outDir;
+                }
+            }
+
             if (outDir == null)
             {
                 MessageBox.Show("Output directory is not selected!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1470,7 +1493,7 @@ namespace FOnlineDatRipper
 
                 if (files2Extract.Count != 0)
                 {
-                    miniExtractor.RunWorkerAsync();
+                    miniExtractor.RunWorkerAsync(outDir);
                 }
             }
             else
@@ -1494,7 +1517,7 @@ namespace FOnlineDatRipper
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
                 cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT || value.Data.ToLower().EndsWith(".dat");
-            } 
+            }
             else
             {
                 cntxtMenuStripLong.Items[0].Enabled = false;
@@ -1518,14 +1541,14 @@ namespace FOnlineDatRipper
                 cntxtMenuStripLong.Items[0].Enabled = fOType == FOnlineFile.FOType.ACM || fOType == FOnlineFile.FOType.FRM || value.Data.ToLower().EndsWith(".acm") || value.Data.ToLower().EndsWith(".frm");
                 cntxtMenuStripLong.Items[1].Enabled = fOType == FOnlineFile.FOType.ACM || value.Data.ToLower().EndsWith(".acm");
                 cntxtMenuStripLong.Items[2].Enabled = fOType == FOnlineFile.FOType.DAT || value.Data.ToLower().EndsWith(".dat");
-            } 
+            }
             else
             {
                 cntxtMenuStripLong.Items[0].Enabled = false;
                 cntxtMenuStripLong.Items[1].Enabled = false;
                 cntxtMenuStripLong.Items[2].Enabled = false;
             }
-        }       
+        }
 
         private void addShortToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1539,11 +1562,11 @@ namespace FOnlineDatRipper
 
         private void treeViewDat_BeforeSelect(object sender, TreeViewCancelEventArgs e)
         {
-            
+
         }
 
         private void txtBoxFilter_TextChanged(object sender, EventArgs e)
-        {            
+        {
             // add all things (files & dirs) from trie to the textbox auto-complete
             var filter = txtBoxFilter.Text;
             var src = new AutoCompleteStringCollection();
@@ -1551,7 +1574,7 @@ namespace FOnlineDatRipper
             Array.Sort(strings);
             src.AddRange(strings);
             txtBoxFilter.AutoCompleteCustomSource = src;
-            
+
             // preorder of the my tree (starting with the '/')
             var preOrderNodes = myTree.Preorder();
             // find the node in the filter
@@ -1563,22 +1586,22 @@ namespace FOnlineDatRipper
                 foreach (FOnlineFile fOnlineFile in fOnlineFiles)
                 {
                     // find fo files nodes which are in fonline Dat files
-                    var foNode = preOrderNodes.Find(n => n.Data.Equals(fOnlineFile.GetTag()) 
+                    var foNode = preOrderNodes.Find(n => n.Data.Equals(fOnlineFile.GetTag())
                                                         && fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT);
                     // if fonline file node is found
-                    if (foNode != null) 
-                    { 
+                    if (foNode != null)
+                    {
                         // make a tree out of a node
                         Tree<string> foTree = new Tree<string>(foNode);
                         // traverse the fo node tree
                         var foPreOrderNodes = foTree.Preorder();
                         // make bool out of if fonline tree contains the node in the filter
-                        bool foContains = foPreOrderNodes.Contains(node);                    
+                        bool foContains = foPreOrderNodes.Contains(node);
                         if (foContains)
                         {
                             rightSelectedFOFile = fOnlineFile;
                             break;
-                        }                        
+                        }
                     }
                 }
             }
@@ -1586,6 +1609,47 @@ namespace FOnlineDatRipper
             if (node != null && node.Parent != null)
             {
                 BuildListView(rightSelectedFOFile, node.Parent);
+            }
+        }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnFilter_Click(object sender, EventArgs e)
+        {
+            // filter from the textbox (file select)
+            var filter = txtBoxFilter.Text;
+            // preorder of the my tree (starting with the '/')
+            var preOrderNodes = myTree.Preorder();
+            // find the node in the filter
+            Node<string> node = preOrderNodes.Find(n => n.Data.Equals(filter));
+
+            rightSelectedFOFile = null;
+            if (node != null && node.Parent != myTree.Root)
+            {
+                foreach (FOnlineFile fOnlineFile in fOnlineFiles)
+                {
+                    // find fo files nodes which are in fonline Dat files
+                    var foNode = preOrderNodes.Find(n => n.Data.Equals(fOnlineFile.GetTag())
+                                                        && fOnlineFile.GetFOFileType() == FOnlineFile.FOType.DAT);
+                    // if fonline file node is found
+                    if (foNode != null)
+                    {
+                        // make a tree out of a node
+                        Tree<string> foTree = new Tree<string>(foNode);
+                        // traverse the fo node tree
+                        var foPreOrderNodes = foTree.Preorder();
+                        // make bool out of if fonline tree contains the node in the filter
+                        bool foContains = foPreOrderNodes.Contains(node);
+                        if (foContains)
+                        {
+                            rightSelectedFOFile = fOnlineFile;
+                            break;
+                        }
+                    }
+                }
             }
         }
     }

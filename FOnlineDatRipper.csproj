@@ -216,6 +216,7 @@
     <None Include="Resources\app.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\file_filter_icon.png" />
     <Content Include="Resources\minus_file_icon.png" />
     <Content Include="Resources\plus_file_icon.png" />
   </ItemGroup>
