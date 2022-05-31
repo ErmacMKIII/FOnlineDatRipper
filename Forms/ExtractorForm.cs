@@ -55,8 +55,8 @@ namespace FOnlineDatRipper
         /// </summary>
         private void Init()
         {
-            this.Width = 400;
-            this.Height = 300;
+            this.Width = 200;
+            this.Height = 150;
 
             this.Text = "Dat File(s) Extractor";
             this.Icon = Resources.app;
@@ -81,6 +81,10 @@ namespace FOnlineDatRipper
             this.cmbBox.Dock = DockStyle.Bottom;
             this.Controls.Add(cmbBox);
 
+            // file proc label
+            this.lblFileProcessing.Dock = DockStyle.Bottom;
+            this.lblFileProcessing.Text = string.Empty;
+            this.Controls.Add(lblFileProcessing);
 
             // button Extract
             this.btnExtract.Dock = DockStyle.Bottom;
@@ -89,10 +93,6 @@ namespace FOnlineDatRipper
             this.btnExtract.Image = Resources.extract_all_icon;
             this.btnExtract.Click += BtnExtract_Click;
             this.Controls.Add(btnExtract);
-
-            // file proc label
-            this.lblFileProcessing.Text = string.Empty;
-            this.Controls.Add(lblFileProcessing);
 
             // progress bar
             this.progBar.Dock = DockStyle.Bottom;

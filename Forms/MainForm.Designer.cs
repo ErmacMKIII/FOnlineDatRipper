@@ -66,6 +66,8 @@ namespace FOnlineDatRipper
             this.lblInArchive = new System.Windows.Forms.Label();
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
+            this.lblFilter = new System.Windows.Forms.Label();
+            this.txtBoxFilter = new System.Windows.Forms.TextBox();
             this.cmbBoxFOFiles = new System.Windows.Forms.ComboBox();
             this.lblDatTargExtr = new System.Windows.Forms.Label();
             this.pnlInputFiles = new System.Windows.Forms.Panel();
@@ -271,6 +273,8 @@ namespace FOnlineDatRipper
             // groupBoxPaths
             // 
             resources.ApplyResources(this.groupBoxPaths, "groupBoxPaths");
+            this.groupBoxPaths.Controls.Add(this.lblFilter);
+            this.groupBoxPaths.Controls.Add(this.txtBoxFilter);
             this.groupBoxPaths.Controls.Add(this.cmbBoxFOFiles);
             this.groupBoxPaths.Controls.Add(this.lblDatTargExtr);
             this.groupBoxPaths.Controls.Add(this.pnlInputFiles);
@@ -283,6 +287,19 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
+            // 
+            // lblFilter
+            // 
+            resources.ApplyResources(this.lblFilter, "lblFilter");
+            this.lblFilter.Name = "lblFilter";
+            // 
+            // txtBoxFilter
+            // 
+            this.txtBoxFilter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.txtBoxFilter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            resources.ApplyResources(this.txtBoxFilter, "txtBoxFilter");
+            this.txtBoxFilter.Name = "txtBoxFilter";
+            this.txtBoxFilter.TextChanged += new System.EventHandler(this.txtBoxFilter_TextChanged);
             // 
             // cmbBoxFOFiles
             // 
@@ -559,5 +576,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ComboBox cmbBoxFOFiles;
         private System.Windows.Forms.ToolStripMenuItem addShortToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem removeShortToolStripMenuItem;
+        private System.Windows.Forms.Label lblFilter;
+        private System.Windows.Forms.TextBox txtBoxFilter;
     }
 }
