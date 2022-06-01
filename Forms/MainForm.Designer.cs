@@ -65,9 +65,9 @@ namespace FOnlineDatRipper
             this.lblInArchive = new System.Windows.Forms.Label();
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
+            this.listBoxInputFiles = new System.Windows.Forms.ListBox();
             this.tblLayOutBtnPnl = new System.Windows.Forms.TableLayoutPanel();
             this.btnFilter = new System.Windows.Forms.Button();
-            this.listBoxInputFiles = new System.Windows.Forms.ListBox();
             this.lblFilter = new System.Windows.Forms.Label();
             this.txtBoxFilter = new System.Windows.Forms.TextBox();
             this.pnlInputFiles = new System.Windows.Forms.Panel();
@@ -75,7 +75,7 @@ namespace FOnlineDatRipper
             this.groupBoxOutput = new System.Windows.Forms.GroupBox();
             this.tblLayOutPnl = new System.Windows.Forms.TableLayoutPanel();
             this.lblCurrExtrFile = new System.Windows.Forms.Label();
-            this.txtBoxCurrExtrFile = new System.Windows.Forms.TextBox();
+            this.txtBoxCurrProcFile = new System.Windows.Forms.TextBox();
             this.groupBoxWorkProgress = new System.Windows.Forms.GroupBox();
             this.taskProgressBar = new System.Windows.Forms.ProgressBar();
             this.mainMenuStrip = new System.Windows.Forms.MenuStrip();
@@ -283,6 +283,12 @@ namespace FOnlineDatRipper
             this.groupBoxPaths.Name = "groupBoxPaths";
             this.groupBoxPaths.TabStop = false;
             // 
+            // listBoxInputFiles
+            // 
+            resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
+            this.listBoxInputFiles.FormattingEnabled = true;
+            this.listBoxInputFiles.Name = "listBoxInputFiles";
+            // 
             // tblLayOutBtnPnl
             // 
             resources.ApplyResources(this.tblLayOutBtnPnl, "tblLayOutBtnPnl");
@@ -298,12 +304,6 @@ namespace FOnlineDatRipper
             this.btnFilter.Name = "btnFilter";
             this.btnFilter.UseVisualStyleBackColor = true;
             this.btnFilter.Click += new System.EventHandler(this.btnFilter_Click);
-            // 
-            // listBoxInputFiles
-            // 
-            resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
-            this.listBoxInputFiles.FormattingEnabled = true;
-            this.listBoxInputFiles.Name = "listBoxInputFiles";
             // 
             // lblFilter
             // 
@@ -340,7 +340,7 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.tblLayOutPnl, "tblLayOutPnl");
             this.tblLayOutPnl.Controls.Add(this.lblCurrExtrFile, 0, 1);
             this.tblLayOutPnl.Controls.Add(this.txtBoxOutDir, 1, 0);
-            this.tblLayOutPnl.Controls.Add(this.txtBoxCurrExtrFile, 1, 1);
+            this.tblLayOutPnl.Controls.Add(this.txtBoxCurrProcFile, 1, 1);
             this.tblLayOutPnl.Controls.Add(this.lblOutDir, 0, 0);
             this.tblLayOutPnl.Name = "tblLayOutPnl";
             // 
@@ -349,11 +349,11 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.lblCurrExtrFile, "lblCurrExtrFile");
             this.lblCurrExtrFile.Name = "lblCurrExtrFile";
             // 
-            // txtBoxCurrExtrFile
+            // txtBoxCurrProcFile
             // 
-            resources.ApplyResources(this.txtBoxCurrExtrFile, "txtBoxCurrExtrFile");
-            this.txtBoxCurrExtrFile.Name = "txtBoxCurrExtrFile";
-            this.txtBoxCurrExtrFile.ReadOnly = true;
+            resources.ApplyResources(this.txtBoxCurrProcFile, "txtBoxCurrProcFile");
+            this.txtBoxCurrProcFile.Name = "txtBoxCurrProcFile";
+            this.txtBoxCurrProcFile.ReadOnly = true;
             // 
             // groupBoxWorkProgress
             // 
@@ -619,7 +619,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.TextBox txtBoxFilter;
         private System.Windows.Forms.TableLayoutPanel tblLayOutPnl;
         private System.Windows.Forms.Label lblCurrExtrFile;
-        private System.Windows.Forms.TextBox txtBoxCurrExtrFile;
+        private System.Windows.Forms.TextBox txtBoxCurrProcFile;
         private System.Windows.Forms.GroupBox groupBoxOutput;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TableLayoutPanel tblLayOutPnlBig;

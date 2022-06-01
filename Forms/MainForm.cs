@@ -258,8 +258,11 @@ namespace FOnlineDatRipper
             // its in another thread so invoke back to UI thread
             base.Invoke((Action)delegate
             {
-                // fonline file index
-                this.taskProgressBar.Value = (currFOFile == null) ? 100 : (int)Math.Round(currFOFile.GetProgress());
+                // don't touch mainform if extractor is doing stuff
+                if (!ExtractorForm.Extractor.IsBusy) 
+                { 
+                    this.taskProgressBar.Value = (int)Math.Round(value);
+                }
             });
         }
 
@@ -671,6 +674,7 @@ namespace FOnlineDatRipper
                 MessageBox.Show("File(s) loaded in (" + seconds + " seconds) with errors." + "\n" + glblErrMsg.ToString(), "Reading File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             this.taskProgressBar.Value = 0;
+            this.txtBoxCurrProcFile.Text = string.Empty;
 
             // do something with FOnline File(s)!
             ProcessFOnlineFiles();
@@ -693,6 +697,8 @@ namespace FOnlineDatRipper
             // sub to the event (dat is fresh spawn so no stacking events)
             dat.OnProgressUpdate += FOnlineFile_OnProgressUpdate;
 
+            dat.OnFileNameProcessing += Dat_OnFileNameProcessing;
+
             // read the input dat file
             dat.ReadFile(inputFile);
 
@@ -701,6 +707,19 @@ namespace FOnlineDatRipper
 
             // return negation of error flag - OK
             return !dat.Error;
+        }
+
+        private void Dat_OnFileNameProcessing(string fileName)
+        {
+            // its in another thread so invoke back to UI thread
+            base.Invoke((Action)delegate
+            {
+                // don't touch mainform if extractor is doing stuff
+                if (!ExtractorForm.Extractor.IsBusy)
+                {
+                    this.txtBoxCurrProcFile.Text = fileName;
+                }
+            });
         }
 
         /// <summary>
@@ -1015,7 +1034,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (FRMForm frmForm = new FRMForm(fRMs))
                     {
-                        frmForm.ShowDialog();
+                        frmForm.ShowDialog(this);
                     }
                 }
 
@@ -1024,7 +1043,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (ACMForm acmForm = new ACMForm(acms))
                     {
-                        acmForm.ShowDialog();
+                        acmForm.ShowDialog(this);
                     }
                 }
 
@@ -1067,7 +1086,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (FRMForm frmForm = new FRMForm(fRMs))
                     {
-                        frmForm.ShowDialog();
+                        frmForm.ShowDialog(this);
                     }
                 }
 
@@ -1076,7 +1095,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (ACMForm acmForm = new ACMForm(acms))
                     {
-                        acmForm.ShowDialog();
+                        acmForm.ShowDialog(this);
                     }
                 }
             }
@@ -1121,9 +1140,8 @@ namespace FOnlineDatRipper
             // create and use the subform
             using (ExtractorForm extForm = new ExtractorForm(datList))
             {
-                extForm.ShowDialog();
-            }
-
+                extForm.ShowDialog(this);               
+            }          
             //if (inputFiles == null)
             //{
             //    MessageBox.Show("There's no input file. Make sure it's loaded first!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1176,6 +1194,8 @@ namespace FOnlineDatRipper
         {
             MessageBox.Show("Dat File(s) sucessfully extracted in " + seconds + " seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.taskProgressBar.Value = 0;
+            this.txtBoxCurrProcFile.Text = string.Empty;
+            this.txtBoxOutDir.Text = string.Empty;
         }
 
         /// <summary>
@@ -1188,14 +1208,20 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v1.0 - ETERNAL - BETA1\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2021-06-23 at 15:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2022-06-01 at 06:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
-            sb.Append("Changelog for v1.0 ETERNAL:\n");
+            sb.Append("Changelog for v1.0 ETERNAL:\n");            
             sb.Append("- Fixed Out of Memory error by disallowing\n");
             sb.Append("  too many files to be opened.\n");
             sb.Append("- Fixed permitting unknown extensions with file open.\n");
+            sb.Append("- Extraction of whole archive is moved to another form and\n");
+            sb.Append("  can be cancelled.\n");
+            sb.Append("- Feature to add/remove file(s) from the root directory.\n");
+            sb.Append("- Feature use select & find file with auto-complete\n");
+            sb.Append("  (case sensitive).\n");
+            sb.Append("- All read/write operations display currently processing file.\n");
             sb.Append("\n");
             sb.Append("Changelog for v0.4 DEUTERIUM:\n");
             sb.Append("- Initial pre-release.\n");
@@ -1256,20 +1282,22 @@ namespace FOnlineDatRipper
             sb.Append("- Extracting archive file(s):\n");
             sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
             sb.Append("\t2. Perform step \"Opening file\".\n");
-            sb.Append("\t3. Choose \"Output...\" by clicking on the button.\n");
-            sb.Append("\t4. Using hierarchical tree view or (and) list view find\n");
+            sb.Append("\t3. Using hierarchical tree view or (and) list view find\n");
             sb.Append("\t   and select designated files for extraction.\n");
-            sb.Append("\t5. Right click to extract them.\n");
+            sb.Append("\t4. Right click and choose extract.\n");
+            sb.Append("\t5. Choose directory where to extract them.\n");
             sb.Append("\t6. Wait for extraction to complete.\n");
             sb.Append("\n");
-            sb.Append("- Extracting all archive files:\n");
+            sb.Append("- Extracting all archive files (quick w/ cancelling):\n");
             sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
             sb.Append("\t2. Perform step \"Opening file\".\n");
-            sb.Append("\t3. Choose \"Output...\" by clicking on the button.\n");
-            sb.Append("\t4. Click on \"Extract All\".\n");
-            sb.Append("\t5. You will be prompted that \n");
-            sb.Append("\t   this operation may take time.\n");
-            sb.Append("\t6. Accept it with \"Yes\" and operation will commence.\n");
+            sb.Append("\t3. Click on \"Extract\" button.\n");
+            sb.Append("\t4. You will be delegated to the extraction form \n");
+            sb.Append("\t5. Choose archive.\n");
+            sb.Append("\t6. Choose directory where to extract the archive.\n");
+            sb.Append("\t7. Wait for extraction to complete.\n");
+            sb.Append("\t7b. Cancelling will result in abruptly.\n");
+            sb.Append("\t    uncomplete operation.\n");
             sb.Append("\n");
             sb.Append("- Preview FRM and play ACM file(s):\n");
             sb.Append("\t1. Locate FRM, ACM whether in DAT archive\n");
@@ -1292,7 +1320,7 @@ namespace FOnlineDatRipper
             sb.Append("\t6. Confirm by choosing the Output directory\n");
             sb.Append("\t   where to store them.\n");
 
-            MessageBox.Show(sb.ToString(), "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(sb.ToString(), "How to use", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -1340,7 +1368,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
                     {
-                        cacmForm.ShowDialog();
+                        cacmForm.ShowDialog(this);
                     }
                 }
 
@@ -1377,7 +1405,7 @@ namespace FOnlineDatRipper
                     // create and use the subform
                     using (ACMConversionForm cacmForm = new ACMConversionForm(acms))
                     {
-                        cacmForm.ShowDialog();
+                        cacmForm.ShowDialog(this);
                     }
                 }
             }
@@ -1650,6 +1678,11 @@ namespace FOnlineDatRipper
                         }
                     }
                 }
+            }
+
+            if (node != null && node.Parent != null)
+            {
+                BuildListView(rightSelectedFOFile, node.Parent);
             }
         }
     }

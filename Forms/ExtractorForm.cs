@@ -24,7 +24,7 @@ namespace FOnlineDatRipper
         /// <summary>
         /// Defines the backgroundWorker.
         /// </summary>
-        private readonly BackgroundWorker extractor = new BackgroundWorker();
+        public static readonly BackgroundWorker Extractor = new BackgroundWorker();
 
 
         private readonly List<Dat> datList;
@@ -35,7 +35,11 @@ namespace FOnlineDatRipper
 
         private readonly Button btnExtract = new Button();
 
+        private readonly Button btnStop = new Button();
+
         private readonly Label lblFileProcessing = new Label();
+
+        private readonly TextBox txtBoxCurrProcFile = new TextBox();
 
         private readonly ProgressBar progBar = new ProgressBar();
 
@@ -55,8 +59,8 @@ namespace FOnlineDatRipper
         /// </summary>
         private void Init()
         {
-            this.Width = 200;
-            this.Height = 150;
+            this.Width = 400;
+            this.Height = 300;
 
             this.Text = "Dat File(s) Extractor";
             this.Icon = Resources.app;
@@ -70,41 +74,103 @@ namespace FOnlineDatRipper
             this.lblChoose.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.lblChoose.Text = "Choose Archive: ";
 
-            this.lblChoose.Dock = DockStyle.Bottom;
-            this.Controls.Add(lblChoose);
+            this.lblChoose.Dock = DockStyle.Fill;
+            //this.Controls.Add(lblChoose);
 
             // add each dat archive to the combo box
             foreach (Dat dat in datList)
             {
                 cmbBox.Items.Add(dat.Tag);
             }
-            this.cmbBox.Dock = DockStyle.Bottom;
+            this.cmbBox.Dock = DockStyle.Fill;
             this.Controls.Add(cmbBox);
 
             // file proc label
             this.lblFileProcessing.Dock = DockStyle.Bottom;
-            this.lblFileProcessing.Text = string.Empty;
-            this.Controls.Add(lblFileProcessing);
+            this.lblFileProcessing.Text = "Currently Extracting:";
+            //this.Controls.Add(lblFileProcessing);
+
+            this.txtBoxCurrProcFile.ReadOnly = true;
+            this.txtBoxCurrProcFile.Dock = DockStyle.Bottom;
+            this.txtBoxCurrProcFile.Text = string.Empty;
+            //this.Controls.Add(txtBoxCurrProcFile);
 
             // button Extract
-            this.btnExtract.Dock = DockStyle.Bottom;
+            this.btnExtract.Dock = DockStyle.Fill;
             this.btnExtract.Text = "EXTRACT...";
             this.btnExtract.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnExtract.Image = Resources.extract_all_icon;
             this.btnExtract.Click += BtnExtract_Click;
-            this.Controls.Add(btnExtract);
+            //this.Controls.Add(btnExtract);
+
+            // button stop
+            this.btnStop.Enabled = false;
+            this.btnStop.Dock = DockStyle.Fill;
+            this.btnStop.Text = "STOP";
+            this.btnStop.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.btnStop.Image = Resources.stop_icon;
+            this.btnStop.Click += BtnStop_Click;
+            //this.Controls.Add(btnStop);
+
+            TableLayoutPanel tblLayoutPnl = new TableLayoutPanel();
+            tblLayoutPnl.RowCount = 4;
+            tblLayoutPnl.ColumnCount = 1;
+            tblLayoutPnl.AutoSize = true;
+            tblLayoutPnl.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            tblLayoutPnl.Dock = DockStyle.Fill;
+
+            tblLayoutPnl.Controls.Add(lblChoose);
+            tblLayoutPnl.Controls.Add(cmbBox);
+            tblLayoutPnl.Controls.Add(btnStop);
+            tblLayoutPnl.Controls.Add(btnExtract);
+
+            this.Controls.Add(tblLayoutPnl);
+            //tblLayoutPnlx.Controls.Add(lblFileProcessing);
+            //tblLayoutPnlx.Controls.Add(txtBoxCurrProcFile);
+            TableLayoutPanel tblLayoutPnlx = new TableLayoutPanel();
+            tblLayoutPnlx.RowCount = 3;
+            tblLayoutPnlx.ColumnCount = 1;
+            tblLayoutPnlx.AutoSize = true;
+            tblLayoutPnlx.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            tblLayoutPnlx.Dock = DockStyle.Bottom;
+
+            tblLayoutPnlx.Controls.Add(lblFileProcessing);
+            tblLayoutPnlx.Controls.Add(txtBoxCurrProcFile);
+            tblLayoutPnlx.Controls.Add(progBar);
+
+            this.Controls.Add(tblLayoutPnlx);
 
             // progress bar
             this.progBar.Dock = DockStyle.Bottom;
             this.Controls.Add(progBar);
 
             // Extractor
-            extractor.DoWork += Extractor_DoWork;
-            extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+            Extractor.DoWork += Extractor_DoWork;
+            Extractor.RunWorkerCompleted += Extractor_RunWorkerCompleted;
+            Extractor.WorkerSupportsCancellation = true;
+        }
+
+        private void BtnStop_Click(object sender, EventArgs e)
+        {
+            DialogResult dialogResult = MessageBox.Show("Are you sure you want to cancel?", "Extracting File(s)", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        
+            if (Extractor.IsBusy && dialogResult == DialogResult.Yes)
+            {
+                //var currDatFile = this.datList.Find(m => m.GetTag().Equals(cmbBox.SelectedItem));
+                //currDatFile.StopSignal = true;
+                Extractor.CancelAsync();
+                btnStop.Enabled = false;
+            }
         }
 
         private void BtnExtract_Click(object sender, EventArgs e)
         {
+            if (cmbBox.SelectedIndex == -1)
+            {
+                MessageBox.Show("There is no selected archive for extracting!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
             var currDatFile = this.datList.Find(m => m.GetTag().Equals(cmbBox.SelectedItem));
             using (FolderBrowserDialog openDirDialog = new FolderBrowserDialog())
             {
@@ -112,7 +178,9 @@ namespace FOnlineDatRipper
                 {
                     var outDir = openDirDialog.SelectedPath;
                     var kvp = new KeyValuePair<Dat, string>(currDatFile, outDir);
-                    extractor.RunWorkerAsync(kvp);
+                    this.btnStop.Enabled = true;
+                    this.cmbBox.Enabled = false;
+                    Extractor.RunWorkerAsync(kvp);
                 }
             }
         }
@@ -127,7 +195,8 @@ namespace FOnlineDatRipper
             // fetch key-value pair argument
             KeyValuePair<Dat, string> kvp = (KeyValuePair<Dat, string>)e.Argument;
             // extract only archives                        
-            DatDoExtractAll(kvp.Key, kvp.Value);
+            bool cancelled = DatDoExtractAll(kvp.Key, kvp.Value);
+            e.Cancel = cancelled;
         }
 
         /// <summary>
@@ -137,8 +206,18 @@ namespace FOnlineDatRipper
         /// <param name="e">The e<see cref="RunWorkerCompletedEventArgs"/>.</param>
         private void Extractor_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show($"Dat File(s) sucessfully extracted in {seconds} seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (e.Cancelled)
+            {
+                MessageBox.Show($"Dat File(s) extraction cancelled by user! Operation completed in {seconds} seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            } 
+            else
+            {
+                MessageBox.Show($"Dat File(s) sucessfully extracted in {seconds} seconds!", "Extracting File(s)", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             this.progBar.Value = 0;
+            this.txtBoxCurrProcFile.Text = string.Empty;
+            this.btnStop.Enabled = false;
+            this.cmbBox.Enabled = true;
         }
 
         /// <summary>
@@ -146,7 +225,7 @@ namespace FOnlineDatRipper
         /// Called from Background worker.
         /// </summary>
         /// <param name="dat">The dat<see cref="Dat"/>.</param>
-        private void DatDoExtractAll(Dat dat, string outDir)
+        private bool DatDoExtractAll(Dat dat, string outDir)
         {
             // sub to the event(s)
             dat.OnProgressUpdate += Dat_OnProgressUpdate;
@@ -158,7 +237,7 @@ namespace FOnlineDatRipper
             stopwatch.Start();
 
             // call dat to extract all
-            dat.ExtractAll(outDir);
+            var cancel = dat.ExtractAll(outDir);
 
             // stop measuring the time
             stopwatch.Stop();
@@ -168,26 +247,36 @@ namespace FOnlineDatRipper
 
             // reset for another read or any op
             stopwatch.Reset();
+
+            return cancel;
         }
 
         private void Dat_OnFileNameProcessing(string fileName)
         {
-            // its in another thread so invoke back to UI thread
+            if (this.IsDisposed)
+            {
+                return;
+            }
+            // its in another thread so invoke back to UI thread            
             base.Invoke((Action)delegate
             {
                 // fonline file index
-                this.lblFileProcessing.Text = fileName;
-            });
+                this.txtBoxCurrProcFile.Text = fileName;
+            });            
         }
 
         private void Dat_OnProgressUpdate(double progress)
-        {            
-            // its in another thread so invoke back to UI thread
+        {
+            if (this.IsDisposed)
+            {
+                return;
+            }
+            // its in another thread so invoke back to UI thread            
             base.Invoke((Action)delegate
             {
                 // fonline file index
                 this.progBar.Value = (int)Math.Round(progress);
-            });
+            });            
         }
     }
 }

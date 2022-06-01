@@ -336,11 +336,20 @@ namespace FOnlineDatRipper
         /// Extract all the files to the output directory.
         /// </summary>
         /// <param name="outdir">Output directory.</param>
-        public void ExtractAll(string outdir)
+        /// <returns>is operation cancelled</returns>
+        public bool ExtractAll(string outdir)
         {
+            bool cancelled = false;
             progress = 0.0;
             foreach (DataBlock dataBlock in dataBlocks)
             {
+                // if cancellation is requested from the Extractor form
+                if (ExtractorForm.Extractor.CancellationPending)
+                {
+                    // cancel it
+                    cancelled = true;
+                    break;
+                }
                 Extract(outdir, dataBlock);
                 if (OnFileNameProcessing != null)
                 {
@@ -353,6 +362,12 @@ namespace FOnlineDatRipper
                 }
             }
             progress = 100.0;
+            if (OnProgressUpdate != null)
+            {
+                OnProgressUpdate(progress);
+            }
+
+            return cancelled;
         }
 
         /// <summary>
