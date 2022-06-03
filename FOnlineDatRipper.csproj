@@ -218,6 +218,7 @@
   <ItemGroup>
     <None Include="Resources\stop_icon.png" />
     <None Include="Resources\file_filter_icon.png" />
+    <None Include="Resources\dir_icon_parent.png" />
     <Content Include="Resources\minus_file_icon.png" />
     <Content Include="Resources\plus_file_icon.png" />
   </ItemGroup>

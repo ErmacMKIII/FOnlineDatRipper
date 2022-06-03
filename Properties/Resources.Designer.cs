@@ -133,6 +133,16 @@ namespace FOnlineDatRipper.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap dir_icon_parent {
+            get {
+                object obj = ResourceManager.GetObject("dir_icon_parent", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap dir_out_icon {
             get {
                 object obj = ResourceManager.GetObject("dir_out_icon", resourceCulture);

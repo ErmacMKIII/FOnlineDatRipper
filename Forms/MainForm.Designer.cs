@@ -57,6 +57,8 @@ namespace FOnlineDatRipper
             this.txtBoxFileCount = new System.Windows.Forms.TextBox();
             this.listViewDat = new System.Windows.Forms.ListView();
             this.groupBoxDatArchive = new System.Windows.Forms.GroupBox();
+            this.toolStripForParentDir = new System.Windows.Forms.ToolStrip();
+            this.parentToolStripButton = new System.Windows.Forms.ToolStripButton();
             this.txtBoxOutDir = new System.Windows.Forms.TextBox();
             this.btnExtractAll = new System.Windows.Forms.Button();
             this.lblOutDir = new System.Windows.Forms.Label();
@@ -93,6 +95,7 @@ namespace FOnlineDatRipper
             this.cntxtMenuStripShort.SuspendLayout();
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
+            this.toolStripForParentDir.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
             this.cntxtMenuListBox.SuspendLayout();
             this.tblLayOutBtnPnl.SuspendLayout();
@@ -218,11 +221,29 @@ namespace FOnlineDatRipper
             // 
             resources.ApplyResources(this.groupBoxDatArchive, "groupBoxDatArchive");
             this.groupBoxDatArchive.Controls.Add(this.listViewDat);
+            this.groupBoxDatArchive.Controls.Add(this.toolStripForParentDir);
             this.groupBoxDatArchive.Controls.Add(this.pnlView);
             this.groupBoxDatArchive.Controls.Add(this.pnlTree);
             this.groupBoxDatArchive.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupBoxDatArchive.Name = "groupBoxDatArchive";
             this.groupBoxDatArchive.TabStop = false;
+            // 
+            // toolStripForParentDir
+            // 
+            this.toolStripForParentDir.CanOverflow = false;
+            resources.ApplyResources(this.toolStripForParentDir, "toolStripForParentDir");
+            this.toolStripForParentDir.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.toolStripForParentDir.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.parentToolStripButton});
+            this.toolStripForParentDir.Name = "toolStripForParentDir";
+            // 
+            // parentToolStripButton
+            // 
+            this.parentToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.parentToolStripButton.Image = global::FOnlineDatRipper.Properties.Resources.dir_icon_parent;
+            resources.ApplyResources(this.parentToolStripButton, "parentToolStripButton");
+            this.parentToolStripButton.Name = "parentToolStripButton";
+            this.parentToolStripButton.Click += new System.EventHandler(this.parentToolStripButton_Click);
             // 
             // txtBoxOutDir
             // 
@@ -463,6 +484,8 @@ namespace FOnlineDatRipper
             this.pnlView.PerformLayout();
             this.groupBoxDatArchive.ResumeLayout(false);
             this.groupBoxDatArchive.PerformLayout();
+            this.toolStripForParentDir.ResumeLayout(false);
+            this.toolStripForParentDir.PerformLayout();
             this.groupBoxPaths.ResumeLayout(false);
             this.groupBoxPaths.PerformLayout();
             this.cntxtMenuListBox.ResumeLayout(false);
@@ -638,5 +661,7 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ContextMenuStrip cntxtMenuListBox;
         private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem remToolStripMenuItem;
+        private System.Windows.Forms.ToolStrip toolStripForParentDir;
+        private System.Windows.Forms.ToolStripButton parentToolStripButton;
     }
 }

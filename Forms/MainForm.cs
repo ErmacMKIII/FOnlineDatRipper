@@ -174,6 +174,11 @@ namespace FOnlineDatRipper
         /// </summary>
         private readonly Tree<string> myVirtualTree = new Tree<string>(new Node<string>("/"));
 
+        /// <summary>
+        /// Current view Node
+        /// </summary>
+        private Node<string> currentViewVirtualNode = null;
+
         ///// <summary>
         ///// Target for operation Extract All
         ///// </summary>
@@ -205,11 +210,12 @@ namespace FOnlineDatRipper
 
             InitDarkTheme(this);
 
-            // dark renderer to the menu strip
+            // dark renderer to the menu strip(s)
             this.mainMenuStrip.Renderer = new DarkRenderer();
             this.cntxtMenuStripShort.Renderer = new DarkRenderer();
             this.cntxtMenuStripLong.Renderer = new DarkRenderer();
             this.cntxtMenuListBox.Renderer = new DarkRenderer();
+            this.toolStripForParentDir.Renderer = new DarkRenderer();
         }
 
         /// <summary>
@@ -443,6 +449,7 @@ namespace FOnlineDatRipper
 
             listViewDat.VirtualListSize = virtualListViewItems.Count;
             datCacheMiss = true;
+            listViewDat.Update();
         }
 
         /// <summary>
@@ -704,6 +711,7 @@ namespace FOnlineDatRipper
                 this.listBoxInputFiles.Items.RemoveAt((int)selectedIndex);
             }
             this.BuildListView(null, myVirtualTree.Root);
+            this.currentViewVirtualNode = myVirtualTree.Root;
         }
 
         /// <summary>
@@ -740,6 +748,7 @@ namespace FOnlineDatRipper
 
             // build list view items from the root "/"
             BuildListView(null, myVirtualTree.Root);
+            this.currentViewVirtualNode = myVirtualTree.Root;
 
             // re-enable list box pop up menu
             this.cntxtMenuListBox.Items[0].Enabled = true;
@@ -995,6 +1004,7 @@ namespace FOnlineDatRipper
                     leftSelectedFOFile = pair.Key;
                     Node<string> node = pair.Value;
                     BuildListView(leftSelectedFOFile, node);
+                    this.currentViewVirtualNode = node;
                 }
             }));
             treeViewDat.EndInvoke(asyncResult);
@@ -1505,6 +1515,7 @@ namespace FOnlineDatRipper
                     if (rightSelectedFOFile != null && kvp.Value.Children.Count > 0)
                     {
                         BuildListView(rightSelectedFOFile, kvp.Value);
+                        this.currentViewVirtualNode = kvp.Value;
                     }
                     // build preview if double click the files
                     if (kvp.Value != null && kvp.Value.Children.Count == 0)
@@ -1692,6 +1703,8 @@ namespace FOnlineDatRipper
         {
             // add all things (files & dirs) from trie to the textbox auto-complete
             var filter = txtBoxFilter.Text;
+            toolStripForParentDir.Enabled = string.IsNullOrEmpty(filter);
+
             var src = new AutoCompleteStringCollection();
             string[] strings = trie.AutoComplete(filter).ToArray();
             Array.Sort(strings);
@@ -1732,6 +1745,7 @@ namespace FOnlineDatRipper
             if (node != null && node.Parent != null)
             {
                 BuildListView(rightSelectedFOFile, node.Parent);
+                this.currentViewVirtualNode = node;
             }
         }
 
@@ -1744,6 +1758,8 @@ namespace FOnlineDatRipper
         {
             // filter from the textbox (file select)
             var filter = txtBoxFilter.Text;
+            toolStripForParentDir.Enabled = string.IsNullOrEmpty(filter);
+
             // preorder of the my tree (starting with the '/')
             var preOrderNodes = myVirtualTree.Preorder();
             // find the node in the filter
@@ -1778,6 +1794,7 @@ namespace FOnlineDatRipper
             if (node != null && node.Parent != null)
             {
                 BuildListView(rightSelectedFOFile, node.Parent);
+                this.currentViewVirtualNode = node;
             }
         }
 
@@ -1795,6 +1812,14 @@ namespace FOnlineDatRipper
         {
             this.cntxtMenuListBox.Items[0].Enabled = true;
             this.cntxtMenuListBox.Items[1].Enabled = listBoxInputFiles.SelectedIndices.Count > 0;
+        }
+
+        private void parentToolStripButton_Click(object sender, EventArgs e)
+        {
+            if (currentViewVirtualNode != null && currentViewVirtualNode.Parent != null) {
+                currentViewVirtualNode = currentViewVirtualNode.Parent;
+                BuildListView(rightSelectedFOFile, currentViewVirtualNode);
+            }
         }
 
         //private void remLongToolStripMenuItem_Click(object sender, EventArgs e)
