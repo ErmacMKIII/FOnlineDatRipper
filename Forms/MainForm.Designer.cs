@@ -51,8 +51,6 @@ namespace FOnlineDatRipper
             this.pnlTree = new System.Windows.Forms.Panel();
             this.treeViewDat = new System.Windows.Forms.TreeView();
             this.cntxtMenuStripShort = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.addShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.removeShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractShortToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.txtBoxPathInfo = new System.Windows.Forms.TextBox();
             this.pnlView = new System.Windows.Forms.Panel();
@@ -66,6 +64,9 @@ namespace FOnlineDatRipper
             this.btnInArch = new System.Windows.Forms.Button();
             this.groupBoxPaths = new System.Windows.Forms.GroupBox();
             this.listBoxInputFiles = new System.Windows.Forms.ListBox();
+            this.cntxtMenuListBox = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.remToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tblLayOutBtnPnl = new System.Windows.Forms.TableLayoutPanel();
             this.btnFilter = new System.Windows.Forms.Button();
             this.lblFilter = new System.Windows.Forms.Label();
@@ -93,6 +94,7 @@ namespace FOnlineDatRipper
             this.pnlView.SuspendLayout();
             this.groupBoxDatArchive.SuspendLayout();
             this.groupBoxPaths.SuspendLayout();
+            this.cntxtMenuListBox.SuspendLayout();
             this.tblLayOutBtnPnl.SuspendLayout();
             this.groupBoxOutput.SuspendLayout();
             this.tblLayOutPnl.SuspendLayout();
@@ -166,25 +168,9 @@ namespace FOnlineDatRipper
             // cntxtMenuStripShort
             // 
             this.cntxtMenuStripShort.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.addShortToolStripMenuItem,
-            this.removeShortToolStripMenuItem,
             this.extractShortToolStripMenuItem});
             this.cntxtMenuStripShort.Name = "cntxtMenuStrip";
             resources.ApplyResources(this.cntxtMenuStripShort, "cntxtMenuStripShort");
-            // 
-            // addShortToolStripMenuItem
-            // 
-            resources.ApplyResources(this.addShortToolStripMenuItem, "addShortToolStripMenuItem");
-            this.addShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.plus_file_icon;
-            this.addShortToolStripMenuItem.Name = "addShortToolStripMenuItem";
-            this.addShortToolStripMenuItem.Click += new System.EventHandler(this.addShortToolStripMenuItem_Click);
-            // 
-            // removeShortToolStripMenuItem
-            // 
-            resources.ApplyResources(this.removeShortToolStripMenuItem, "removeShortToolStripMenuItem");
-            this.removeShortToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.minus_file_icon;
-            this.removeShortToolStripMenuItem.Name = "removeShortToolStripMenuItem";
-            this.removeShortToolStripMenuItem.Click += new System.EventHandler(this.removeShortToolStripMenuItem_Click);
             // 
             // extractShortToolStripMenuItem
             // 
@@ -285,9 +271,34 @@ namespace FOnlineDatRipper
             // 
             // listBoxInputFiles
             // 
+            this.listBoxInputFiles.ContextMenuStrip = this.cntxtMenuListBox;
             resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
             this.listBoxInputFiles.FormattingEnabled = true;
             this.listBoxInputFiles.Name = "listBoxInputFiles";
+            this.listBoxInputFiles.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
+            this.listBoxInputFiles.SelectedIndexChanged += new System.EventHandler(this.listBoxInputFiles_SelectedIndexChanged);
+            // 
+            // cntxtMenuListBox
+            // 
+            this.cntxtMenuListBox.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToolStripMenuItem,
+            this.remToolStripMenuItem});
+            this.cntxtMenuListBox.Name = "cntxtMenuListBox";
+            resources.ApplyResources(this.cntxtMenuListBox, "cntxtMenuListBox");
+            // 
+            // addToolStripMenuItem
+            // 
+            this.addToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.plus_file_icon;
+            this.addToolStripMenuItem.Name = "addToolStripMenuItem";
+            resources.ApplyResources(this.addToolStripMenuItem, "addToolStripMenuItem");
+            this.addToolStripMenuItem.Click += new System.EventHandler(this.addToolStripMenuItem_Click);
+            // 
+            // remToolStripMenuItem
+            // 
+            resources.ApplyResources(this.remToolStripMenuItem, "remToolStripMenuItem");
+            this.remToolStripMenuItem.Image = global::FOnlineDatRipper.Properties.Resources.minus_file_icon;
+            this.remToolStripMenuItem.Name = "remToolStripMenuItem";
+            this.remToolStripMenuItem.Click += new System.EventHandler(this.remToolStripMenuItem_Click);
             // 
             // tblLayOutBtnPnl
             // 
@@ -454,6 +465,7 @@ namespace FOnlineDatRipper
             this.groupBoxDatArchive.PerformLayout();
             this.groupBoxPaths.ResumeLayout(false);
             this.groupBoxPaths.PerformLayout();
+            this.cntxtMenuListBox.ResumeLayout(false);
             this.tblLayOutBtnPnl.ResumeLayout(false);
             this.tblLayOutBtnPnl.PerformLayout();
             this.groupBoxOutput.ResumeLayout(false);
@@ -613,8 +625,6 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem exitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem addShortToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem removeShortToolStripMenuItem;
         private System.Windows.Forms.Label lblFilter;
         private System.Windows.Forms.TextBox txtBoxFilter;
         private System.Windows.Forms.TableLayoutPanel tblLayOutPnl;
@@ -625,5 +635,8 @@ namespace FOnlineDatRipper
         private System.Windows.Forms.TableLayoutPanel tblLayOutPnlBig;
         private System.Windows.Forms.Button btnFilter;
         private System.Windows.Forms.TableLayoutPanel tblLayOutBtnPnl;
+        private System.Windows.Forms.ContextMenuStrip cntxtMenuListBox;
+        private System.Windows.Forms.ToolStripMenuItem addToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem remToolStripMenuItem;
     }
 }
