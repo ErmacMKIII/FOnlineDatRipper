@@ -340,7 +340,11 @@ namespace FOnlineDatRipper
 
             virtualListViewItems.Clear();
             listViewDat.Items.Clear();
-
+            // if null is parsed instead of fatal error use myRoot
+            if (node == null)
+            {
+                node = myVirtualTree.Root;
+            }
             // if no children (like files) make it no effect
             if (node.Children.Count == 0)
             {
@@ -449,7 +453,7 @@ namespace FOnlineDatRipper
 
             listViewDat.VirtualListSize = virtualListViewItems.Count;
             datCacheMiss = true;
-            listViewDat.Update();
+            listViewDat.Invalidate(true);
         }
 
         /// <summary>
@@ -710,6 +714,9 @@ namespace FOnlineDatRipper
             {
                 this.listBoxInputFiles.Items.RemoveAt((int)selectedIndex);
             }
+
+            this.ProcessFOnlineFiles();
+
             this.BuildListView(null, myVirtualTree.Root);
             this.currentViewVirtualNode = myVirtualTree.Root;
         }
@@ -1383,7 +1390,7 @@ namespace FOnlineDatRipper
             sb.Append("\t1. Locate Fallout 2 archive (*.dat) on your filesystem.\n");
             sb.Append("\t2. Perform step \"Opening file\".\n");
             sb.Append("\t3. Click on \"Extract\" button.\n");
-            sb.Append("\t4. You will be delegated to the extraction form \n");
+            sb.Append("\t4. You will be delegated to the extraction form. \n");
             sb.Append("\t5. Choose archive.\n");
             sb.Append("\t6. Choose directory where to extract the archive.\n");
             sb.Append("\t7. Wait for extraction to complete.\n");
@@ -1703,6 +1710,13 @@ namespace FOnlineDatRipper
         {
             // add all things (files & dirs) from trie to the textbox auto-complete
             var filter = txtBoxFilter.Text;
+            if (string.IsNullOrEmpty(filter))
+            {
+                toolStripForParentDir.Enabled = true;
+                BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                return;
+            }
+
             toolStripForParentDir.Enabled = string.IsNullOrEmpty(filter);
 
             var src = new AutoCompleteStringCollection();
@@ -1715,7 +1729,6 @@ namespace FOnlineDatRipper
             var preOrderNodes = myVirtualTree.Preorder();
             // find the node in the filter
             Node<string> node = preOrderNodes.Find(n => n.Data.Equals(filter));
-
             rightSelectedFOFile = null;
             if (node != null && node.Parent != myVirtualTree.Root)
             {
@@ -1758,6 +1771,13 @@ namespace FOnlineDatRipper
         {
             // filter from the textbox (file select)
             var filter = txtBoxFilter.Text;
+            if (string.IsNullOrEmpty(filter))
+            {
+                toolStripForParentDir.Enabled = true;
+                BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                return;
+            }
+
             toolStripForParentDir.Enabled = string.IsNullOrEmpty(filter);
 
             // preorder of the my tree (starting with the '/')
