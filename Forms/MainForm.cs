@@ -1299,7 +1299,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v1.0 - ETERNAL - BETA1\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2022-06-03 at 02:00).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2022-06-03 at 04:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1322,7 +1322,7 @@ namespace FOnlineDatRipper
             sb.Append("of FOnline/Fallout 2 files in one software.\n");
             sb.Append("\n");
             sb.Append("\n");
-            sb.Append("Copyright © 2021\n");
+            sb.Append("Copyright © 2022\n");
             sb.Append("Alexander \"Ermac\" Stojanovich\n");
             sb.Append("\n");
 
@@ -1387,7 +1387,7 @@ namespace FOnlineDatRipper
             sb.Append("\t5. Choose archive.\n");
             sb.Append("\t6. Choose directory where to extract the archive.\n");
             sb.Append("\t7. Wait for extraction to complete.\n");
-            sb.Append("\t7b. Cancelling will result in abruptly.\n");
+            sb.Append("\t7b. Cancelling will result in abruptly,\n");
             sb.Append("\t    uncomplete operation.\n");
             sb.Append("\n");
             sb.Append("- Preview FRM and play ACM file(s):\n");
