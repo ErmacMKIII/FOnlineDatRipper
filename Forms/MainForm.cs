@@ -656,6 +656,9 @@ namespace FOnlineDatRipper
                         //}
                     }
 
+                    this.cntxtMenuListBox.Items[0].Enabled = false;
+                    this.cntxtMenuListBox.Items[1].Enabled = false;
+
                     reader.RunWorkerAsync(inputFiles);
                 }
             }
@@ -915,6 +918,7 @@ namespace FOnlineDatRipper
                             }
                             break;
                         default:
+                            listBoxInputFiles.Items.Remove((string)inputFile);
                             glblErrMsg.Append("@" + inputFile + " : Unknown extension \"" + extension + "\"!\n");
                             break;
                     }
@@ -1304,7 +1308,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v1.0 - ETERNAL - BETA1\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2022-06-04 at 02:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2022-06-04 at 04:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1711,7 +1715,10 @@ namespace FOnlineDatRipper
             if (string.IsNullOrEmpty(filter))
             {
                 toolStripForParentDir.Enabled = true;
-                BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                if (currentViewVirtualNode != null)
+                {
+                    BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                }
                 return;
             }
 
@@ -1772,7 +1779,10 @@ namespace FOnlineDatRipper
             if (string.IsNullOrEmpty(filter))
             {
                 toolStripForParentDir.Enabled = true;
-                BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                if (currentViewVirtualNode != null)
+                {
+                    BuildListView(rightSelectedFOFile, currentViewVirtualNode.Parent);
+                }
                 return;
             }
 
