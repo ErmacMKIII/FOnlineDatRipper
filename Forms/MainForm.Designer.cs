@@ -296,7 +296,6 @@ namespace FOnlineDatRipper
             resources.ApplyResources(this.listBoxInputFiles, "listBoxInputFiles");
             this.listBoxInputFiles.FormattingEnabled = true;
             this.listBoxInputFiles.Name = "listBoxInputFiles";
-            this.listBoxInputFiles.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.listBoxInputFiles.SelectedIndexChanged += new System.EventHandler(this.listBoxInputFiles_SelectedIndexChanged);
             // 
             // cntxtMenuListBox

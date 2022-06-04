@@ -694,27 +694,25 @@ namespace FOnlineDatRipper
         //}
 
         private void FileRemove()
-        {
-            var selectedItems = listBoxInputFiles.SelectedItems;
-            foreach (var selectedItem in selectedItems)
-            {   
-                FOnlineFile foFile = this.fOnlineFiles.Find(f => f.GetFilePath().Equals(selectedItem));                
-                // remove from left view control tree
-                this.rootTreeNode.Nodes.RemoveByKey(foFile.GetTag());
-                // remove from virtual list for right view list data view
-                this.virtualListViewItems.RemoveAll(m => m.Text.Equals(foFile.GetTag()));
-                // remove from virtual filesystem tree
-                this.myVirtualTree.Root.Children.RemoveAll(node => node.Data.Equals(foFile.GetTag()));
-                // remove from fonline files
-                fOnlineFiles.Remove(foFile);
-            }
-
+        {            
             var selectedIndices = listBoxInputFiles.SelectedIndices;
-            foreach (var selectedIndex in selectedIndices)
+            foreach (int selectedIndex in selectedIndices)
             {
-                this.listBoxInputFiles.Items.RemoveAt((int)selectedIndex);
-            }
-
+                FOnlineFile foFile = this.fOnlineFiles.Find(f => f.GetFilePath().Equals(listBoxInputFiles.Items[selectedIndex]));
+                if (foFile != null)
+                {
+                    // remove from left view control tree
+                    this.rootTreeNode.Nodes.RemoveByKey(foFile.GetTag());
+                    // remove from virtual list for right view list data view
+                    this.virtualListViewItems.RemoveAll(m => m.Text.Equals(foFile.GetTag()));
+                    // remove from virtual filesystem tree
+                    this.myVirtualTree.Root.Children.RemoveAll(node => node.Data.Equals(foFile.GetTag()));                    
+                    // remove from list box (selected as filepath)
+                    this.listBoxInputFiles.Items.Remove((string) foFile.GetFilePath());
+                    // remove from fonline files
+                    fOnlineFiles.Remove(foFile);
+                }                
+            }            
             this.ProcessFOnlineFiles();
 
             this.BuildListView(null, myVirtualTree.Root);
@@ -1306,7 +1304,7 @@ namespace FOnlineDatRipper
             StringBuilder sb = new StringBuilder();
             sb.Append("VERSION v1.0 - ETERNAL - BETA1\n");
             sb.Append("\n");
-            sb.Append("PUBLIC BUILD reviewed on 2022-06-03 at 04:30).\n");
+            sb.Append("PUBLIC BUILD reviewed on 2022-06-04 at 02:30).\n");
             sb.Append("This software is free software.\n");
             sb.Append("Licensed under GNU General Public License (GPL).\n");
             sb.Append("\n");
@@ -1830,7 +1828,7 @@ namespace FOnlineDatRipper
 
         private void listBoxInputFiles_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.cntxtMenuListBox.Items[0].Enabled = true;
+            this.cntxtMenuListBox.Items[0].Enabled = !reader.IsBusy;
             this.cntxtMenuListBox.Items[1].Enabled = listBoxInputFiles.SelectedIndices.Count > 0;
         }
 
